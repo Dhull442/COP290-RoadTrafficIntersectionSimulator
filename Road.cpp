@@ -4,15 +4,24 @@
 #include <stdio.h>
 #include "Vehicle.h"
 
-Road::Road(int id, float length, float width) {
-    self.id = id;
-    self.length = length;
-    self.width = width;
-    // Signal is red by default
-    self.signal = "RED";
-    // Default window lengths and widths
-    self.window_length = 640;
-    self.window_height = 480;
+Road::Road(){
+  this->id = 0;
+  this->length = 0.0;
+  this->width = 0.0;
+  // Signal is red by default
+  this->signal = "RED";
+  this->signalPosition = 0.0;
+
+  // OpenGL part
+  // Default window lengths and widths
+  this->window_length = 640;
+  this->window_height = 480;
+}
+
+Road::Road(int id, float length, float width):Road(){
+    this->id = id;
+    this->length = length;
+    this->width = width;
 }
 
 void Road::addVehicle(Vehicle* vehicle) {
@@ -21,8 +30,8 @@ void Road::addVehicle(Vehicle* vehicle) {
     vehicle->onRoad = true;
     vehicle->parentRoad = this;
     // Update the values
-    vehicle->currentPos = self.queuePos;
-    self.queuePos -= self.bufferLength;
+    vehicle->currentPos = this->queuePos;
+    this->queuePos -= this->bufferLength;
 }
 
 // Runs the simulation and renders the road
@@ -33,17 +42,17 @@ void Road::runSim(float t) {
     float currentTime = glfwGetTime();
 
     while(currentTime - beginTime < t) {
-        if(glfwWindowShouldClose(self.window)) {
+        if(glfwWindowShouldClose(this->window)) {
             // Check if a window close signal is received
-            glfwDestroyWindow(self.window);
+            glfwDestroyWindow(this->window);
             glfwTerminate();
         }
 
-        self.isClear = true;
+        this->isClear = true;
         // Update positions of each car
-        for(auto v: self.vehicles) {
+        for(auto v: this->vehicles) {
             v->updatePos(currentTime - oldTime);
-            self.isClear = self.isClear && (((v->length + v->currentPos) > self.length) || (v->currentPos < 0));
+            this->isClear = this->isClear && (((v->length + v->currentPos) > this->length) || (v->currentPos < 0));
             oldTime = currentTime;
             currentTime = glfwGetTime();
         }
@@ -53,6 +62,26 @@ void Road::runSim(float t) {
     }
 }
 
+// Gives first obstacle position in the given window
+float Road::firstObstacle(float startPos, float topRow, float botRow ){
+  float position=this->length;
+  for(auto v : this->vehicles ){
+    if(v->unrestrictedposition.second < topRow || (v->unrestrictedposition.second-v->width)>botRow){
+      float back = (v->unrestrictedposition.first-v->length);
+      if(position > back && back > startPos ){
+        position = back;
+      }
+    }
+  }
+  return position;
+}
+
+// Updates the unrestricted new positions of every vehicle
+void Road::updateUnrestrictedpositions(float delT){
+  for(auto v : this -> vehicles ){
+    v->updatePos(delT,false);
+  };
+}
 // The error_callback function prints out the error and exits with non-zero status
 static void Road::error_callback(int error, const char* description) {
     std::cerr << description << std::endl;
@@ -78,14 +107,14 @@ void Road::setupRoad() {
     glfwSetErrorCallback(Road::error_callback);
 
     // Create a new window
-    self.window = glfwCreateWindow(self.window_length, self.window_height, "SimView", NULL, NULL);
-    if (!self.window) {
+    this->window = glfwCreateWindow(this->window_length, this->window_height, "SimView", NULL, NULL);
+    if (!this->window) {
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
 
     // Make this context current
-    glfwMakeContextCurrent(self.window);
+    glfwMakeContextCurrent(this->window);
 
     // Set the key_callback function
     glfwSetKeyCallback(window, Road::key_callback);
@@ -95,7 +124,7 @@ void Road::renderRoad() {
     // Get frameBuffer attributes
     float ratio;
     int frame_height, frame_width;
-    glfwGetFramebufferSize(self.window, &window_height, &window_width);
+    glfwGetFramebufferSize(this->window, &window_height, &window_width);
     ratio = frame_width/(float)frame_height;
 
     // Create a blank viewport
@@ -106,6 +135,6 @@ void Road::renderRoad() {
 
 
     // Swap the buffers, to display rendered stuff on the screen
-    glfwSwapBuffers(self.window);
+    glfwSwapBuffers(this->window);
     glfwPollEvents();
 }
