@@ -2,33 +2,41 @@
 #define VEHICLE_H
 
 #include <bits/stdc++.h>
-#include "Road.h"
-#include <GLFW/glfw3.h>
-#include <stdlib.h>
-#include <stdio.h>
+// #include "Road.h"
+// #include <GLFW/glfw3.h>
+// #include <stdlib.h>
+// #include <stdio.h>
 
 class Vehicle {
     private:
+        std::string default_type = "not specified";
         float default_maxspeed = 1;
-        float default_acceleration  1;
+        float default_acceleration = 1;
         float default_length = 2;
         float default_width = 2;
+        int default_skill = 1;
 
     public:
         std::string type;
         float length, width;
+        int skill;
         float maxspeed;
         float acceleration;
         float currentSpeed;
-        float currentPos; // The coordinate of the front of the vehicle
+        std::pair<float,float> currentPosition; // The coordinate of the front-top of the vehicle
+        std::pair<float,float> unrestrictedposition;
         bool isOnRoad;
         Road* parentRoad; // Pointer to the road on which the vehicle is
 
+
         // Initializes a Vehicle object with default values
+        Vehicle();
+
+        // Intializes a Vehicle with values
         Vehicle(std::string type, float length, float width);
 
         // Updates the position and velocity of the car based on delT
         void updatePos(float delT);
-}
+};
 
 #endif

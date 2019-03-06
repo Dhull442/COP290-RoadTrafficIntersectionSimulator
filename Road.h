@@ -16,6 +16,7 @@ class Road {
     public:
         float length;
         float width;
+        float signalPosition;
         int window_length;
         int window_height;
         int id;
@@ -32,6 +33,10 @@ class Road {
         // Add a Vehicle to the road
         void addVehicle(Vehicle* vehicle);
 
+        void updateUnrestrictedpositions(float delT);
+        // First vehicle obstacle in a lane
+        float firstObstacle(float startPos, float topRow, float botRow )
+
         // Run the simulation on the road for time t
         void runSim(float t);
 
@@ -42,7 +47,7 @@ class Road {
 
         // Setup the OpenGL context with the road
         void setupRoad();
-        
+
         // Render the road into the window, reading the class attributes
         void renderRoad();
     }
