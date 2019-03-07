@@ -23,18 +23,18 @@ Road::Road(int id, float length, float width):Road(){
     this->length = length;
     this->width = width;
 }
+
 Road::Road(int id):Road(){
     this->id = id;
 }
 
-void Road::setDefaults(float maxspeed, float acceleration,float length, float width,int skill,float speed_limit){
+void Road::setDefaults(float maxspeed, float acceleration,float length, float width,int skill){
     // Input correclty < No checks here >
     this->default_maxspeed = maxspeed;
     this->default_acceleration = acceleration;
     this->default_length = length;
     this->default_width = width;
     this->default_skill = skill;
-    this->speed_limit = speed_limit;
 }
 
 // For adding vehicle
@@ -46,6 +46,9 @@ void Road::addVehicle(Vehicle* vehicle) {
     // Update the values
     vehicle->currentPosition = this->queuePos;
     this->queuePos -= this->bufferLength;
+
+    // To set defaults of road if not constructed
+    vehicles.back()->reConstruct();
 }
 
 // Runs the simulation and renders the road

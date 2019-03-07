@@ -8,6 +8,7 @@
 #include <stdio.h>
 
 class Road {
+        // All co-ordinates consider left bottom as (0,0)
     private:
         // The initial position of the queue.
         double queuePos;
@@ -15,13 +16,11 @@ class Road {
         double bufferLength;
     public:
         // default vehicle Parameters
-        std::string default_type = "not specified";
         double default_maxspeed = 1;
         double default_acceleration = 1;
         double default_length = 2;
         double default_width = 2;
         int default_skill = 1;
-        double speed_limit = -1;
 
 
         double length;
@@ -41,7 +40,7 @@ class Road {
         Road(int id, double length, double width, double delT = 0.1);
         Road(int id);
         Road();
-        void setDefaults(double maxspeed, double acceleration,double length, double width,int skill,double speed_limit)
+        void setDefaults(double maxspeed, double acceleration,double length, double width,int skill)
         // Add a Vehicle to the road
         void addVehicle(Vehicle* vehicle);
 

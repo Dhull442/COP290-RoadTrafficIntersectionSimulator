@@ -152,7 +152,7 @@ int main(int argc, char **argv){
           #endif
         }
         // CHANGE MODE
-        if(line.find("SIMULATION") != std::string::npos){
+        if(line.find("START") != std::string::npos){
           defmode = false;
         }
       }
