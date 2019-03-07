@@ -9,22 +9,18 @@
 
 class Vehicle {
     private:
-        std::string default_type = "not specified";
-        float default_maxspeed = 1;
-        float default_acceleration = 1;
-        float default_length = 2;
-        float default_width = 2;
-        int default_skill = 1;
+
 
     public:
         std::string type;
-        float length, width;
+        double length, width;
         int skill;
-        float maxspeed;
-        float acceleration;
-        float currentSpeed;
-        std::pair<float,float> currentPosition; // The coordinate of the front-top of the vehicle
-        std::pair<float,float> unrestrictedposition;
+        double maxspeed;
+        double acceleration;
+        double currentSpeed;
+        std::string color;
+        std::pair<double,double> currentPosition; // The coordinate of the front-top of the vehicle
+        std::pair<double,double> unrestrictedposition;
         bool isOnRoad;
         Road* parentRoad; // Pointer to the road on which the vehicle is
 
@@ -32,11 +28,12 @@ class Vehicle {
         // Initializes a Vehicle object with default values
         Vehicle();
 
+        Vehicle(std::string type);
         // Intializes a Vehicle with values
-        Vehicle(std::string type, float length, float width);
+        Vehicle(std::string type, double length, double width);
 
         // Updates the position and velocity of the car based on delT
-        void updatePos(float delT);
+        void updatePos(double delT);
 };
 
 #endif
