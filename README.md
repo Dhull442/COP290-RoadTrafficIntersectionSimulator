@@ -6,15 +6,15 @@ SIM CITY
 - we will have to implement vehicular motion such that vehicles in front move first, so we know the space for next ones. (I have done basic unrestricted position to check new co-ordinates to update prev ones)
 - Added speed limit ( right now same for all vehicles )
 - can do toLowerCase in wehicle type to avoid any faltu errors
+- set default values to real life related
 ### Issues
 - The defaults of vehicles must come from road;
-
+- Input type of vehicles correctly (include `\n` too rn).
 
 ### Enhancements
 - Make multiple incomes in one second on road;
 - can implement driving level as well: 0 - new, 1 - intermediate, 2 - expert;
-
-```
+- [ DONE ]```
 ================
     |
     |
@@ -33,4 +33,4 @@ this shouldn't go to
          |
 ================
 ```
-even if the middle speed is more
+even if the middle speed is more.
