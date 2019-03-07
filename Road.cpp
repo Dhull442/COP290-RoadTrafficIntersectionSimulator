@@ -23,14 +23,28 @@ Road::Road(int id, float length, float width):Road(){
     this->length = length;
     this->width = width;
 }
+Road::Road(int id):Road(){
+    this->id = id;
+}
 
+void Road::setDefaults(float maxspeed, float acceleration,float length, float width,int skill,float speed_limit){
+    // Input correclty < No checks here >
+    this->default_maxspeed = maxspeed;
+    this->default_acceleration = acceleration;
+    this->default_length = length;
+    this->default_width = width;
+    this->default_skill = skill;
+    this->speed_limit = speed_limit;
+}
+
+// For adding vehicle
 void Road::addVehicle(Vehicle* vehicle) {
     vehicles.push_back(vehicle);
     // Add the road to the vehicle
     vehicle->onRoad = true;
     vehicle->parentRoad = this;
     // Update the values
-    vehicle->currentPos = this->queuePos;
+    vehicle->currentPosition = this->queuePos;
     this->queuePos -= this->bufferLength;
 }
 
@@ -49,14 +63,14 @@ void Road::runSim(float t) {
         }
 
         this->isClear = true;
+        this->updateUnrestrictedpositions(currentTime - oldTime);
         // Update positions of each car
         for(auto v: this->vehicles) {
-            v->updatePos(currentTime - oldTime);
+            v->updatePos(currentTime - oldTime,true);
             this->isClear = this->isClear && (((v->length + v->currentPos) > this->length) || (v->currentPos < 0));
-            oldTime = currentTime;
-            currentTime = glfwGetTime();
         }
-
+        oldTime = currentTime;
+        currentTime = glfwGetTime();
         // Render the current state
         renderRoad();
     }

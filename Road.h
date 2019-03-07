@@ -10,13 +10,23 @@
 class Road {
     private:
         // The initial position of the queue.
-        float queuePos;
+        double queuePos;
         // The default distance between two objects.
-        float bufferLength;
+        double bufferLength;
     public:
-        float length;
-        float width;
-        float signalPosition;
+        // default vehicle Parameters
+        std::string default_type = "not specified";
+        double default_maxspeed = 1;
+        double default_acceleration = 1;
+        double default_length = 2;
+        double default_width = 2;
+        int default_skill = 1;
+        double speed_limit = -1;
+
+
+        double length;
+        double width;
+        double signalPosition;
         int window_length;
         int window_height;
         int id;
@@ -28,17 +38,20 @@ class Road {
         std::vector<Vehicle*> vehicles;
 
         // Initialize the Road object
-        Road(int id, float length, float width, float delT = 0.1);
-
+        Road(int id, double length, double width, double delT = 0.1);
+        Road(int id);
+        Road();
+        void setDefaults(double maxspeed, double acceleration,double length, double width,int skill,double speed_limit)
         // Add a Vehicle to the road
         void addVehicle(Vehicle* vehicle);
 
-        void updateUnrestrictedpositions(float delT);
+        void updateUnrestrictedpositions(double delT);
+
         // First vehicle obstacle in a lane
-        float firstObstacle(float startPos, float topRow, float botRow )
+        double firstObstacle(double startPos, double topRow, double botRow )
 
         // Run the simulation on the road for time t
-        void runSim(float t);
+        void runSim(double t);
 
         // The error_callback function
         static void error_callback(int error, const char* description);

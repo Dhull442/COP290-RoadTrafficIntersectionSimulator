@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 #include "Vehicle.h"
-#include "Roah.h"
+#include "Road.h"
 Vehicle::Vehicle(){
   // Initializing defaults
   this->type = this->default_type;
@@ -15,16 +15,19 @@ Vehicle::Vehicle(){
   this->currentPosition = make_pair(0,0);
   this->unrestrictedposition = this->currentPosition;
 }
-Vehicle::Vehicle(std::string type, float length, float width): Vehicle(){
+Vehicle::Vehicle(std::string type, double length, double width): Vehicle(){
   this->type = type;
   this->length = length;
   this->width = width;
 }
-void Vehicle::updatePos(float delT,bool limit){
+Vehicle::Vehicle(std::string type):Vehicle(){
+  this->type = type;
+}
+void Vehicle::updatePos(double delT,bool limit){
   if(limit){
-    float obstacle = this.parentRoad->firstObstacle(this->currentPosition.first,this->currentPosition.second,this->currentPosition.second-this->width);
+    double obstacle = this.parentRoad->firstObstacle(this->currentPosition.first,this->currentPosition.second,this->currentPosition.second-this->width);
   };
-  float unrestrictedNewPosition = this->currentPosition.first + (this->currentSpeed)*(delT) + (0.5)*(this->acceleration)*(delT)*(delT);
+  double unrestrictedNewPosition = this->currentPosition.first + (this->currentSpeed)*(delT) + (0.5)*(this->acceleration)*(delT)*(delT);
   if(limit){
   if(obstacle>unrestrictedNewPosition){
     this->currentPosition.first = unrestrictedNewPosition;
