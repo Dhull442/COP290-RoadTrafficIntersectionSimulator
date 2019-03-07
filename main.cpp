@@ -5,6 +5,21 @@
 #include "Road.h"
 typedef std::vector<Road*> Model;
 #endif
+std::string preprocess(std::string a){
+  std::string ans = "";
+  for(int i=0;i<a.length();i++){
+    if(a[i]=='#')
+      break;
+    if(a[i] >= 65 && a[i] <= 90){
+      ans += (a[i] + 32);
+    }
+    if(a[i] >= 97 && a[i] <= 122){
+      ans += a[i];
+    }
+    else continue;
+  }
+  return ans;
+}
 int main(int argc, char **argv){
   // Add a check here
   std::ifstream configFile;
@@ -83,7 +98,7 @@ int main(int argc, char **argv){
         }
         if(line.find("Default_Type") != std::string::npos){
           // Create and add new road;
-          std::string type = line.substr(line.find("=") + 1);
+          std::string type = preprocess(line.substr(line.find("=") + 1));
           #ifdef IMPL
           model.back()->default_type = type;
           #else
@@ -107,7 +122,7 @@ int main(int argc, char **argv){
         }
         if(line.find("Vehicle_Type") != std::string::npos){
           // Create and add new road;
-          std::string vtype = line.substr(line.find("=") + 2);
+          std::string vtype = preprocess(line.substr(line.find("=") + 1));
           #ifdef IMPL
           Vehicle newVehicle(vtype);
           model.back()->addVehicle(&newVehicle);
@@ -158,13 +173,13 @@ int main(int argc, char **argv){
       }
       else{
         // For simulation
-        std::cout << "~ ~ ~ ~ SIMULATION ~ ~ ~ ~"<<std::endl;
+        std::cout << "* * * * * * * * * ~ ~ ~ ~ SIMULATION ~ ~ ~ ~ * * * * * * * * *"<<std::endl;
         if(line.find("END") != std::string::npos){
           break;
         }
       }
     }
     }
-    std::cout<<"~ ~ ~ ~ THE END ~ ~ ~ ~"<<std::endl;
+    std::cout<<"* * * * * * * * * ~ ~ ~ ~ ~ THEEND ~ ~ ~ ~ ~ * * * * * * * * *"<<std::endl;
   }
 }
