@@ -18,7 +18,7 @@ Road::Road(){
   this->window_height = 480;
 }
 
-Road::Road(int id, float length, float width):Road(){
+Road::Road(int id, double length, double width):Road(){
     this->id = id;
     this->length = length;
     this->width = width;
@@ -28,7 +28,7 @@ Road::Road(int id):Road(){
     this->id = id;
 }
 
-void Road::setDefaults(float maxspeed, float acceleration,float length, float width,int skill){
+void Road::setDefaults(double maxspeed, double acceleration,double length, double width,int skill){
     // Input correclty < No checks here >
     this->default_maxspeed = maxspeed;
     this->default_acceleration = acceleration;
@@ -52,11 +52,11 @@ void Road::addVehicle(Vehicle* vehicle) {
 }
 
 // Runs the simulation and renders the road
-void Road::runSim(float t) {
+void Road::runSim(double t) {
     // Run until time is exhausted
-    float beginTime = glfwGetTime();
-    float oldTime = glfwGetTime();
-    float currentTime = glfwGetTime();
+    double beginTime = glfwGetTime();
+    double oldTime = glfwGetTime();
+    double currentTime = glfwGetTime();
 
     while(currentTime - beginTime < t) {
         if(glfwWindowShouldClose(this->window)) {
@@ -80,11 +80,11 @@ void Road::runSim(float t) {
 }
 
 // Gives first obstacle position in the given window
-float Road::firstObstacle(float startPos, float topRow, float botRow ){
-  float position=this->length;
+double Road::firstObstacle(double startPos, double topRow, double botRow ){
+  double position=this->length;
   for(auto v : this->vehicles ){
     if(v->unrestrictedposition.second < topRow || (v->unrestrictedposition.second-v->width)>botRow){
-      float back = (v->unrestrictedposition.first-v->length);
+      double back = (v->unrestrictedposition.first-v->length);
       if(position > back && back > startPos ){
         position = back;
       }
@@ -94,7 +94,7 @@ float Road::firstObstacle(float startPos, float topRow, float botRow ){
 }
 
 // Updates the unrestricted new positions of every vehicle
-void Road::updateUnrestrictedpositions(float delT){
+void Road::updateUnrestrictedpositions(double delT){
   for(auto v : this -> vehicles ){
     v->updatePos(delT,false);
   };
@@ -139,10 +139,10 @@ void Road::setupRoad() {
 
 void Road::renderRoad() {
     // Get frameBuffer attributes
-    float ratio;
+    double ratio;
     int frame_height, frame_width;
     glfwGetFramebufferSize(this->window, &window_height, &window_width);
-    ratio = frame_width/(float)frame_height;
+    ratio = frame_width/(double)frame_height;
 
     // Create a blank viewport
     glViewport(0, 0, width, height);
