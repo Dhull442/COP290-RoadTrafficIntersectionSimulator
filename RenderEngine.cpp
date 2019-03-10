@@ -1,14 +1,14 @@
 #include <bits/stdc++.h>
 #include "Vehicle.h"
-#include "Road.h"
+// #include "Road.h"
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "linmath.h"
 
-RenderEngine::RenderEngine(Road* targetRoad) {
-    this->targetRoad = targetRoad;
-}
+// RenderEngine::RenderEngine(Road* targetRoad) {
+//     this->targetRoad = targetRoad;
+// }
 
 RenderEngine::RenderEngine() {
     // Empty function for debugging purposes

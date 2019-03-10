@@ -3,7 +3,7 @@
 
 #include <bits/stdc++.h>
 #include "Vehicle.h"
-#include "Road.h"
+// #include "Road.h"
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -12,12 +12,12 @@
 // This class takes a road object and renders it
 class RenderEngine {
   public:
-    Road* targetRoad;
+    // Road* targetRoad;
     bool isInitialized;
     // The variable which store the OpenGL window
     GLFWwindow* window;
 
-    RenderEngine(Road* targetRoad);
+    // RenderEngine(Road* targetRoad);
     RenderEngine();
 
     // The error callback function
