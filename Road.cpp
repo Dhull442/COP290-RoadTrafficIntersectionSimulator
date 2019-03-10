@@ -224,6 +224,6 @@ void Road::updateUnrestrictedpositions(double delT){
 //     glfwSwapBuffers(this->window);
 //     glfwPollEvents();
 // }
-int main(){
-    std::cout<<"compiles EXIT_SUCCESS"<<std::endl;
-}
+// int main(){
+//    std::cout<<"compiles EXIT_SUCCESS"<<std::endl;
+// }
