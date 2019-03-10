@@ -157,7 +157,7 @@ double Road::firstObstacle(double startPos, double topRow, double botRow ){
 
 // Updates the unrestricted new positions of every vehicle
 void Road::updateUnrestrictedpositions(double delT){
-  for(auto v : this -> vehicles ){
+  for(auto v : this -> vehicles) {
     v->updatePos(delT,false);
   };
 }
