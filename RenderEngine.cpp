@@ -1,10 +1,11 @@
 #include <bits/stdc++.h>
-#include "Vehicle.h"
+// #include "Vehicle.h"
 // #include "Road.h"
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "linmath.h"
+#include "RenderEngine.h"
 
 // RenderEngine::RenderEngine(Road* targetRoad) {
 //     this->targetRoad = targetRoad;
@@ -37,41 +38,43 @@ void RenderEngine::setup() {
     glfwSetErrorCallback(error_callback);
 
     // Create a window, context
-    this->window = glfwCreateWindow(640, 480, "TrafficSim", NULL, NULL);
-    if (!this->window) {
+    RenderEngine::window = glfwCreateWindow(640, 480, "TrafficSim", NULL, NULL);
+    if (!RenderEngine::window) {
         // Context creation failed
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
 
-    this->isInitialized = true;
+    RenderEngine::isInitialized = true;
     // Make the context current
-    glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent(RenderEngine::window);
     // Set the swap interval
     glfwSwapInterval(1);
     // Set the key_callback method
-    glfwSetKeyCallback(this->window, key_callback);
+    glfwSetKeyCallback(RenderEngine::window, key_callback);
 }
 
 void RenderEngine::render() {
     // While the window is not closed do this
-    while(!glfwWindowShouldClose(this->window)) {
+    while(!glfwWindowShouldClose(RenderEngine::window)) {
         // Setup the frame
         float ratio;
         int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
+        glfwGetFramebufferSize(RenderEngine::window, &width, &height);
         ratio = width / (float) height;
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glBegin();
         glRectd(0, 0, 1, 1);
-        glEnd();
 
         // Swap buffers and check for events
-        glfwSwapBuffers(this->window);
+        glfwSwapBuffers(RenderEngine::window);
         glfwPollEvents();
     }
     glfwTerminate();
     std::cout << "Simulation Done..." << std::endl;
+}
+
+int main() {
+    std::cout << "Hello World" << std::endl;
 }

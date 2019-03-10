@@ -12,7 +12,7 @@
 // This class takes a road object and renders it
 class RenderEngine {
   public:
-    // Road* targetRoad;
+   // Road* targetRoad;
     bool isInitialized;
     // The variable which store the OpenGL window
     GLFWwindow* window;
