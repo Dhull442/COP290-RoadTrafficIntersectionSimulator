@@ -1,4 +1,4 @@
-#ifdef RENDER_ENGINE_H
+#ifndef RENDER_ENGINE_H
 #define RENDER_ENGINE_H
 
 #include <bits/stdc++.h>
@@ -12,6 +12,7 @@
 // This class takes a road object and renders it
 class RenderEngine {
   public:
+    RenderEngine();
    // Road* targetRoad;
     bool isInitialized;
     // The variable which store the OpenGL window
