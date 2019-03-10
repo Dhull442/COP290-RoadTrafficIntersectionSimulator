@@ -20,7 +20,7 @@ void RenderEngine::error_callback(int error, const char* description) {
 }
 
 // Function which receives the key events
-static void RenderEngine::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+void RenderEngine::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         // Set the close_flag to true
         glfwSetWindowShouldClose(window, GLFW_TRUE);
@@ -35,10 +35,10 @@ void RenderEngine::setup() {
     }
 
     // Set the error_callback function
-    glfwSetErrorCallback(error_callback);
+    glfwSetErrorCallback(RenderEngine::error_callback);
 
     // Create a window, context
-    RenderEngine::window = glfwCreateWindow(640, 480, "TrafficSim", NULL, NULL);
+    RenderEngine::window = glfwCreateWindow(640, 480, "TrafficSim", glfwGetPrimaryMonitor(), NULL);
     if (!RenderEngine::window) {
         // Context creation failed
         glfwTerminate();
@@ -51,7 +51,7 @@ void RenderEngine::setup() {
     // Set the swap interval
     glfwSwapInterval(1);
     // Set the key_callback method
-    glfwSetKeyCallback(RenderEngine::window, key_callback);
+    glfwSetKeyCallback(RenderEngine::window, RenderEngine::key_callback);
 }
 
 void RenderEngine::render() {
@@ -76,5 +76,8 @@ void RenderEngine::render() {
 }
 
 int main() {
-    std::cout << "Hello World" << std::endl;
+    RenderEngine engine;
+    engine.setup();
+    engine.render();
 }
+

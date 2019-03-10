@@ -1,8 +1,8 @@
-#ifdef RENDER_ENGINE_H
+#ifndef RENDER_ENGINE_H
 #define RENDER_ENGINE_H
 
 #include <bits/stdc++.h>
-#include "Vehicle.h"
+// #include "Vehicle.h"
 // #include "Road.h"
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
@@ -21,13 +21,15 @@ class RenderEngine {
     RenderEngine();
 
     // The error callback function
-    void error_callback(int error, const char* description);
+    static void error_callback(int error, const char* description);
+    // The key_callback function
+    static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
     // Initialize the variables
     void setup();
 
     // Clear the screen and render the road afresh
     void render();
-}
+};
 
 #endif
