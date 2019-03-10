@@ -6,6 +6,59 @@
 typedef std::vector<Road*> Model;
 typedef std::vector<Vehicle*> vv;
 #endif
+void simulationActions(
+  #ifdef IMPL
+  Road* road,
+  vv vehicles,
+  #endif
+  std::vector<std::string> tokens){
+  for(int i=0;i<tokens.size();i++){
+    // Parse the value and function
+    std::string function = tokens[i].substr(0,tokens[i].find("="));
+    std::string value = tokens[i].substr(tokens[i].find("=")+1);
+
+    // Signal change routine
+    if(!function.compare("Signal")){
+      if(!value.compare("GREEN")||!value.compare("RED")){
+        #ifdef IMPL
+          road->signal = value;
+        #else
+          std::cout<<"Updated signal to "<<value<<std::endl;
+        #endif
+      }
+      else{
+        std::cout<<"[ ERROR ] Signal can only be GREEN/RED" <<std::endl;
+        std::exit(1);
+      }
+      return;
+    }
+
+    // Passing time routine
+    if(!function.compare("Pass")){
+      double time = std::atof(value.c_str());
+      #ifdef IMPL
+      #else
+        std::cout<<"Pass time = "<<time<<std::endl;
+      #endif
+      return;
+    }
+
+    // addition of vehicles routine
+    #ifdef IMPL
+    for(int v = 0; v < vehicles.size(); v++ ){
+      if(!vehicles[v]->type.compare(preprocess(function))){  // preprocessing to ignore any fuss due to Capitals
+        road->addVehicle(vehicles[v],value);
+        return;
+      }
+    }
+    #endif
+    // None found
+    {
+      std::cout<<"No function defined for "<<function<<" with value "<<value<<std::endl;
+      std::exit(1);
+    }
+  }
+}
 std::string preprocess(std::string a){
   std::string ans = "";
   for(int i=0;i<a.length();i++){
@@ -33,7 +86,7 @@ int main(int argc, char **argv){
     bool defmode = true;
     #ifdef IMPL
     Model model;
-    vV vehicles;
+    vv vehicles;
     #endif
     std::string line;
     int num_rules=0,safety_skill;
@@ -227,11 +280,68 @@ int main(int argc, char **argv){
           }
         }
         else{
-          // For simulation
-          std::cout << "* * * * * * * * * ~ ~ ~ ~ SIMULATION ~ ~ ~ ~ * * * * * * * * *"<<std::endl;
+          // Catch END statement
           if(line.find("END") != std::string::npos){
             break;
           }
+          // For simulation
+          std::string delimiter = ";";
+          std::vector<std::string> tokens;
+          bool roadSpecified = false;
+          int road_id;
+          int pos=0;
+          #ifdef IMPL
+           Road* road;
+          #endif
+          // Extract tokens from string
+          while ((pos = line.find(delimiter)) != std::string::npos) {
+            tokens.push_back(line.substr(0, pos));
+            line.erase(0, pos + delimiter.length());
+          }
+          if(tokens.size()<1){
+            // No Tokens found
+            std::cout<<"[ ERROR ] Please follow the config file syntax!" <<std::endl;
+            std::exit(1);
+          }
+          if(tokens[0].find("Road") != std::string::npos){
+            roadSpecified = true;
+            road_id = std::atoi(tokens[0].substr(tokens[0].find("=") + 1).c_str());
+            #ifdef IMPL
+              for(int num = 0; num < model.size(); num++){
+                if(model[num]->id == road_id){
+                  road = model[num];
+                  break;
+                }
+              }
+              if(road == NULL){
+                std::cout <<"[ ERROR ] No Road with id "<<road_id<<" exists" <<std::endl;
+                std::exit(1);
+              }
+            #else
+            std::cout<<"Road Id: "<<road_id<<std::endl;
+            #endif
+            tokens.erase(tokens.begin());
+          }
+          if(roadSpecified){
+            #ifdef IMPL
+              simulationActions(road,vehicles,tokens);
+            #else
+              std::cout<<"Functions are going on with road" <<road_id<<std::endl;
+              simulationActions(tokens);
+            #endif
+          }
+          if(!roadSpecified){
+            #ifdef IMPL
+              if(model.size()<1){
+                std::cout<<"[ ERROR ] No Roads exist"<<std::endl;
+              }
+              simulationActions(model.back(),tokens,vehicles);
+            #else
+              std::cout<<"Functions are going on with latest road"<<std::endl;
+              simulationActions(tokens);
+            #endif
+          }
+          std::cout << "* * * * * * * * * ~ ~ ~ ~ SIMULATION ~ ~ ~ ~ * * * * * * * * *"<<std::endl;
         }
       }
     }

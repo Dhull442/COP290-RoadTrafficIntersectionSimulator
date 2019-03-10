@@ -38,16 +38,18 @@ void Road::setDefaults(double maxspeed, double acceleration,double length, doubl
 }
 
 // For adding vehicle
-void Road::addVehicle(Vehicle* vehicle) {
-    vehicles.push_back(vehicle);
+void Road::addVehicle(Vehicle* vehicle,std::string color) {  // Vehicle from template
+    Vehicle newVehicle = *vehicle; // Make a copy from vehicle template
+    newVehicle.onRoad = true;
+    newVehicle.parentRoad = this;
+    newVehicle.currentPosition.first = this->queuePos;
+    this->vehicles.push_back(newVehicle);
     // Add the road to the vehicle
-    vehicle->onRoad = true;
-    vehicle->parentRoad = this;
+
     // Update the values
-    // vehicle->currentPosition = this->queuePos;
     this->queuePos -= this->bufferLength;
 
-    To set defaults of road if not constructed
+    // To set defaults of road if not constructed
     vehicles.back()->reConstruct();
 }
 
