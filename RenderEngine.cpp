@@ -72,7 +72,7 @@ void RenderEngine::render() {
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT);
         // Render the background
-        glClearColor(this->bgcolor[0], this->bgcolor[1], this->bgcolor[2], 1.0f);
+        glClearColor((float)this->bgcolor[0]/255.0f, (float)this->bgcolor[1]/255.0f, (float)this->bgcolor[2]/255.0f, 1.0f);
 
         // Render the road
         RenderEngine::renderRoad();
@@ -98,9 +98,9 @@ void RenderEngine::renderRoad() {
     glRectd(-1.0f, ycoord, xcoord, -ycoord);
 
     // Render the signal in the remaining part
-    glColor3f(this->targetRoad->signalColor[0],
-              this->targetRoad->signalColor[1],
-              this->targetRoad->signalColor[2]);
+    glColor3f((float)this->targetRoad->signalColor[0]/255.0f,
+              (float)this->targetRoad->signalColor[0]/255.0f,
+              (float)this->targetRoad->signalColor[0]/255.0f;
     glRectd(xcoord, ycoord, 1.0f, -ycoord);
 }
 
