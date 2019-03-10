@@ -2,24 +2,28 @@
 #define RENDER_ENGINE_H
 
 #include <bits/stdc++.h>
-// #include "Vehicle.h"
-// #include "Road.h"
+#include "Vehicle.h"
+#include "Road.h"
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "linmath.h"
 
-// This class takes a road object and renders it
+// This class takes a Road object and renders it
 class RenderEngine {
   public:
-    RenderEngine();
-   // Road* targetRoad;
-    bool isInitialized;
+    // The road that this will render
+    Road* targetRoad;
+    // The scaling factor
+    int scaling;
+    // Used to create a full screen simulation
+    int monitorWidth, monitorHeight;
+    // Set the background color
+    vector<float> bgcolor;
+
     // The variable which store the OpenGL window
     GLFWwindow* window;
-
-    // RenderEngine(Road* targetRoad);
-    RenderEngine();
+    // Constructor function
+    RenderEngine(Road* targetRoad, int scaling=20);
 
     // The error callback function
     static void error_callback(int error, const char* description);
@@ -29,8 +33,13 @@ class RenderEngine {
     // Initialize the variables
     void setup();
 
-    // Clear the screen and render the road afresh
+    // Clear the screen and render the road, vehicles afresh
     void render();
+    void renderRoad();
+    void renderVehicle(Vehicle* vehicle);
+    
+    // Returns the time since start
+    float getTime();
 };
 
 #endif

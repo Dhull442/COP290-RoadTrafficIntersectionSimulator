@@ -1,18 +1,21 @@
 #include <bits/stdc++.h>
-// #include "Vehicle.h"
-// #include "Road.h"
+#include "Vehicle.h"
+#include "Road.h"
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "linmath.h"
 #include "RenderEngine.h"
 
-// RenderEngine::RenderEngine(Road* targetRoad) {
-//     this->targetRoad = targetRoad;
-// }
-
-RenderEngine::RenderEngine() {
-    // Empty function for debugging purposes
+RenderEngine::RenderEngine(Road* targetRoad, int scaling = 20, int monitorWidth=1280, int monitorHeight=800) {
+    this->targetRoad = targetRoad;
+    this->scaling = scaling;
+    // Set the default background color
+    this->bgcolor.push_back(1.0f);
+    this->bgcolor.push_back(0.968f);
+    this->bgcolor.push_back(0.3529f);
+    // Set the monitor Parameters
+    this->monitorWidth = monitorWidth;
+    this->monitorHeight = monitorHeight;
 }
 
 void RenderEngine::error_callback(int error, const char* description) {
@@ -38,7 +41,7 @@ void RenderEngine::setup() {
     glfwSetErrorCallback(RenderEngine::error_callback);
 
     // Create a window, context
-    RenderEngine::window = glfwCreateWindow(640, 480, "TrafficSim", glfwGetPrimaryMonitor(), NULL);
+    RenderEngine::window = glfwCreateWindow(this->monitorWidth, this->monitorHeight, "TrafficSim", glfwGetPrimaryMonitor(), NULL);
     if (!RenderEngine::window) {
         // Context creation failed
         glfwTerminate();
@@ -54,6 +57,10 @@ void RenderEngine::setup() {
     glfwSetKeyCallback(RenderEngine::window, RenderEngine::key_callback);
 }
 
+float RenderEngine::getTime() {
+    return glfwGetTime();
+}
+
 void RenderEngine::render() {
     // While the window is not closed do this
     while(!glfwWindowShouldClose(RenderEngine::window)) {
@@ -64,8 +71,16 @@ void RenderEngine::render() {
         ratio = width / (float) height;
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT);
+        // Render the background
+        glClearColor(this->bgcolor[0], this->bgcolor[1], this->bgcolor[2], 1.0f);
 
-        glRectd(0, 0, 1, 1);
+        // Render the road
+        RenderEngine::renderRoad();
+
+        // Iterate over the vehicles
+        for(auto v: this->targetRoad->vehicles) {
+            renderRoad(v);
+        }
 
         // Swap buffers and check for events
         glfwSwapBuffers(RenderEngine::window);
@@ -75,9 +90,36 @@ void RenderEngine::render() {
     std::cout << "Simulation Done..." << std::endl;
 }
 
+void RenderEngine::renderRoad() {
+    // Render the road in black
+    glColor3f(0.0f, 0.0f, 0.0f);
+    float ycoord = this->targetRoad->width*this->scaling/(float)this->monitorHeight;
+    float xcoord = (this->targetRoad->length*this->scaling - (int)(this->monitorWidth/2))/(float)((int)(this->monitorWidth/2));
+    glRectd(-1.0f, ycoord, xcoord, -ycoord);
+
+    // Render the signal in the remaining part
+    glColor3f(this->targetRoad->signalColor[0],
+              this->targetRoad->signalColor[1],
+              this->targetRoad->signalColor[2]);
+    glRectd(xcoord, ycoord, 1.0f, -ycoord);
+}
+
+void RenderEngine::renderVehicle(Vehicle* vehicle) {
+    if (vehicle->isOnRoad) {
+        // Render only if the vehicle is on the Road
+        float x = -1.0 + (float)vehicle->currentPos[0]*this->scaling*2/(float)(this->monitorWidth);
+        float y = (float)this->scaling*(this->targetRoad->width-2*vehicle->currentPos[1])/(float)this->monitorHeight;
+        float delx = 2*vehicle->width*this->scaling/(float)this->monitorWidth;
+        float dely = 2*vehicle->length*this->scaling/(float)this->monitorHeight;
+        // Set the correct color
+        glColor3f(vehicle->color[0], vehicle->color[1], vehicle->color[2]);
+        // Render the rectangle
+        glRectd(x, y, x - delx, y - dely);
+    }
+}
+
 int main() {
     RenderEngine engine;
     engine.setup();
     engine.render();
 }
-
