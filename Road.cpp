@@ -3,9 +3,11 @@
 #include "Road.h"
 #include "RenderEngine.h"
 
-Road::Road(){
+Road::Road() {
   #ifdef RENDER_ENGINE_H
-  new(&(this->engine)) RenderEngine(this);
+  //new(&(this->engine)) RenderEngine(this);
+  RenderEngine newengine(this);
+  this->engine = newengine;
   this->engine.setup();
   #endif
   this->id = 0;

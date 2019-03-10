@@ -7,16 +7,21 @@
 #include "RenderEngine.h"
 
 // #define GLFW_TRUE true
-RenderEngine::RenderEngine(Road* targetRoad, int scaling = 20, int monitorWidth=1280, int monitorHeight=800) {
+RenderEngine::RenderEngine(Road* targetRoad) {
     this->targetRoad = targetRoad;
-    this->scaling = scaling;
+    this->scaling = 20;
     // Set the default background color
     this->bgcolor.push_back(1.0f);
     this->bgcolor.push_back(0.968f);
     this->bgcolor.push_back(0.3529f);
     // Set the monitor Parameters
-    this->monitorWidth = monitorWidth;
-    this->monitorHeight = monitorHeight;
+    this->monitorWidth = 1280;
+    this->monitorHeight = 800;
+}
+
+// Default constructor
+RenderEngine::RenderEngine() {
+    // Do nothing
 }
 
 void RenderEngine::error_callback(int error, const char* description) {

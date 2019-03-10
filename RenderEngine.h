@@ -28,8 +28,9 @@ class RenderEngine {
     GLFWwindow* window;
     // Constructor function
 
-    RenderEngine(Road* targetRoad, int scaling, int monitorWidth, int monitorHeight);
-    // RenderEngine(Road* targetRoad, int scaling=20);
+    RenderEngine(Road* targetRoad);
+    // Default constructor
+    RenderEngine();
 
     // The error callback function
     static void error_callback(int error, const char* description);
