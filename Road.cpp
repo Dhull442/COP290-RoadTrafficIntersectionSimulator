@@ -1,17 +1,24 @@
 #include <bits/stdc++.h>
-#include <GLFW/glfw3.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include "Vehicle.h"
+#include "Road.h"
+#include "RenderEngine.h"
 
 Road::Road(){
+  #ifdef RENDER_ENGINE_H
+  RenderEngine engine(this);
+  this->engine = engine;
+  this->engine.setup();
+  #endif
   this->id = 0;
   this->length = 0.0;
   this->width = 0.0;
   // Signal is red by default
   this->signal = "RED";
+  this->signal_rgb.push_back(0);
+  this->signal_rgb.push_back(0);
+  this->signal_rgb.push_back(0);
+  this->setSignal(this->signal);
   this->signalPosition = 0.0;
-
   // OpenGL part
   // Default window lengths and widths
   this->window_length = 640;
@@ -40,48 +47,100 @@ void Road::setDefaults(double maxspeed, double acceleration,double length, doubl
 // For adding vehicle
 void Road::addVehicle(Vehicle* vehicle,std::string color) {  // Vehicle from template
     Vehicle newVehicle = *vehicle; // Make a copy from vehicle template
-    newVehicle.onRoad = true;
+    newVehicle.setColor(color);
+    newVehicle.isOnRoad = true;
     newVehicle.parentRoad = this;
-    newVehicle.currentPosition.first = this->queuePos;
-    this->vehicles.push_back(newVehicle);
+    newVehicle.currentPosition = this->initPosition();
+    this->vehicles.push_back(&newVehicle);
     // Add the road to the vehicle
-
-    // Update the values
-    this->queuePos -= this->bufferLength;
 
     // To set defaults of road if not constructed
     vehicles.back()->reConstruct();
 }
 
+void Road::setSignal(std::string signal){
+  if(!signal.compare("GREEN")){
+    this->signal = signal;
+    this->signal_rgb[0] = 11;
+    this->signal_rgb[1] = 229;
+    this->signal_rgb[2] = 8;
+  }
+  if(!signal.compare("RED")){
+    this->signal = signal;
+    this->signal_rgb[0] = 237;
+    this->signal_rgb[1] = 32;
+    this->signal_rgb[2] = 32;
+  }
+  {
+    std::cout<<"[ ERROR ] Signal can only be GREEN/RED";
+  }
+}
 
 // Runs the simulation and renders the road
-void Road::runSim(double t) {
+void Road::runSim(double delT) {
     // Run until time is exhausted
-    double beginTime = glfwGetTime();
-    double oldTime = glfwGetTime();
-    double currentTime = glfwGetTime();
+    double beginTime =
+    #ifdef RENDER_ENGINE_H
+    this->engine.getTime();
+    #else
+    0;
+    #endif
+    double oldTime;
+    double currentTime =
+    #ifdef RENDER_ENGINE_H
+    this->engine.getTime();
+    #else
+    0;
+    #endif
 
-    while(currentTime - beginTime < t) {
-        if(glfwWindowShouldClose(this->window)) {
-            // Check if a window close signal is received
-            glfwDestroyWindow(this->window);
-            glfwTerminate();
-        }
+    while(currentTime - beginTime < delT) {
 
-        this->isClear = true;
         this->updateUnrestrictedpositions(currentTime - oldTime);
         // Update positions of each car
-        for(auto v: this->vehicles) {
-            v->updatePos(currentTime - oldTime,true);
-            this->isClear = this->isClear && (((v->length + v->currentPos) > this->length) || (v->currentPos < 0));
+        for(int i=0;i<this->vehicles.size();i++) {
+            vehicles[i]->updatePos(currentTime - oldTime,true);
         }
         oldTime = currentTime;
-        currentTime = glfwGetTime();
+        currentTime =
+        #ifdef RENDER_ENGINE_H
+        this->engine.getTime();
+        #else
+        0.1;
+        #endif
         // Render the current state
-        renderRoad();
+        #ifdef RENDER_ENGINE_H
+        this->engine.render();
+        #endif
     }
 }
 
+std::pair<double,double> Road::initPosition(){
+
+  // complex algorithm later
+  double posx=this->length ;//, posy=this->width;
+  // std::vector< std::pair< double, double > > obs;
+  // posX is x co-ordinate on road, posY is y co-ordinate
+  for(int i=0;i<this->vehicles.size();i++){
+    if((vehicles[i]->currentPosition.first - vehicles[i]->length) < posx ) // backEnd of vehicle
+    {
+      posx = (vehicles[i]->currentPosition.first - vehicles[i]->length);
+      // posy = vehicles[i]->currentPosition.second;
+    }
+  }
+  if(posx>0){
+    return std::make_pair(0,this->width);
+  }
+  else
+    return std::make_pair(posx,this->width);
+  // obs.push_back(make_pair(posx,posy));
+
+}
+// std::vector<std::pair<double ,double> > Road::topedgeprofile(){
+//   std::vector<std::pair<double ,double> > tmp;
+// }
+// std::vector<std::pair<double ,double> > Road::botedgeprofile(){
+//
+// }
 // Gives first obstacle position in the given window
 double Road::firstObstacle(double startPos, double topRow, double botRow ){
   double position=this->length;
@@ -103,58 +162,55 @@ void Road::updateUnrestrictedpositions(double delT){
   };
 }
 // The error_callback function prints out the error and exits with non-zero status
-static void Road::error_callback(int error, const char* description) {
-    std::cerr << description << std::endl;
-    std::exit(1);
-}
+// static void Road::error_callback(int error, const char* description) {
+//     std::cerr << description << std::endl;
+//     std::exit(1);
+// }
 
-static void Road::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    // Exit when the escape key is pressed
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-        glfwWindowShouldClose(window, GL_TRUE);
-    }
-}
-
-void Road::setupRoad() {
-    // Initialize GLFW
-    glfwInit();
-    glEnable(GL_DEPTH_TEST);
-    if (!glfwInit()) {
-        exit(EXIT_FAILURE);
-    }
-
-    // Set the error_callback function
-    glfwSetErrorCallback(Road::error_callback);
-
-    // Create a new window
-    this->window = glfwCreateWindow(this->window_length, this->window_height, "SimView", NULL, NULL);
-    if (!this->window) {
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    }
-
-    // Make this context current
-    glfwMakeContextCurrent(this->window);
-
-    // Set the key_callback function
-    glfwSetKeyCallback(window, Road::key_callback);
-}
-
-void Road::renderRoad() {
-    // Get frameBuffer attributes
-    double ratio;
-    int frame_height, frame_width;
-    glfwGetFramebufferSize(this->window, &window_height, &window_width);
-    ratio = frame_width/(double)frame_height;
-
-    // Create a blank viewport
-    glViewport(0, 0, width, height);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    // Render the road as a rectangle
-
-
-    // Swap the buffers, to display rendered stuff on the screen
-    glfwSwapBuffers(this->window);
-    glfwPollEvents();
+//
+// void Road::setupRoad() {
+//     // Initialize GLFW
+//     glfwInit();
+//     glEnable(GL_DEPTH_TEST);
+//     if (!glfwInit()) {
+//         exit(EXIT_FAILURE);
+//     }
+//
+//     // Set the error_callback function
+//     glfwSetErrorCallback(Road::error_callback);
+//
+//     // Create a new window
+//     this->window = glfwCreateWindow(this->window_length, this->window_height, "SimView", NULL, NULL);
+//     if (!this->window) {
+//         glfwTerminate();
+//         exit(EXIT_FAILURE);
+//     }
+//
+//     // Make this context current
+//     glfwMakeContextCurrent(this->window);
+//
+//     // Set the key_callback function
+//     glfwSetKeyCallback(window, Road::key_callback);
+// }
+//
+// void Road::renderRoad() {
+//     // Get frameBuffer attributes
+//     double ratio;
+//     int frame_height, frame_width;
+//     glfwGetFramebufferSize(this->window, &window_height, &window_width);
+//     ratio = frame_width/(double)frame_height;
+//
+//     // Create a blank viewport
+//     glViewport(0, 0, width, height);
+//     glClear(GL_COLOR_BUFFER_BIT);
+//
+//     // Render the road as a rectangle
+//
+//
+//     // Swap the buffers, to display rendered stuff on the screen
+//     glfwSwapBuffers(this->window);
+//     glfwPollEvents();
+// }
+int main(){
+    std::cout<<"compiles EXIT_SUCCESS"<<std::endl;
 }

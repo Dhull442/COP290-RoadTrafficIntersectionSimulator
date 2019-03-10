@@ -2,14 +2,13 @@
 #define VEHICLE_H
 
 #include <bits/stdc++.h>
-// #include "Road.h"
-// #include <GLFW/glfw3.h>
-// #include <stdlib.h>
-// #include <stdio.h>
+#include "Road.h"
+
+class Road;
 
 class Vehicle {
     private:
-
+        std::string color;
 
     public:
         std::string type;
@@ -18,9 +17,9 @@ class Vehicle {
         double maxspeed;
         double acceleration;
         double currentSpeed;
-        std::string color;
         std::pair<double,double> currentPosition; // The coordinate of the front-top of the vehicle
         std::pair<double,double> unrestrictedposition;
+        std::vector< int > color_rgb;
         bool isOnRoad;
         Road* parentRoad; // Pointer to the road on which the vehicle is
 
@@ -31,11 +30,11 @@ class Vehicle {
         Vehicle(std::string type);
         // Intializes a Vehicle with values
         Vehicle(std::string type, double length, double width);
-        reConstruct();
-        setColor(std::string color);
+        void reConstruct();
+        void setColor(std::string color);
 
         // Updates the position and velocity of the car based on delT
-        void updatePos(double delT);
+        void updatePos(double delT,bool limit);
 };
 
 #endif

@@ -6,12 +6,20 @@
 typedef std::vector<Road*> Model;
 typedef std::vector<Vehicle*> vv;
 #endif
+#ifdef VEHICLE_H
+  #ifdef ROAD_H
+    #ifndef IMPL
+    #define IMPL
+    #endif
+  #endif
+#endif
 void simulationActions(
   #ifdef IMPL
   Road* road,
   vv vehicles,
   #endif
   std::vector<std::string> tokens){
+    double delT=0;
   for(int i=0;i<tokens.size();i++){
     // Parse the value and function
     std::string function = tokens[i].substr(0,tokens[i].find("="));
@@ -19,38 +27,31 @@ void simulationActions(
 
     // Signal change routine
     if(!function.compare("Signal")){
-      if(!value.compare("GREEN")||!value.compare("RED")){
-        #ifdef IMPL
-          road->signal = value;
-        #else
-          std::cout<<"Updated signal to "<<value<<std::endl;
-        #endif
-      }
-      else{
-        std::cout<<"[ ERROR ] Signal can only be GREEN/RED" <<std::endl;
-        std::exit(1);
-      }
-      return;
+      road->setSignal(value);
+      continue;
     }
 
     // Passing time routine
     if(!function.compare("Pass")){
-      double time = std::atof(value.c_str());
+      delT += std::atof(value.c_str());
       #ifdef IMPL
       #else
         std::cout<<"Pass time = "<<time<<std::endl;
       #endif
-      return;
+      continue;
     }
 
     // addition of vehicles routine
     #ifdef IMPL
+    bool found = false;
     for(int v = 0; v < vehicles.size(); v++ ){
       if(!vehicles[v]->type.compare(preprocess(function))){  // preprocessing to ignore any fuss due to Capitals
         road->addVehicle(vehicles[v],value);
-        return;
+        found = true;
+        break;
       }
     }
+    if(found)continue;
     #endif
     // None found
     {
@@ -58,6 +59,11 @@ void simulationActions(
       std::exit(1);
     }
   }
+  #ifdef IMPL
+    road->runSim(delT);
+  #else
+    std::cout<<"Running Simulation with ΔT = "<<delT<<std::endl;
+  #endif
 }
 std::string preprocess(std::string a){
   std::string ans = "";
@@ -298,11 +304,12 @@ int main(int argc, char **argv){
             tokens.push_back(line.substr(0, pos));
             line.erase(0, pos + delimiter.length());
           }
+          // No Tokens found
           if(tokens.size()<1){
-            // No Tokens found
             std::cout<<"[ ERROR ] Please follow the config file syntax!" <<std::endl;
             std::exit(1);
           }
+          // Check if road defined
           if(tokens[0].find("Road") != std::string::npos){
             roadSpecified = true;
             road_id = std::atoi(tokens[0].substr(tokens[0].find("=") + 1).c_str());
