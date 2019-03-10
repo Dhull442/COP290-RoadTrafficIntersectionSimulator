@@ -5,8 +5,7 @@
 
 Road::Road(){
   #ifdef RENDER_ENGINE_H
-  RenderEngine engine(this);
-  this->engine = engine;
+  new(&(this->engine)) RenderEngine(this);
   this->engine.setup();
   #endif
   this->id = 0;
@@ -117,16 +116,28 @@ void Road::runSim(double delT) {
 std::pair<double,double> Road::initPosition(){
 
   // complex algorithm later
+  // std::vector<std::pair < std::pair<double,double>, double> > map; // ((top,bot),minposX)
   double posx=this->length ;//, posy=this->width;
   // std::vector< std::pair< double, double > > obs;
   // posX is x co-ordinate on road, posY is y co-ordinate
+  // for(int i=0;i<this->vehicles.size();i++){
+  //   // Vehicle* v = vehicles[i];
+  //   // if(map.length == 0){
+  //   //   map.push_back(std::make_pair(v->currentPosition.second,v->currentPosition.first - v->length));
+  //   //   map.push_back(std::make_pair(v->currentPosition-v->width,v->currentPosition.first - v->length));
+  //   // }
+  //   // traverse through map;
+  //   // for(int k = 0;k<map.size();k++){
+  //   //
+  //   // }
+  // }
   for(int i=0;i<this->vehicles.size();i++){
     if((vehicles[i]->currentPosition.first - vehicles[i]->length) < posx ) // backEnd of vehicle
     {
       posx = (vehicles[i]->currentPosition.first - vehicles[i]->length);
       // posy = vehicles[i]->currentPosition.second;
     }
-  }
+}
   if(posx>0){
     return std::make_pair(0,this->width);
   }
