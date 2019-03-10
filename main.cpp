@@ -13,6 +13,24 @@ typedef std::vector<Vehicle*> vv;
     #endif
   #endif
 #endif
+
+std::string preprocess(std::string a){
+  std::string ans = "";
+  for(int i=0;i<a.length();i++){
+    if(a[i]=='#')
+      break;
+    if(a[i] >= 65 && a[i] <= 90){
+      ans += (a[i] + 32);
+    }
+    if(a[i] >= 97 && a[i] <= 122){
+      ans += a[i];
+    }
+    else continue;
+  }
+  return ans;
+}
+
+
 void simulationActions(
   #ifdef IMPL
   Road* road,
@@ -65,21 +83,7 @@ void simulationActions(
     std::cout<<"Running Simulation with ΔT = "<<delT<<std::endl;
   #endif
 }
-std::string preprocess(std::string a){
-  std::string ans = "";
-  for(int i=0;i<a.length();i++){
-    if(a[i]=='#')
-      break;
-    if(a[i] >= 65 && a[i] <= 90){
-      ans += (a[i] + 32);
-    }
-    if(a[i] >= 97 && a[i] <= 122){
-      ans += a[i];
-    }
-    else continue;
-  }
-  return ans;
-}
+
 int main(int argc, char **argv){
   // Add a check here
   std::ifstream configFile;
@@ -210,15 +214,15 @@ int main(int argc, char **argv){
             std::cout << "Acceleration : "<<acc<< std::endl;
             #endif
           }
-          if(line.find("Default_Type") != std::string::npos){
+          //if(line.find("Default_Type") != std::string::npos){
             // Create and add new road;
-            std::string type = preprocess(line.substr(line.find("=") + 1));
-            #ifdef IMPL
-            model.back()->default_type = type;
-            #else
-            std::cout << "Type : "<<type<< std::endl;
-            #endif
-          }
+          //  std::string type = preprocess(line.substr(line.find("=") + 1));
+          //  #ifdef IMPL
+          //  model.back()->default_type = type;
+           // #else
+           // std::cout << "Type : "<<type<< std::endl;
+            //#endif
+          //}
           if(line.find("Default_Skill") != std::string::npos){
             // Create and add new road;
             int skill = std::atoi(line.substr(line.find("=") + 1).c_str());
@@ -342,7 +346,7 @@ int main(int argc, char **argv){
               if(model.size()<1){
                 std::cout<<"[ ERROR ] No Roads exist"<<std::endl;
               }
-              simulationActions(model.back(),tokens,vehicles);
+              simulationActions(model.back(),vehicles,tokens);
             #else
               std::cout<<"Functions are going on with latest road"<<std::endl;
               simulationActions(tokens);
