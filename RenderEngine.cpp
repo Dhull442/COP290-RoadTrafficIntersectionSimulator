@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include "RenderEngine.h"
 
+// #define GLFW_TRUE true
 RenderEngine::RenderEngine(Road* targetRoad, int scaling = 20, int monitorWidth=1280, int monitorHeight=800) {
     this->targetRoad = targetRoad;
     this->scaling = scaling;
@@ -79,7 +80,7 @@ void RenderEngine::render() {
 
         // Iterate over the vehicles
         for(auto v: this->targetRoad->vehicles) {
-            renderRoad(v);
+            renderVehicle(v);
         }
 
         // Swap buffers and check for events
@@ -98,28 +99,28 @@ void RenderEngine::renderRoad() {
     glRectd(-1.0f, ycoord, xcoord, -ycoord);
 
     // Render the signal in the remaining part
-    glColor3f((float)this->targetRoad->signalColor[0]/255.0f,
-              (float)this->targetRoad->signalColor[0]/255.0f,
-              (float)this->targetRoad->signalColor[0]/255.0f;
+    glColor3f((float)this->targetRoad->signal_rgb[0]/255.0f,
+              (float)this->targetRoad->signal_rgb[0]/255.0f,
+              (float)this->targetRoad->signal_rgb[0]/255.0f);
     glRectd(xcoord, ycoord, 1.0f, -ycoord);
 }
 
 void RenderEngine::renderVehicle(Vehicle* vehicle) {
     if (vehicle->isOnRoad) {
         // Render only if the vehicle is on the Road
-        float x = -1.0 + (float)vehicle->currentPos[0]*this->scaling*2/(float)(this->monitorWidth);
-        float y = (float)this->scaling*(this->targetRoad->width-2*vehicle->currentPos[1])/(float)this->monitorHeight;
+        float x = -1.0 + (float)vehicle->currentPosition.first*this->scaling*2/(float)(this->monitorWidth);
+        float y = (float)this->scaling*(this->targetRoad->width-2*vehicle->currentPosition.second)/(float)this->monitorHeight;
         float delx = 2*vehicle->width*this->scaling/(float)this->monitorWidth;
         float dely = 2*vehicle->length*this->scaling/(float)this->monitorHeight;
         // Set the correct color
-        glColor3f(vehicle->color[0], vehicle->color[1], vehicle->color[2]);
+        glColor3f(vehicle->color_rgb[0], vehicle->color_rgb[1], vehicle->color_rgb[2]);
         // Render the rectangle
         glRectd(x, y, x - delx, y - dely);
     }
 }
 
-int main() {
-    RenderEngine engine;
-    engine.setup();
-    engine.render();
-}
+// int main() {
+//     RenderEngine engine();
+//     engine.setup();
+//     engine.render();
+// }

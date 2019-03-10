@@ -18,7 +18,7 @@ class Road {
     public:
         // default vehicle Parameters
         #ifdef RENDER_ENGINE_H
-        RenderEngine engine();
+        RenderEngine engine;
         #endif
         double default_maxspeed = 1;
         double default_acceleration = 1;

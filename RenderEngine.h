@@ -8,6 +8,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+class Vehicle;
+class Road;
+
 // This class takes a Road object and renders it
 class RenderEngine {
   public:
@@ -15,15 +18,18 @@ class RenderEngine {
     Road* targetRoad;
     // The scaling factor
     int scaling;
+    bool isInitialized;
     // Used to create a full screen simulation
     int monitorWidth, monitorHeight;
     // Set the background color
-    vector<float> bgcolor;
+    std::vector<float> bgcolor;
 
     // The variable which store the OpenGL window
     GLFWwindow* window;
     // Constructor function
-    RenderEngine(Road* targetRoad, int scaling=20);
+
+    RenderEngine(Road* targetRoad, int scaling, int monitorWidth, int monitorHeight);
+    // RenderEngine(Road* targetRoad, int scaling=20);
 
     // The error callback function
     static void error_callback(int error, const char* description);
@@ -37,7 +43,7 @@ class RenderEngine {
     void render();
     void renderRoad();
     void renderVehicle(Vehicle* vehicle);
-    
+
     // Returns the time since start
     float getTime();
 };
