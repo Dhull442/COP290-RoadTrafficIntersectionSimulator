@@ -32,7 +32,7 @@ class Road {
         double signalPosition;
         int window_length;
         int window_height;
-        int id;
+        int id=-1;
         // GLFWwindow* window; // The rendering window
         std::vector< int > signal_rgb;
         // Pointer to the Vehicle objects on the road
