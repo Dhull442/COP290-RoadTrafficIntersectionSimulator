@@ -4,7 +4,67 @@
 #include "Vehicle.h"
 #include "Road.h"
 typedef std::vector<Road*> Model;
+typedef std::vector<Vehicle*> vv;
 #endif
+#ifdef VEHICLE_H
+  #ifdef ROAD_H
+    #ifndef IMPL
+    #define IMPL
+    #endif
+  #endif
+#endif
+void simulationActions(
+  #ifdef IMPL
+  Road* road,
+  vv vehicles,
+  #endif
+  std::vector<std::string> tokens){
+    double delT=0;
+  for(int i=0;i<tokens.size();i++){
+    // Parse the value and function
+    std::string function = tokens[i].substr(0,tokens[i].find("="));
+    std::string value = tokens[i].substr(tokens[i].find("=")+1);
+
+    // Signal change routine
+    if(!function.compare("Signal")){
+      road->setSignal(value);
+      continue;
+    }
+
+    // Passing time routine
+    if(!function.compare("Pass")){
+      delT += std::atof(value.c_str());
+      #ifdef IMPL
+      #else
+        std::cout<<"Pass time = "<<time<<std::endl;
+      #endif
+      continue;
+    }
+
+    // addition of vehicles routine
+    #ifdef IMPL
+    bool found = false;
+    for(int v = 0; v < vehicles.size(); v++ ){
+      if(!vehicles[v]->type.compare(preprocess(function))){  // preprocessing to ignore any fuss due to Capitals
+        road->addVehicle(vehicles[v],value);
+        found = true;
+        break;
+      }
+    }
+    if(found)continue;
+    #endif
+    // None found
+    {
+      std::cout<<"No function defined for "<<function<<" with value "<<value<<std::endl;
+      std::exit(1);
+    }
+  }
+  #ifdef IMPL
+    road->runSim(delT);
+  #else
+    std::cout<<"Running Simulation with ΔT = "<<delT<<std::endl;
+  #endif
+}
 std::string preprocess(std::string a){
   std::string ans = "";
   for(int i=0;i<a.length();i++){
@@ -32,6 +92,7 @@ int main(int argc, char **argv){
     bool defmode = true;
     #ifdef IMPL
     Model model;
+    vv vehicles;
     #endif
     std::string line;
     int num_rules=0,safety_skill;
@@ -178,7 +239,7 @@ int main(int argc, char **argv){
             std::string vtype = preprocess(line.substr(line.find("=") + 1));
             #ifdef IMPL
             Vehicle newVehicle(vtype);
-            model.back()->addVehicle(&newVehicle);
+            vehicles.push_back(&newVehicle);
             #else
             std::cout << "New Vehicle Type : "<<vtype<< std::endl;
             #endif
@@ -187,7 +248,7 @@ int main(int argc, char **argv){
             // Create and add new road;
             double length = std::atof(line.substr(line.find("=") + 1).c_str());
             #ifdef IMPL
-            model.back()->vehicles.back()->length  = length;
+            vehicles.back()->length  = length;
             #else
             std::cout << "Vehicle Length : "<<length<< std::endl;
             #endif
@@ -196,7 +257,7 @@ int main(int argc, char **argv){
             // Create and add new road;
             double width = std::atof(line.substr(line.find("=") + 1).c_str());
             #ifdef IMPL
-            model.back()->vehicles.back()->width  = width;
+            vehicles.back()->width  = width;
             #else
             std::cout << "Vehicle width : "<<width<< std::endl;
             #endif
@@ -205,7 +266,7 @@ int main(int argc, char **argv){
             // Create and add new road;
             double maxsp = std::atof(line.substr(line.find("=") + 1).c_str());
             #ifdef IMPL
-            model.back()->vehicles.back()->maxspeed = maxsp;
+            vehicles.back()->maxspeed = maxsp;
             #else
             std::cout << "Vehicle maxspeed : "<<maxsp<< std::endl;
             #endif
@@ -214,7 +275,7 @@ int main(int argc, char **argv){
             // Create and add new road;
             double acc = std::atof(line.substr(line.find("=") + 1).c_str());
             #ifdef IMPL
-            model.back()->vehicles.back()->acceleration = acc;
+            vehicles.back()->acceleration = acc;
             #else
             std::cout << "Vehicle Acceleration : "<<acc<< std::endl;
             #endif
@@ -225,11 +286,69 @@ int main(int argc, char **argv){
           }
         }
         else{
-          // For simulation
-          std::cout << "* * * * * * * * * ~ ~ ~ ~ SIMULATION ~ ~ ~ ~ * * * * * * * * *"<<std::endl;
+          // Catch END statement
           if(line.find("END") != std::string::npos){
             break;
           }
+          // For simulation
+          std::string delimiter = ";";
+          std::vector<std::string> tokens;
+          bool roadSpecified = false;
+          int road_id;
+          int pos=0;
+          #ifdef IMPL
+           Road* road;
+          #endif
+          // Extract tokens from string
+          while ((pos = line.find(delimiter)) != std::string::npos) {
+            tokens.push_back(line.substr(0, pos));
+            line.erase(0, pos + delimiter.length());
+          }
+          // No Tokens found
+          if(tokens.size()<1){
+            std::cout<<"[ ERROR ] Please follow the config file syntax!" <<std::endl;
+            std::exit(1);
+          }
+          // Check if road defined
+          if(tokens[0].find("Road") != std::string::npos){
+            roadSpecified = true;
+            road_id = std::atoi(tokens[0].substr(tokens[0].find("=") + 1).c_str());
+            #ifdef IMPL
+              for(int num = 0; num < model.size(); num++){
+                if(model[num]->id == road_id){
+                  road = model[num];
+                  break;
+                }
+              }
+              if(road == NULL){
+                std::cout <<"[ ERROR ] No Road with id "<<road_id<<" exists" <<std::endl;
+                std::exit(1);
+              }
+            #else
+            std::cout<<"Road Id: "<<road_id<<std::endl;
+            #endif
+            tokens.erase(tokens.begin());
+          }
+          if(roadSpecified){
+            #ifdef IMPL
+              simulationActions(road,vehicles,tokens);
+            #else
+              std::cout<<"Functions are going on with road" <<road_id<<std::endl;
+              simulationActions(tokens);
+            #endif
+          }
+          if(!roadSpecified){
+            #ifdef IMPL
+              if(model.size()<1){
+                std::cout<<"[ ERROR ] No Roads exist"<<std::endl;
+              }
+              simulationActions(model.back(),tokens,vehicles);
+            #else
+              std::cout<<"Functions are going on with latest road"<<std::endl;
+              simulationActions(tokens);
+            #endif
+          }
+          std::cout << "* * * * * * * * * ~ ~ ~ ~ SIMULATION ~ ~ ~ ~ * * * * * * * * *"<<std::endl;
         }
       }
     }
