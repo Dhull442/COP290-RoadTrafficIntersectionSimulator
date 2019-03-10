@@ -51,11 +51,9 @@ void simulationActions(
 
     // Passing time routine
     if(!function.compare("Pass")){
-      delT += std::atof(value.c_str());
-      #ifdef IMPL
-      #else
-        std::cout<<"Pass time = "<<time<<std::endl;
-      #endif
+      delT += std::atof(value.c_str());              
+  std::cout<<"Pass time = "<<time<<std::endl;
+      
       continue;
     }
 

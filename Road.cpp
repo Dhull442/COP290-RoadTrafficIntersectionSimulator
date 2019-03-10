@@ -34,6 +34,7 @@ Road::Road(int id, double length, double width):Road(){
 
 Road::Road(int id):Road(){
     this->id = id;
+    std::cout<<"Road with ID "<<this->id<<" initialized."<<std::endl;
 }
 
 void Road::setDefaults(double maxspeed, double acceleration,double length, double width,int skill){
@@ -65,12 +66,14 @@ void Road::setSignal(std::string signal){
     this->signal_rgb[0] = 11;
     this->signal_rgb[1] = 229;
     this->signal_rgb[2] = 8;
+return;
   }
   if(!signal.compare("RED")){
     this->signal = signal;
     this->signal_rgb[0] = 237;
     this->signal_rgb[1] = 32;
     this->signal_rgb[2] = 32;
+return;
   }
   {
     std::cout<<"[ ERROR ] Signal can only be GREEN/RED";
