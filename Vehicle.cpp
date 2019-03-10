@@ -37,10 +37,10 @@ void Vehicle::reConstruct(){
     if(this->width  == -1){
       this->width = this->parentRoad->default_width;
     }
-    if(this->maxspeed == -1){
+    if(this->maxspeed == -1 || this->maxspeed > this->parent->default_maxspeed){
       this->maxspeed = this->parentRoad->default_maxspeed;
     }
-    if(this->acceleration == -1){
+    if(this->acceleration == -1 || this->acceleration > this->parentRoad->default_acceleration){
       this->acceleration = this->parentRoad->default_acceleration;
     }
     if(this->skill == -1){
@@ -48,7 +48,9 @@ void Vehicle::reConstruct(){
     }
   }
 }
-
+void Vehicle::setColor(std::string color){
+  this->color = color;
+}
 void Vehicle::updatePos(double delT,bool limit){
   if(limit){
     double obstacle = this.parentRoad->firstObstacle(this->currentPosition.first,this->currentPosition.second,this->currentPosition.second-this->width);

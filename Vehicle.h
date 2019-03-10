@@ -31,6 +31,8 @@ class Vehicle {
         Vehicle(std::string type);
         // Intializes a Vehicle with values
         Vehicle(std::string type, double length, double width);
+        reConstruct();
+        setColor(std::string color);
 
         // Updates the position and velocity of the car based on delT
         void updatePos(double delT);

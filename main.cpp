@@ -4,6 +4,7 @@
 #include "Vehicle.h"
 #include "Road.h"
 typedef std::vector<Road*> Model;
+typedef std::vector<Vehicle*> vv;
 #endif
 std::string preprocess(std::string a){
   std::string ans = "";
@@ -32,6 +33,7 @@ int main(int argc, char **argv){
     bool defmode = true;
     #ifdef IMPL
     Model model;
+    vV vehicles;
     #endif
     std::string line;
     int num_rules=0,safety_skill;
@@ -178,7 +180,7 @@ int main(int argc, char **argv){
             std::string vtype = preprocess(line.substr(line.find("=") + 1));
             #ifdef IMPL
             Vehicle newVehicle(vtype);
-            model.back()->addVehicle(&newVehicle);
+            vehicles.push_back(&newVehicle);
             #else
             std::cout << "New Vehicle Type : "<<vtype<< std::endl;
             #endif
@@ -187,7 +189,7 @@ int main(int argc, char **argv){
             // Create and add new road;
             double length = std::atof(line.substr(line.find("=") + 1).c_str());
             #ifdef IMPL
-            model.back()->vehicles.back()->length  = length;
+            vehicles.back()->length  = length;
             #else
             std::cout << "Vehicle Length : "<<length<< std::endl;
             #endif
@@ -196,7 +198,7 @@ int main(int argc, char **argv){
             // Create and add new road;
             double width = std::atof(line.substr(line.find("=") + 1).c_str());
             #ifdef IMPL
-            model.back()->vehicles.back()->width  = width;
+            vehicles.back()->width  = width;
             #else
             std::cout << "Vehicle width : "<<width<< std::endl;
             #endif
@@ -205,7 +207,7 @@ int main(int argc, char **argv){
             // Create and add new road;
             double maxsp = std::atof(line.substr(line.find("=") + 1).c_str());
             #ifdef IMPL
-            model.back()->vehicles.back()->maxspeed = maxsp;
+            vehicles.back()->maxspeed = maxsp;
             #else
             std::cout << "Vehicle maxspeed : "<<maxsp<< std::endl;
             #endif
@@ -214,7 +216,7 @@ int main(int argc, char **argv){
             // Create and add new road;
             double acc = std::atof(line.substr(line.find("=") + 1).c_str());
             #ifdef IMPL
-            model.back()->vehicles.back()->acceleration = acc;
+            vehicles.back()->acceleration = acc;
             #else
             std::cout << "Vehicle Acceleration : "<<acc<< std::endl;
             #endif

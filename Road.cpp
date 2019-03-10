@@ -44,12 +44,13 @@ void Road::addVehicle(Vehicle* vehicle) {
     vehicle->onRoad = true;
     vehicle->parentRoad = this;
     // Update the values
-    vehicle->currentPosition = this->queuePos;
+    // vehicle->currentPosition = this->queuePos;
     this->queuePos -= this->bufferLength;
 
-    // To set defaults of road if not constructed
+    To set defaults of road if not constructed
     vehicles.back()->reConstruct();
 }
+
 
 // Runs the simulation and renders the road
 void Road::runSim(double t) {
