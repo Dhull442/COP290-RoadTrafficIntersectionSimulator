@@ -3,7 +3,6 @@
 
 #include <bits/stdc++.h>
 #include "Vehicle.h"
-#include <GLFW/glfw3.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -29,7 +28,6 @@ class Road {
         int window_length;
         int window_height;
         int id;
-        GLFWwindow* window; // The rendering window
         bool isClear; // Checks if the road is clear
         std::string signal; // The signal value at this time
 
@@ -52,16 +50,6 @@ class Road {
         // Run the simulation on the road for time t
         void runSim(double t);
 
-        // The error_callback function
-        static void error_callback(int error, const char* description);
-        // The key function
-        static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-
-        // Setup the OpenGL context with the road
-        void setupRoad();
-
-        // Render the road into the window, reading the class attributes
-        void renderRoad();
     }
 
 #endif

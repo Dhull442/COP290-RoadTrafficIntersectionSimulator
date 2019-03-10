@@ -95,63 +95,7 @@ double Road::firstObstacle(double startPos, double topRow, double botRow ){
 
 // Updates the unrestricted new positions of every vehicle
 void Road::updateUnrestrictedpositions(double delT){
-  for(auto v : this -> vehicles ){
+  for(auto v : this -> vehicles) {
     v->updatePos(delT,false);
-  };
-}
-// The error_callback function prints out the error and exits with non-zero status
-static void Road::error_callback(int error, const char* description) {
-    std::cerr << description << std::endl;
-    std::exit(1);
-}
-
-static void Road::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    // Exit when the escape key is pressed
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-        glfwWindowShouldClose(window, GL_TRUE);
-    }
-}
-
-void Road::setupRoad() {
-    // Initialize GLFW
-    glfwInit();
-    glEnable(GL_DEPTH_TEST);
-    if (!glfwInit()) {
-        exit(EXIT_FAILURE);
-    }
-
-    // Set the error_callback function
-    glfwSetErrorCallback(Road::error_callback);
-
-    // Create a new window
-    this->window = glfwCreateWindow(this->window_length, this->window_height, "SimView", NULL, NULL);
-    if (!this->window) {
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    }
-
-    // Make this context current
-    glfwMakeContextCurrent(this->window);
-
-    // Set the key_callback function
-    glfwSetKeyCallback(window, Road::key_callback);
-}
-
-void Road::renderRoad() {
-    // Get frameBuffer attributes
-    double ratio;
-    int frame_height, frame_width;
-    glfwGetFramebufferSize(this->window, &window_height, &window_width);
-    ratio = frame_width/(double)frame_height;
-
-    // Create a blank viewport
-    glViewport(0, 0, width, height);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    // Render the road as a rectangle
-
-
-    // Swap the buffers, to display rendered stuff on the screen
-    glfwSwapBuffers(this->window);
-    glfwPollEvents();
+  }
 }
