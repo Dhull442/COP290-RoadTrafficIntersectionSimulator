@@ -91,45 +91,31 @@ void RenderEngine::render(double delT) {
   #else
   0;
   #endif
-  std::cout<<"Starting Render routine"<<std::endl;
-  while((currentTime - beginTime < delT)&&!glfwWindowShouldClose(RenderEngine::window)) {
-      // std::cout<<"Positions are being updated"<<std::endl;
+  std::cout << "Starting Render routine"<< std::endl;
+  while((currentTime - beginTime < delT) && !glfwWindowShouldClose(RenderEngine::window)) {
       this->targetRoad->updateSim(currentTime - beginTime);
-      // std::cout<<"Positions updated succesfully"<<std::endl;
-      // RENDER engine
-      {
-        // std::cout << "Calling the render function" << std::endl;
-        // std::cout << glfwWindowShouldClose(RenderEngine::window) << std::endl;
-        // std::cout << "Checking condition" << std::endl;
-        // While the window is not closed do this
-        // if(!glfwWindowShouldClose(RenderEngine::window)) {
-            // Setup the frame
-            // std::cout << "Setting up the frame here" << std::endl;
-            float ratio;
-            int width=800, height=800;
-            // std::cout << "Getting framebuffer size" << std::endl;
-            glfwGetFramebufferSize(RenderEngine::window, &width, &height);
-            // std::cout << "Framebuffer size obtained" << std::endl;
+        float ratio;
+        int width=800, height=800;
 
-            ratio = width / (float) height;
-            glViewport(0, 0, width, height);
-            glClear(GL_COLOR_BUFFER_BIT);
-            // Render the background
-            // std::cout << "Rendering the background" << std::endl;
-            glClearColor((float)this->bgcolor[0]/255.0f, (float)this->bgcolor[1]/255.0f, (float)this->bgcolor[2]/255.0f, 1.0f);
+        glfwGetFramebufferSize(RenderEngine::window, &width, &height);
 
-            // Render the road
-            RenderEngine::renderRoad();
+        ratio = width / (float) height;
+        glViewport(0, 0, width, height);
+        glClear(GL_COLOR_BUFFER_BIT);
+        // Render the background
+        glClearColor((float)this->bgcolor[0]/255.0f, (float)this->bgcolor[1]/255.0f, (float)this->bgcolor[2]/255.0f, 1.0f);
 
-            // Iterate over the vehicles
-            for(auto v: this->targetRoad->vehicles) {
-                renderVehicle(v);
-            }
+        // Render the road
+        RenderEngine::renderRoad();
 
-            // Swap buffers and check for events
-            glfwSwapBuffers(RenderEngine::window);
-            glfwPollEvents();
-            // std::cout << "Rendering Done..." << std::endl;
+        // Iterate over the vehicles
+        for(auto v: this->targetRoad->vehicles) {
+            renderVehicle(v);
+        }
+
+        // Swap buffers and check for events
+        glfwSwapBuffers(RenderEngine::window);
+        glfwPollEvents();
       }
 
       oldTime = currentTime;
@@ -141,13 +127,6 @@ void RenderEngine::render(double delT) {
       #endif
 
   }
-  // std::cout <<"Rendered one more!"<<std::endl;
-
-   // } else {
-    //    std::cout << "Window is closed" << std::endl;
-     //   glfwTerminate();
-     //   std::exit(1);
-    // }
 }
 
 void RenderEngine::renderRoad() {
