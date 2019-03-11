@@ -126,6 +126,9 @@ void Vehicle::updatePos(double delT,bool limit){
     this->unrestrictedposition.first = unrestrictedNewPosition;
   }
 }
+// bool operator< (Vehicle v){
+//   return Vehicle::currentPosition.first < v.currentPosition.first;
+// }
 // int main(){
 //   Vehicle mine("Car",2,2);
 //   std::cout << mine.skill << std::endl;

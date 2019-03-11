@@ -16,3 +16,6 @@ rend:
 
 clean:
 	rm -rf *.o a.out
+
+al:
+	g++ -std=c++11 -o main main.cpp -DIMPL Road.o Vehicle.o RenderEngine.o -lGL -lGLU -lglfw3 -lX11 -lXxf86vm -lXrandr -lpthread -lXi -ldl -lXinerama -lXcursor

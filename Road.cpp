@@ -4,6 +4,7 @@
 #include "RenderEngine.h"
 
 Road::Road() {
+  std::cout<<"This is the most general constructor"<<std::endl;
   #ifdef RENDER_ENGINE_H
   //new(&(this->engine)) RenderEngine(this);
   RenderEngine newengine(this);
@@ -80,42 +81,49 @@ return;
   }
 }
 
+void Road::updateSim(double delT){
+  std::cout << "updating Simulation positions" <<std::endl;
+  this->updateUnrestrictedpositions(delT);
+  // Update positions of each car
+  for(int i=0;i<this->vehicles.size();i++) {
+      vehicles[i]->updatePos(delT,true);
+  }
+}
+
 // Runs the simulation and renders the road
 void Road::runSim(double delT) {
     // Run until time is exhausted
-    double beginTime =
-    #ifdef RENDER_ENGINE_H
-    this->engine.getTime();
-    #else
-    0;
-    #endif
-    double oldTime;
-    double currentTime =
-    #ifdef RENDER_ENGINE_H
-    this->engine.getTime();
-    #else
-    0;
-    #endif
-
-    while(currentTime - beginTime < delT) {
-
-        this->updateUnrestrictedpositions(currentTime - oldTime);
-        // Update positions of each car
-        for(int i=0;i<this->vehicles.size();i++) {
-            vehicles[i]->updatePos(currentTime - oldTime,true);
-        }
-        oldTime = currentTime;
-        currentTime =
-        #ifdef RENDER_ENGINE_H
-        this->engine.getTime();
-        #else
-        0.1;
-        #endif
-        // Render the current state
-        #ifdef RENDER_ENGINE_H
-        this->engine.render();
-        #endif
-    }
+    // double beginTime =
+    // #ifdef RENDER_ENGINE_H
+    // this->engine.getTime();
+    // #else
+    // 0;
+    // #endif
+    // double oldTime;
+    // double currentTime =
+    // #ifdef RENDER_ENGINE_H
+    // this->engine.getTime();
+    // #else
+    // 0;
+    // #endif
+    // GLFWwindow* window;
+    // while(currentTime - beginTime < delT) {
+    //
+    //
+    //     oldTime = currentTime;
+    //     currentTime =
+    //     #ifdef RENDER_ENGINE_H
+    //     this->engine.getTime();
+    //     #else
+    //     0.1;
+    //     #endif
+    //     // Render the current state
+    //     #ifdef RENDER_ENGINE_H
+    //     this->engine.render();
+    //     #endif
+    // }
+    // return;
+    this->engine.render(delT);
 }
 
 std::pair<double,double> Road::initPosition(){
@@ -176,6 +184,7 @@ void Road::updateUnrestrictedpositions(double delT){
   for(auto v : this -> vehicles) {
     v->updatePos(delT,false);
   };
+  std::cout <<" Updated unrestricted positions" <<std::endl;
 }
 // The error_callback function prints out the error and exits with non-zero status
 // static void Road::error_callback(int error, const char* description) {

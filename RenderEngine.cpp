@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include "RenderEngine.h"
 
-// #define GLFW_TRUE true
 RenderEngine::RenderEngine(Road* targetRoad) {
     std::cout << "Instantiated RenderEngine for road " << targetRoad->id << std::endl;
     this->targetRoad = targetRoad;
@@ -78,39 +77,73 @@ float RenderEngine::getTime() {
     return time;
 }
 
-void RenderEngine::render() {
-    std::cout << "Calling the render function" << std::endl;
-    // std::cout << glfwWindowShouldClose(RenderEngine::window) << std::endl;
-    std::cout << "Checking condition" << std::endl;
-    // While the window is not closed do this
-    // if(!glfwWindowShouldClose(RenderEngine::window)) {
-        // Setup the frame
-        std::cout << "Setting up the frame here" << std::endl;
-        float ratio;
-        int width=800, height=800;
-        std::cout << "Getting framebuffer size" << std::endl;
-        glfwGetFramebufferSize(RenderEngine::window, &width, &height);
-        std::cout << "Framebuffer size obtained" << std::endl;
+void RenderEngine::render(double delT) {
+  std::cout <<"Road is with "<< this->targetRoad->id <<std::endl;
+  double beginTime =
+  #ifdef RENDER_ENGINE_H
+  RenderEngine::getTime();
+  #else
+  0;
+  #endif
+  double oldTime;
+  double currentTime =
+  #ifdef RENDER_ENGINE_H
+  RenderEngine::getTime();
+  #else
+  0;
+  #endif
+  std::cout<<"Starting Render routine"<<std::endl;
+  while((currentTime - beginTime < delT)) {
+      std::cout<<"Positions are being updated"<<std::endl;
+      this->targetRoad->updateSim(currentTime - beginTime);
+      std::cout<<"Positions updated succesfully"<<std::endl;
+      // RENDER engine
+      {
+        std::cout << "Calling the render function" << std::endl;
+        // std::cout << glfwWindowShouldClose(RenderEngine::window) << std::endl;
+        std::cout << "Checking condition" << std::endl;
+        // While the window is not closed do this
+        // if(!glfwWindowShouldClose(RenderEngine::window)) {
+            // Setup the frame
+            std::cout << "Setting up the frame here" << std::endl;
+            float ratio;
+            int width=800, height=800;
+            std::cout << "Getting framebuffer size" << std::endl;
+            glfwGetFramebufferSize(RenderEngine::window, &width, &height);
+            std::cout << "Framebuffer size obtained" << std::endl;
 
-        ratio = width / (float) height;
-        glViewport(0, 0, width, height);
-        glClear(GL_COLOR_BUFFER_BIT);
-        // Render the background
-        std::cout << "Rendering the background" << std::endl;
-        glClearColor((float)this->bgcolor[0]/255.0f, (float)this->bgcolor[1]/255.0f, (float)this->bgcolor[2]/255.0f, 1.0f);
+            ratio = width / (float) height;
+            glViewport(0, 0, width, height);
+            glClear(GL_COLOR_BUFFER_BIT);
+            // Render the background
+            std::cout << "Rendering the background" << std::endl;
+            glClearColor((float)this->bgcolor[0]/255.0f, (float)this->bgcolor[1]/255.0f, (float)this->bgcolor[2]/255.0f, 1.0f);
 
-        // Render the road
-        RenderEngine::renderRoad();
+            // Render the road
+            RenderEngine::renderRoad();
 
-        // Iterate over the vehicles
-        for(auto v: this->targetRoad->vehicles) {
-            renderVehicle(v);
-        }
+            // Iterate over the vehicles
+            for(auto v: this->targetRoad->vehicles) {
+                renderVehicle(v);
+            }
 
-        // Swap buffers and check for events
-        glfwSwapBuffers(RenderEngine::window);
-        glfwPollEvents();
-        std::cout << "Rendering Done..." << std::endl;
+            // Swap buffers and check for events
+            glfwSwapBuffers(RenderEngine::window);
+            glfwPollEvents();
+            std::cout << "Rendering Done..." << std::endl;
+      }
+
+      oldTime = currentTime;
+      currentTime =
+      #ifdef RENDER_ENGINE_H
+      RenderEngine::getTime();
+      #else
+      0.1;
+      #endif
+
+  }
+  std::cout <<"Rendered one more!"<<std::endl;
+
    // } else {
     //    std::cout << "Window is closed" << std::endl;
      //   glfwTerminate();
