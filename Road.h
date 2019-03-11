@@ -41,6 +41,7 @@ class Road {
         Road(int id, double length, double width);
         Road(int id);
         Road();
+        void updateSim(double delT);
         void setDefaults(double maxspeed, double acceleration,double length, double width,int skill);
         // Add a Vehicle to the road
         void addVehicle(Vehicle* vehicle,std::string color);
