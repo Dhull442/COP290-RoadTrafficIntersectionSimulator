@@ -39,9 +39,9 @@ class RenderEngine {
 
     // Initialize the variables
     void setup();
-
+    // RenderEngine::window getWindow();
     // Clear the screen and render the road, vehicles afresh
-    void render();
+    void render(double delT);
     void renderRoad();
     void renderVehicle(Vehicle* vehicle);
 

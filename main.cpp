@@ -1,18 +1,18 @@
 #include<bits/stdc++.h>
 // #include"Parser.h"
-#ifdef IMPL
+// #ifdef IMPL
 #include "Vehicle.h"
 #include "Road.h"
 typedef std::vector<Road*> Model;
 typedef std::vector<Vehicle*> vv;
-#endif
-#ifdef VEHICLE_H
-  #ifdef ROAD_H
-    #ifndef IMPL
-    #define IMPL
-    #endif
-  #endif
-#endif
+// #endif
+// #ifdef VEHICLE_H
+//   #ifdef ROAD_H
+//     #ifndef IMPL
+//     #define IMPL
+    // #endif
+  // #endif
+// #endif
 
 std::string preprocess(std::string a){
   std::string ans = "";
@@ -30,11 +30,12 @@ std::string preprocess(std::string a){
   return ans;
 }
 void simulationActions(
-  #ifdef IMPL
+  // #ifdef IMPL
   Road* road,
   vv vehicles,
-  #endif
+  // #endif
   std::vector<std::string> tokens){
+    // std::cout <<"Road with ID "<<road -> id <<std::endl;
     double delT=0;
   for(int i=0;i<tokens.size();i++){
     // Parse the value and function
@@ -43,26 +44,27 @@ void simulationActions(
 
     // Signal change routine
     if(!function.compare("Signal")){
-      #ifdef IMPL
+      // #ifdef IMPL
       road->setSignal(value);
-      #else
+      // #else
         std::cout<<"Road Signal = "<<value<<std::endl;
-      #endif
+      // #endif
       continue;
     }
 
     // Passing time routine
     if(!function.compare("Pass")){
-      delT += std::atof(value.c_str());
-      #ifdef IMPL
-      #else
+      double time = std::atof(value.c_str());
+      delT += time;
+      // #ifdef IMPL
+      // #else
         std::cout<<"Pass time = "<<time<<std::endl;
-      #endif
+      // #endif
       continue;
     }
 
     // addition of vehicles routine
-    #ifdef IMPL
+    // #ifdef IMPL
     bool found = false;
     for(int v = 0; v < vehicles.size(); v++ ){
       if(!vehicles[v]->type.compare(preprocess(function))){  // preprocessing to ignore any fuss due to Capitals
@@ -72,21 +74,20 @@ void simulationActions(
       }
     }
     if(found)continue;
-    #else
-      std::cout<<function<<"="<<value<<std::endl;
-      continue;
-    #endif
+    // #else
+    // #endif
     // None found
     {
       std::cout<<"No function defined for "<<function<<" with value "<<value<<std::endl;
       std::exit(1);
     }
   }
-  #ifdef IMPL
-    road->runSim(delT);
-  #else
+  // #ifdef IMPL
+
     std::cout<<"Running Simulation with ΔT = "<<delT<<std::endl;
-  #endif
+    road->runSim(delT);
+  // #else
+  // #endif
 }
 int main(int argc, char **argv){
   // Add a check here
@@ -98,10 +99,10 @@ int main(int argc, char **argv){
   }
   else{
     bool defmode = true;
-    #ifdef IMPL
+    // #ifdef IMPL
     Model model;
     vv vehicles;
-    #endif
+    // #endif
     std::string line;
     int num_rules=0,safety_skill;
     double safety_maxspeed,safety_acceleration,safety_length,safety_width;
@@ -115,46 +116,46 @@ int main(int argc, char **argv){
             // Create and add new road;
             safety_maxspeed = std::atof(line.substr(line.find("=") + 1).c_str());
             num_rules++;
-            #ifdef IMPL
-            #else
+            // #ifdef IMPL
+            // #else
             std::cout << "Safety_MaxSpeed : " << safety_maxspeed << std::endl;
-            #endif
+            // #endif
           }
           if(line.find("Safety_Acceleration") != std::string::npos){
             // Create and add new road;
             safety_acceleration = std::atof(line.substr(line.find("=") + 1).c_str());
             num_rules++;
-            #ifdef IMPL
-            #else
+            // #ifdef IMPL
+            // #else
             std::cout << "Safety_Acceleration : " << safety_acceleration << std::endl;
-            #endif
+            // #endif
           }
           if(line.find("Safety_Length") != std::string::npos){
             // Create and add new road;
             safety_length = std::atof(line.substr(line.find("=") + 1).c_str());
             num_rules++;
-            #ifdef IMPL
-            #else
+            // #ifdef IMPL
+            // #else
             std::cout << "Safety_Length : " << safety_length << std::endl;
-            #endif
+            // #endif
           }
           if(line.find("Safety_Width") != std::string::npos){
             // Create and add new road;
             safety_width = std::atof(line.substr(line.find("=") + 1).c_str());
             num_rules++;
-            #ifdef IMPL
-            #else
+            // #ifdef IMPL
+            // #else
             std::cout << "Safety_width : " << safety_width << std::endl;
-            #endif
+            // #endif
           }
           if(line.find("Safety_Skill") != std::string::npos){
             // Create and add new road;
             safety_skill = std::atoi(line.substr(line.find("=") + 1).c_str());
             num_rules++;
-            #ifdef IMPL
-            #else
+            // #ifdef IMPL
+            // #else
             std::cout << "Safety_Skill : " << safety_skill << std::endl;
-            #endif
+            // #endif
           }
           if(line.find("Road_Id") != std::string::npos){
             // Create and add new road;
@@ -163,69 +164,70 @@ int main(int argc, char **argv){
               std::exit(1);
             }
             int id = std::atoi(line.substr(line.find("=") + 1).c_str());
-            #ifdef IMPL
-            Road newroad(id);
-            newroad.setDefaults(safety_maxspeed,safety_acceleration,safety_length,safety_width,safety_skill);
-            model.push_back(&newroad);
-            #else
-            std::cout << "Road ID : " << id << std::endl;
-            #endif
+            // #ifdef IMPL
+            Road* newroad= new Road(id);
+            newroad->setDefaults(safety_maxspeed,safety_acceleration,safety_length,safety_width,safety_skill);
+            model.push_back(newroad);
+            std::cout << "This road is " << model.back()->id<<std::endl;
+            // #else
+            std::cout << "Road ID : " << newroad->id << std::endl;
+            // #endif
           }
           if(line.find("Road_Length") != std::string::npos){
             // Create and add new road;
             double length = std::atof(line.substr(line.find("=") + 1).c_str());
-            #ifdef IMPL
+            // #ifdef IMPL
             model.back()->length = length;
-            #else
+            // #else
             std::cout << "Length : "<<length<< std::endl;
-            #endif
+            // #endif
           }
           if(line.find("Road_Width") != std::string::npos){
             // Create and add new road;
             double width = std::atof(line.substr(line.find("=") + 1).c_str());
-            #ifdef IMPL
+            // #ifdef IMPL
             model.back()->width = width;
-            #else
+            // #else
             std::cout << "Width : "<<width<< std::endl;
-            #endif
+            // #endif
           }
           if(line.find("Road_Signal") != std::string::npos){
             // Create and add new road;
             double signal = std::atof(line.substr(line.find("=") + 1).c_str());
-            #ifdef IMPL
+            // #ifdef IMPL
             model.back()->signalPosition = signal;
-            #else
+            // #else
             std::cout << "Signal : "<<signal<< std::endl;
-            #endif
+            // #endif
           }
 
           // Default Params
           if(line.find("Default_MaxSpeed") != std::string::npos){
             // Create and add new road;
             double maxsp = std::atof(line.substr(line.find("=") + 1).c_str());
-            #ifdef IMPL
+            // #ifdef IMPL
             model.back()->default_maxspeed = maxsp;
-            #else
+            // #else
             std::cout << "Maxspeed : "<<maxsp<< std::endl;
-            #endif
+            // #endif
           }
           if(line.find("Default_Acceleration") != std::string::npos){
             // Create and add new road;
             double acc = std::atof(line.substr(line.find("=") + 1).c_str());
-            #ifdef IMPL
+            // #ifdef IMPL
             model.back()->default_acceleration = acc;
-            #else
+            // #else
             std::cout << "Acceleration : "<<acc<< std::endl;
-            #endif
+            // #endif
           }
           // if(line.find("Default_Type") != std::string::npos){
           //   // Create and add new road;
           //   std::string type = preprocess(line.substr(line.find("=") + 1));
-          //   #ifdef IMPL
+          //   // #ifdef IMPL
           //   model.back()->default_type = type;
-          //   #else
+          //   // #else
           //   std::cout << "Type : "<<type<< std::endl;
-          //   #endif
+          //   // #endif
           // }
           if(line.find("Default_Skill") != std::string::npos){
             // Create and add new road;
@@ -236,57 +238,57 @@ int main(int argc, char **argv){
             if( skill > 2){
               skill =2 ;
             }
-            #ifdef IMPL
+            // #ifdef IMPL
             model.back()->default_skill = skill;
-            #else
+            // #else
             std::cout << "Skill : "<<skill<< std::endl;
-            #endif
+            // #endif
           }
           if(line.find("Vehicle_Type") != std::string::npos){
             // Create and add new road;
             std::string vtype = preprocess(line.substr(line.find("=") + 1));
-            #ifdef IMPL
-            Vehicle newVehicle(vtype);
-            vehicles.push_back(&newVehicle);
-            #else
+            // #ifdef IMPL
+            Vehicle* newVehicle = new Vehicle(vtype);
+            vehicles.push_back(newVehicle);
+            // #else
             std::cout << "New Vehicle Type : "<<vtype<< std::endl;
-            #endif
+            // #endif
           }
           if(line.find("Vehicle_Length") != std::string::npos){
             // Create and add new road;
             double length = std::atof(line.substr(line.find("=") + 1).c_str());
-            #ifdef IMPL
+            // #ifdef IMPL
             vehicles.back()->length  = length;
-            #else
+            // #else
             std::cout << "Vehicle Length : "<<length<< std::endl;
-            #endif
+            // #endif
           }
           if(line.find("Vehicle_Width") != std::string::npos){
             // Create and add new road;
             double width = std::atof(line.substr(line.find("=") + 1).c_str());
-            #ifdef IMPL
+            // #ifdef IMPL
             vehicles.back()->width  = width;
-            #else
+            // #else
             std::cout << "Vehicle width : "<<width<< std::endl;
-            #endif
+            // #endif
           }
           if(line.find("Vehicle_MaxSpeed") != std::string::npos){
             // Create and add new road;
             double maxsp = std::atof(line.substr(line.find("=") + 1).c_str());
-            #ifdef IMPL
+            // #ifdef IMPL
             vehicles.back()->maxspeed = maxsp;
-            #else
+            // #else
             std::cout << "Vehicle maxspeed : "<<maxsp<< std::endl;
-            #endif
+            // #endif
           }
           if(line.find("Vehicle_Acceleration") != std::string::npos){
             // Create and add new road;
             double acc = std::atof(line.substr(line.find("=") + 1).c_str());
-            #ifdef IMPL
+            // #ifdef IMPL
             vehicles.back()->acceleration = acc;
-            #else
+            // #else
             std::cout << "Vehicle Acceleration : "<<acc<< std::endl;
-            #endif
+            // #endif
           }
           // CHANGE MODE
           if(line.find("START") != std::string::npos){
@@ -304,9 +306,9 @@ int main(int argc, char **argv){
           bool roadSpecified = false;
           int road_id;
           int pos=0;
-          #ifdef IMPL
-           Road* road;
-          #endif
+          // #ifdef IMPL
+          Road* road;
+          // #endif
           // Extract tokens from string
           while ((pos = line.find(delimiter)) != std::string::npos) {
             tokens.push_back(line.substr(0, pos));
@@ -321,7 +323,7 @@ int main(int argc, char **argv){
           if(tokens[0].find("Road") != std::string::npos){
             roadSpecified = true;
             road_id = std::atoi(tokens[0].substr(tokens[0].find("=") + 1).c_str());
-            #ifdef IMPL
+            // #ifdef IMPL
               for(int num = 0; num < model.size(); num++){
                 if(model[num]->id == road_id){
                   road = model[num];
@@ -332,31 +334,32 @@ int main(int argc, char **argv){
                 std::cout <<"[ ERROR ] No Road with id "<<road_id<<" exists" <<std::endl;
                 std::exit(1);
               }
-            #else
+            // #else
             std::cout<<"Road Id: "<<road_id<<std::endl;
-            #endif
+            // #endif
             tokens.erase(tokens.begin());
           }
           if(roadSpecified){
-            #ifdef IMPL
+            // #ifdef IMPL
               simulationActions(road,vehicles,tokens);
-            #else
-              std::cout<<"Functions are going on with road" <<road_id<<std::endl;
-              simulationActions(tokens);
-            #endif
+            // #else
+              // std::cout<<"Functions are going on with road" <<road_id<<std::endl;
+              // simulationActions(tokens);
+            // #endif
           }
           if(!roadSpecified){
-            #ifdef IMPL
+            // #ifdef IMPL
               if(model.size()<1){
                 std::cout<<"[ ERROR ] No Roads exist"<<std::endl;
+                std::exit(1);
               }
               simulationActions(model.back(),vehicles,tokens);
-            #else
-              std::cout<<"Functions are going on with latest road"<<std::endl;
-              simulationActions(tokens);
-            #endif
+            // #else
+              // std::cout<<"Functions are going on with latest road added"<<std::endl;
+              // simulationActions(tokens);
+            // #endif
           }
-          std::cout << "* * * * * * * * * ~ ~ ~ ~ SIMULATION ~ ~ ~ ~ * * * * * * * * *"<<std::endl;
+          // std::cout << "* * * * * * * * * ~ ~ ~ ~ SIMULATION ~ ~ ~ ~ * * * * * * * * *"<<std::endl;
         }
       }
     }
