@@ -23,12 +23,10 @@ class Road {
         double default_width = 2;
         int default_skill = 1;
 
-
         double length;
         double width;
         double signalPosition;
-        int window_length;
-        int window_height;
+        int lanes;
         int id=-1;
         std::vector< int > signal_rgb;
         // Pointer to the Vehicle objects on the road
@@ -38,7 +36,7 @@ class Road {
         Road(int id);
         Road();
         void updateSim(double delT);
-        void setDefaults(double maxspeed, double acceleration,double length, double width,int skill);
+        void setDefaults(double maxspeed, double acceleration,double length, double width,int skill,int lanes);
         // Add a Vehicle to the road
         void addVehicle(Vehicle* vehicle,std::string color);
         void updateUnrestrictedpositions(double delT);
