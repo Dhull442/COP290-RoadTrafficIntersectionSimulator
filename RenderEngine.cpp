@@ -9,7 +9,10 @@
 RenderEngine::RenderEngine(Road* targetRoad) {
     std::cout << "Instantiated RenderEngine for road " << targetRoad->id << std::endl;
     this->targetRoad = targetRoad;
-    this->scaling = 20;
+    // Dividing by this factor gives it in viewport dimensions
+    this->scalex = 25;
+    this->scaley = 50;
+    this->signalSize = 1;
     // Set the default background color
     this->bgcolor.push_back(1.0f);
     this->bgcolor.push_back(0.968f);
@@ -45,7 +48,6 @@ void RenderEngine::setup() {
     if (!glfwInit()) {
         exit(EXIT_FAILURE);
     }
-    // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,GL_TRUE);
 
     // Set the error_callback function
     glfwSetErrorCallback(RenderEngine::error_callback);
@@ -73,7 +75,6 @@ void RenderEngine::setup() {
 
 float RenderEngine::getTime() {
     float time = glfwGetTime();
-    // std::cout << "The current time is " << time << std::endl;
     return time;
 }
 
@@ -93,6 +94,7 @@ void RenderEngine::render(double delT) {
     #endif
     std::cout << "Starting Render routine"<< std::endl;
     while((currentTime - beginTime < delT) && !glfwWindowShouldClose(RenderEngine::window)) {
+        std::cout << "Rendering now..." << std::endl;
         this->targetRoad->updateSim(currentTime - beginTime);
         float ratio;
         int width=800, height=800;
@@ -102,11 +104,17 @@ void RenderEngine::render(double delT) {
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT);
         // Render the background
-        glClearColor((float)this->bgcolor[0]/255.0f, (float)this->bgcolor[1]/255.0f, (float)this->bgcolor[2]/255.0f, 1.0f);
+        glClearColor((float)this->bgcolor[0], (float)this->bgcolor[1], (float)this->bgcolor[2], 1.0f);
 
         // Render the road
         RenderEngine::renderRoad();
 
+        // Render a rectangle moving at constant speed
+        glColor3f(0.0f, 0.0f, 0.0f);
+        float t = glfwGetTime();
+        glRectd(t/10.0-1, 0.8, t/10.0-0.98, 0.75);
+
+        std::cout << "num vehicles; " << this->targetRoad->vehicles.size() << std::endl;
         // Iterate over the vehicles
         for(auto v: this->targetRoad->vehicles) {
             renderVehicle(v);
@@ -115,30 +123,27 @@ void RenderEngine::render(double delT) {
         // Swap buffers and check for events
         glfwSwapBuffers(RenderEngine::window);
         glfwPollEvents();
-    }
 
-    oldTime = currentTime;
-    currentTime =
-    #ifdef RENDER_ENGINE_H
-    RenderEngine::getTime();
-    #else
-    0.1;
-    #endif
+        oldTime = currentTime;
+        currentTime =
+        #ifdef RENDER_ENGINE_H
+        RenderEngine::getTime();
+        #else
+        #endif
+    }
 }
 
 void RenderEngine::renderRoad() {
-    // std::cout << "Rendering the road" << std::endl;
     // Render the road in gray
     glColor3f(0.2f, 0.2f, 0.2f);
-    float ycoord = this->targetRoad->width*this->scaling/(float)this->monitorHeight;
-    float xcoord = (this->targetRoad->length*this->scaling - (int)(this->monitorWidth/2))/(float)((int)(this->monitorWidth/2));
+    float ycoord = this->targetRoad->width/(float)this->scaley*2;
+    float xcoord = this->targetRoad->length/(float)this->scalex - 1.0;
     glRectd(-1.0f, ycoord, xcoord, -ycoord);
 
-    // Render the signal in the remaining part
-    glColor3f((float)this->targetRoad->signal_rgb[0]/255.0f,
-    (float)this->targetRoad->signal_rgb[1]/255.0f,
-    (float)this->targetRoad->signal_rgb[2]/255.0f);
-    glRectd(xcoord, ycoord, 1.0f, -ycoord);
+    // Render the signal as a strip
+    float xsignal = this->targetRoad->signalPosition/(float)this->scalex - 1.0;
+    glColor3f((float)this->targetRoad->signal_rgb[0]/255.0f, (float)this->targetRoad->signal_rgb[1]/255.0f, (float)this->targetRoad->signal_rgb[2]/255.0f);
+    glRectd(xsignal, ycoord, xsignal + this->signalSize/(float)this->scalex, -ycoord);
 }
 
 void RenderEngine::endSim() {
@@ -146,25 +151,20 @@ void RenderEngine::endSim() {
 }
 
 void RenderEngine::renderVehicle(Vehicle* vehicle) {
-    // std::cout << "Rendering the Vehicle" << std::endl;
     if (vehicle->isOnRoad) {
-        // std::cout << "The vehicle is on the road" << std::endl;
         // Render only if the vehicle is on the Road
-        float x = -1.0 + (float)vehicle->currentPosition.first*this->scaling*2/(float)(this->monitorWidth);
-        float y = (float)this->scaling*(this->targetRoad->width-2*vehicle->currentPosition.second)/(float)this->monitorHeight;
-        float delx = 2*vehicle->width*this->scaling/(float)this->monitorWidth;
-        float dely = 2*vehicle->length*this->scaling/(float)this->monitorHeight;
+        float x = -1.0 + (float)vehicle->currentPosition.first/(float)this->scalex;
+        float y = ((float)this->targetRoad->width/2 - (float)vehicle->currentPosition.second)/(this->scaley);
+        float delx = vehicle->width/(float)this->scalex;
+        float dely = vehicle->length/(float)this->scaley;
+
         // Set the correct color
         glColor3f((float)vehicle->color_rgb[0]/255.0f,
         (float)vehicle->color_rgb[1]/255.0f,
         (float)vehicle->color_rgb[2]/255.0f);
+
         // Render the rectangle
+        std::cout << "Vehicle rendered at " << x << " " << y << " " << x - delx << " " << y - dely << std::endl;
         glRectd(x, y, x -  delx, y - dely);
     }
 }
-
-// int main() {
-//     RenderEngine engine();
-//     engine.setup();
-//     engine.render();
-// }
