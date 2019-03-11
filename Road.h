@@ -11,10 +11,7 @@ class Road {
         // All co-ordinates consider left bottom as (0,0)
     private:
         std::string signal; // The signal value at this time
-        // The initial position of the queue.
-        // double queuePos;
-        // The default distance between two objects.
-        // double bufferLength;
+        std::vector<std::pair<double, double> > map;
     public:
         // default vehicle Parameters
         #ifdef RENDER_ENGINE_H
@@ -33,7 +30,6 @@ class Road {
         int window_length;
         int window_height;
         int id=-1;
-        // GLFWwindow* window; // The rendering window
         std::vector< int > signal_rgb;
         // Pointer to the Vehicle objects on the road
         std::vector<Vehicle*> vehicles;
@@ -53,18 +49,8 @@ class Road {
         // Run the simulation on the road for time t
         void runSim(double t);
         void setSignal(std::string signal);
-        // The error_callback function
-        // static void error_callback(int error, const char* description);
-        // The key function
-        // static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-        std::pair<double,double> initPosition();
-        // std::vector<std::pair<double ,double> > topedgeprofile();
-        // std::vector<std::pair<double ,double> > botedgeprofile();
-        // Setup the OpenGL context with the road
-        // void setupRoad();
+        std::pair<double,double> initPosition(Vehicle* v);
 
-        // Render the road into the window, reading the class attributes
-        // void renderRoad();
     };
 
 #endif

@@ -130,7 +130,7 @@ void Vehicle::updatePos(double delT,bool limit){
     this->currentPosition.first = obstacle;
   }
   if((this->currentPosition.first - this->length) >= this->parentRoad->length){
-    std::cout <<"Vehicle gone offroad"<<std::endl;
+    // std::cout <<"Vehicle gone offroad"<<std::endl;
     this->isOnRoad = false;
   }
   }
