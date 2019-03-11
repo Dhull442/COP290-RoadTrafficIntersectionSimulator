@@ -67,12 +67,15 @@ void simulationActions(
     // #ifdef IMPL
     bool found = false;
     for(int v = 0; v < vehicles.size(); v++ ){
+      std::cout << vehicles[v]->type <<",does it match "<<preprocess(function)<<std::endl;
       if(!vehicles[v]->type.compare(preprocess(function))){  // preprocessing to ignore any fuss due to Capitals
         road->addVehicle(vehicles[v],value);
         found = true;
         break;
       }
+      std::cout << "NO"  <<std::endl;
     }
+    std::cout << "YES" << std::endl;
     if(found)continue;
     // #else
     // #endif

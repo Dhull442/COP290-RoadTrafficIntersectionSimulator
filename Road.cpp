@@ -49,16 +49,17 @@ void Road::setDefaults(double maxspeed, double acceleration,double length, doubl
 
 // For adding vehicle
 void Road::addVehicle(Vehicle* vehicle,std::string color) {  // Vehicle from template
-    Vehicle newVehicle = *vehicle; // Make a copy from vehicle template
-    newVehicle.setColor(color);
-    newVehicle.isOnRoad = true;
-    newVehicle.parentRoad = this;
-    newVehicle.currentPosition = this->initPosition();
-    this->vehicles.push_back(&newVehicle);
+    Vehicle* newVehicle = vehicle; // Make a copy from vehicle template
+    newVehicle->setColor(color);
+    newVehicle->isOnRoad = true;
+    newVehicle->parentRoad = this;
+    newVehicle->currentPosition = this->initPosition();
+    this->vehicles.push_back(newVehicle);
     // Add the road to the vehicle
 
     // To set defaults of road if not constructed
     vehicles.back()->reConstruct();
+    std::cout <<this->vehicles.back()->type <<" of "<<color<<" added"<<std::endl;
 }
 
 void Road::setSignal(std::string signal){
@@ -85,7 +86,9 @@ void Road::updateSim(double delT){
   std::cout << "updating Simulation positions" <<std::endl;
   this->updateUnrestrictedpositions(delT);
   // Update positions of each car
+  std::cout << "Updating restricted positions" <<std::endl;
   for(int i=0;i<this->vehicles.size();i++) {
+      std::cout << "Sending vehicle "<<vehicles[i]->type<<std::endl;
       vehicles[i]->updatePos(delT,true);
   }
 }
@@ -184,7 +187,7 @@ void Road::updateUnrestrictedpositions(double delT){
   for(auto v : this -> vehicles) {
     v->updatePos(delT,false);
   };
-  std::cout <<" Updated unrestricted positions" <<std::endl;
+  std::cout <<"Updated unrestricted positions for everyone" <<std::endl;
 }
 // The error_callback function prints out the error and exits with non-zero status
 // static void Road::error_callback(int error, const char* description) {

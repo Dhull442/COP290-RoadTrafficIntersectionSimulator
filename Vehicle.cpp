@@ -121,7 +121,11 @@ void Vehicle::updatePos(double delT,bool limit){
     this->currentPosition.first = unrestrictedNewPosition;
   }
   else
-    this->currentPosition.first = obstacle;}
+    this->currentPosition.first = obstacle;
+  if(this->currentPosition.first - this->length > this->parentRoad->length){
+    this->isOnRoad = false;
+  }
+  }
   else{
     this->unrestrictedposition.first = unrestrictedNewPosition;
   }
