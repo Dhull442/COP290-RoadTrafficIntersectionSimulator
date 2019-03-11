@@ -363,6 +363,12 @@ int main(int argc, char **argv){
         }
       }
     }
-    std::cout<<"/ \\ - / * * * * * * * * * ~ ~ ~ ~ ~ THEEND ~ ~ ~ ~ ~ * * * * * * * * * \\ - / \\"<<std::endl;
+
+    // For each road in model, terminate the Road
+    for(auto road: model) {
+        road->engine.endSim();
+    }
+
+    std::cout<<"* * * * * * * * * ~ ~ ~ ~ ~ THEEND ~ ~ ~ ~ ~ * * * * * * * * *"<<std::endl;
   }
 }

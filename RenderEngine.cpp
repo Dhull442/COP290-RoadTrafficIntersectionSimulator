@@ -78,76 +78,52 @@ float RenderEngine::getTime() {
 }
 
 void RenderEngine::render(double delT) {
-  double beginTime =
-  #ifdef RENDER_ENGINE_H
-  RenderEngine::getTime();
-  #else
-  0;
-  #endif
-  double oldTime;
-  double currentTime =
-  #ifdef RENDER_ENGINE_H
-  RenderEngine::getTime();
-  #else
-  0;
-  #endif
-  std::cout<<"Starting Render routine"<<std::endl;
-  while((currentTime - beginTime < delT)&&!glfwWindowShouldClose(RenderEngine::window)) {
-      // std::cout<<"Positions are being updated"<<std::endl;
-      this->targetRoad->updateSim(currentTime - beginTime);
-      // std::cout<<"Positions updated succesfully"<<std::endl;
-      // RENDER engine
-      {
-        // std::cout << "Calling the render function" << std::endl;
-        // std::cout << glfwWindowShouldClose(RenderEngine::window) << std::endl;
-        // std::cout << "Checking condition" << std::endl;
-        // While the window is not closed do this
-        // if(!glfwWindowShouldClose(RenderEngine::window)) {
-            // Setup the frame
-            // std::cout << "Setting up the frame here" << std::endl;
-            float ratio;
-            int width=800, height=800;
-            // std::cout << "Getting framebuffer size" << std::endl;
-            glfwGetFramebufferSize(RenderEngine::window, &width, &height);
-            // std::cout << "Framebuffer size obtained" << std::endl;
+    double beginTime =
+    #ifdef RENDER_ENGINE_H
+    RenderEngine::getTime();
+    #else
+    0;
+    #endif
+    double oldTime;
+    double currentTime =
+    #ifdef RENDER_ENGINE_H
+    RenderEngine::getTime();
+    #else
+    0;
+    #endif
+    std::cout << "Starting Render routine"<< std::endl;
+    while((currentTime - beginTime < delT) && !glfwWindowShouldClose(RenderEngine::window)) {
+        this->targetRoad->updateSim(currentTime - beginTime);
+        float ratio;
+        int width=800, height=800;
+        glfwGetFramebufferSize(RenderEngine::window, &width, &height);
 
-            ratio = width / (float) height;
-            glViewport(0, 0, width, height);
-            glClear(GL_COLOR_BUFFER_BIT);
-            // Render the background
-            // std::cout << "Rendering the background" << std::endl;
-            glClearColor((float)this->bgcolor[0]/255.0f, (float)this->bgcolor[1]/255.0f, (float)this->bgcolor[2]/255.0f, 1.0f);
+        ratio = width / (float) height;
+        glViewport(0, 0, width, height);
+        glClear(GL_COLOR_BUFFER_BIT);
+        // Render the background
+        glClearColor((float)this->bgcolor[0]/255.0f, (float)this->bgcolor[1]/255.0f, (float)this->bgcolor[2]/255.0f, 1.0f);
 
-            // Render the road
-            RenderEngine::renderRoad();
+        // Render the road
+        RenderEngine::renderRoad();
 
-            // Iterate over the vehicles
-            for(auto v: this->targetRoad->vehicles) {
-                renderVehicle(v);
-            }
+        // Iterate over the vehicles
+        for(auto v: this->targetRoad->vehicles) {
+            renderVehicle(v);
+        }
 
-            // Swap buffers and check for events
-            glfwSwapBuffers(RenderEngine::window);
-            glfwPollEvents();
-            // std::cout << "Rendering Done..." << std::endl;
-      }
+        // Swap buffers and check for events
+        glfwSwapBuffers(RenderEngine::window);
+        glfwPollEvents();
+    }
 
-      oldTime = currentTime;
-      currentTime =
-      #ifdef RENDER_ENGINE_H
-      RenderEngine::getTime();
-      #else
-      0.1;
-      #endif
-
-  }
-  // std::cout <<"Rendered one more!"<<std::endl;
-
-   // } else {
-    //    std::cout << "Window is closed" << std::endl;
-     //   glfwTerminate();
-     //   std::exit(1);
-    // }
+    oldTime = currentTime;
+    currentTime =
+    #ifdef RENDER_ENGINE_H
+    RenderEngine::getTime();
+    #else
+    0.1;
+    #endif
 }
 
 void RenderEngine::renderRoad() {
@@ -160,9 +136,13 @@ void RenderEngine::renderRoad() {
 
     // Render the signal in the remaining part
     glColor3f((float)this->targetRoad->signal_rgb[0]/255.0f,
-              (float)this->targetRoad->signal_rgb[1]/255.0f,
-              (float)this->targetRoad->signal_rgb[2]/255.0f);
+    (float)this->targetRoad->signal_rgb[1]/255.0f,
+    (float)this->targetRoad->signal_rgb[2]/255.0f);
     glRectd(xcoord, ycoord, 1.0f, -ycoord);
+}
+
+void RenderEngine::endSim() {
+    glfwTerminate();
 }
 
 void RenderEngine::renderVehicle(Vehicle* vehicle) {
@@ -176,8 +156,8 @@ void RenderEngine::renderVehicle(Vehicle* vehicle) {
         float dely = 2*vehicle->length*this->scaling/(float)this->monitorHeight;
         // Set the correct color
         glColor3f((float)vehicle->color_rgb[0]/255.0f,
-                  (float)vehicle->color_rgb[1]/255.0f,
-                  (float)vehicle->color_rgb[2]/255.0f);
+        (float)vehicle->color_rgb[1]/255.0f,
+        (float)vehicle->color_rgb[2]/255.0f);
         // Render the rectangle
         glRectd(x, y, x -  delx, y - dely);
     }
