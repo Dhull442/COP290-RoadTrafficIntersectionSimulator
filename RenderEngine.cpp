@@ -153,16 +153,16 @@ void RenderEngine::render(double delT) {
 
 void RenderEngine::renderRoad() {
     std::cout << "Rendering the road" << std::endl;
-    // Render the road in black
-    glColor3f(0.0f, 0.0f, 0.0f);
+    // Render the road in gray
+    glColor3f(0.1f, 0.1f, 0.1f);
     float ycoord = this->targetRoad->width*this->scaling/(float)this->monitorHeight;
     float xcoord = (this->targetRoad->length*this->scaling - (int)(this->monitorWidth/2))/(float)((int)(this->monitorWidth/2));
     glRectd(-1.0f, ycoord, xcoord, -ycoord);
 
     // Render the signal in the remaining part
     glColor3f((float)this->targetRoad->signal_rgb[0]/255.0f,
-              (float)this->targetRoad->signal_rgb[0]/255.0f,
-              (float)this->targetRoad->signal_rgb[0]/255.0f);
+              (float)this->targetRoad->signal_rgb[1]/255.0f,
+              (float)this->targetRoad->signal_rgb[2]/255.0f);
     glRectd(xcoord, ycoord, 1.0f, -ycoord);
 }
 
@@ -176,9 +176,11 @@ void RenderEngine::renderVehicle(Vehicle* vehicle) {
         float delx = 2*vehicle->width*this->scaling/(float)this->monitorWidth;
         float dely = 2*vehicle->length*this->scaling/(float)this->monitorHeight;
         // Set the correct color
-        glColor3f(vehicle->color_rgb[0], vehicle->color_rgb[1], vehicle->color_rgb[2]);
+        glColor3f((float)vehicle->color_rgb[0]/255.0f,
+                  (float)vehicle->color_rgb[1]/255.0f,
+                  (float)vehicle->color_rgb[2]/255.0f);
         // Render the rectangle
-        glRectd(x, y, x - delx, y - dely);
+        glRectd(x, y, x + delx, y + dely);
     }
 }
 
