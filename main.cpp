@@ -105,7 +105,7 @@ int main(int argc, char **argv){
     // #endif
     std::string line;
     int num_rules=0,safety_skill;
-    double safety_maxspeed,safety_acceleration,safety_length,safety_width;
+    double safety_maxspeed,safety_acceleration,safety_length,safety_width,safety_lanes;
     while(std::getline(configFile,line)){
       if (! line.length()) continue;  // IGN empty
       if (line[0] == '#') continue;  // IGN with #
@@ -157,9 +157,18 @@ int main(int argc, char **argv){
             std::cout << "Safety_Skill : " << safety_skill << std::endl;
             // #endif
           }
+          if(line.find("Safety_Lanes") != std::string::npos){
+            // Create and add new road;
+            safety_lanes = std::atoi(line.substr(line.find("=") + 1).c_str());
+            num_rules++;
+            // #ifdef IMPL
+            // #else
+            std::cout << "Safety_Lanes : " << safety_skill << std::endl;
+            // #endif
+          }
           if(line.find("Road_Id") != std::string::npos){
             // Create and add new road;
-            if(num_rules!= 5){
+            if(num_rules!= 6){
               std::cout << "[ ERROR ] Please Specify all the rules."<<std::endl;
               std::exit(1);
             }
@@ -168,7 +177,7 @@ int main(int argc, char **argv){
             Road* newroad= new Road(id);
             newroad->setDefaults(safety_maxspeed,safety_acceleration,safety_length,safety_width,safety_skill);
             model.push_back(newroad);
-            std::cout << "This road is " << model.back()->id<<std::endl;
+            model.back()->lanes = safety_lanes;
             // #else
             std::cout << "Road ID : " << newroad->id << std::endl;
             // #endif
@@ -189,6 +198,15 @@ int main(int argc, char **argv){
             model.back()->width = width;
             // #else
             std::cout << "Width : "<<width<< std::endl;
+            // #endif
+          }
+          if(line.find("Road_Lanes") != std::string::npos){
+            // Create and add new road;
+            int lanes = std::atoi(line.substr(line.find("=") + 1).c_str());
+            // #ifdef IMPL
+            model.back()->lanes = lanes;
+            // #else
+            std::cout << "Lanes : "<<lanes<< std::endl;
             // #endif
           }
           if(line.find("Road_Signal") != std::string::npos){
