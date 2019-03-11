@@ -10,6 +10,7 @@ Road::Road() {
     this->engine = newengine;
     this->engine.setup();
     #endif
+    this->lanes = 1;
     this->id = 0;
     this->length = 0.0;
     this->width = 0.0;
@@ -20,10 +21,6 @@ Road::Road() {
     this->signal_rgb.push_back(0);
     this->setSignal(this->signal);
     this->signalPosition = 0.0;
-    // OpenGL part
-    // Default window lengths and widths
-    this->window_length = 640;
-    this->window_height = 480;
 }
 
 Road::Road(int id, double length, double width):Road(){
@@ -120,36 +117,58 @@ void Road::runSim(double delT) {
 }
 
 
-std::pair<double,double> Road::initPosition(Vehicle* vehicle) {
-  double posx = 0;
-  std::vector<Vehicle*> beforeLine;
-  for(auto v: this->vehicles){
-    if((v->unrestrictedposition.first - v->length)<0) // if back end of vehicle is beyond start.
-      beforeLine.push_back(v);
-  }
-
-  if(beforeLine.size()<1)
-    return std::make_pair(0,this->width);
-  // if(beforeLine[0]->currentPosition.second + vehicle->width <= this->width){
-  //
+std::pair<double,double> Road::initPosition(Vehicle* vehicle){
+  // double posx = 0;
+  // std::vector<Vehicle*> beforeLine;
+  // for(auto v: this->vehicles){
+  //   if((v->currentPosition.first - v->length)<0) // if back end of vehicle will be beyond start.
+  //     beforeLine.push_back(v);
   // }
+  //
+  // if(beforeLine.size()<1)
+  //   return std::make_pair(0,this->width);
   // for(int i=0;i<beforeLine.size();i++){
-  //   if(i == 0){
-  //     if()
+  //   if(i==0){
+  //       if()
   //   }
   // }
-  posx=this->length;
-  for(int i=0;i<this->vehicles.size();i++){
-    if((vehicles[i]->currentPosition.first - vehicles[i]->length) < posx ) // back End of vehicle
-    {
-      posx = (vehicles[i]->currentPosition.first - vehicles[i]->length);
+  // posx=this->length;
+  // for(int i=0;i<this->vehicles.size();i++){
+  //   if((vehicles[i]->currentPosition.first - vehicles[i]->length) < posx ) // back End of vehicle
+  //   {
+  //     posx = (vehicles[i]->currentPosition.first - vehicles[i]->length);
+  //
+  //   }
+  //   if(posx>0){
+  //       return std::make_pair(0,this->width);
+  //   }
+  //   else
+  //   return std::make_pair(posx,this->width);
 
+  // Lane implementation
+  double lanewidth = this->width / (double) this->lanes;
+  double lanepos=this->width;
+  int laneno=this->lanes - 1;
+  double posy=this->width,posx=0;
+  for( int i=0;laneno >= 0 ;i++ ){
+      if(i > this->vehicles.size()){
+          posx = 0;
+          posy = (laneno) * lanewidth;
+          break;
+      }
+      else{
+           v = this->vehicles[i];
+      if(v->currentPosition.second <= lanewidth*laneno){
+          laneno--;
+      }
+      double back = (v->currentPosition.first-v->length);
+      if(posx < back && back <= 0){
+          posx = back;
+          posy = (laneno+1) * lanewidth;
+      }
     }
-    if(posx>0){
-        return std::make_pair(0,this->width);
-    }
-    else {return std::make_pair(posx,this->width);}
-    }
+  }
+  return std::make_pair(posx,posy);
 }
 
 // Gives first obstacle position in the given window
