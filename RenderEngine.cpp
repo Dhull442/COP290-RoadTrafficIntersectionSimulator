@@ -25,7 +25,7 @@ RenderEngine::RenderEngine(Road* targetRoad) {
 // Default constructor
 RenderEngine::RenderEngine() {
     // Do nothing
-    std::cout << "RenderEngine() default constructor called" << std::endl;
+    // std::cout << "RenderEngine() default constructor called" << std::endl;
 }
 
 void RenderEngine::error_callback(int error, const char* description) {
@@ -94,7 +94,7 @@ void RenderEngine::render(double delT) {
     #endif
     std::cout << "Starting Render routine"<< std::endl;
     while((currentTime - beginTime < delT) && !glfwWindowShouldClose(RenderEngine::window)) {
-        std::cout << "Rendering now..." << std::endl;
+        // std::cout << "Rendering now..." << std::endl;
         this->targetRoad->updateSim(currentTime - beginTime);
         float ratio;
         int width=800, height=800;
@@ -114,7 +114,7 @@ void RenderEngine::render(double delT) {
         float t = glfwGetTime();
         glRectd(t/10.0-1, 0.8, t/10.0-0.98, 0.75);
 
-        std::cout << "num vehicles; " << this->targetRoad->vehicles.size() << std::endl;
+        // std::cout << "num vehicles; " << this->targetRoad->vehicles.size() << std::endl;
         // Iterate over the vehicles
         for(auto v: this->targetRoad->vehicles) {
             renderVehicle(v);
@@ -164,7 +164,7 @@ void RenderEngine::renderVehicle(Vehicle* vehicle) {
         (float)vehicle->color_rgb[2]/255.0f);
 
         // Render the rectangle
-        std::cout << "Vehicle rendered at " << x << " " << y << " " << x - delx << " " << y - dely << std::endl;
+        // std::cout << "Vehicle rendered at " << x << " " << y << " " << x - delx << " " << y - dely << std::endl;
         glRectd(x, y, x -  delx, y - dely);
     }
 }
