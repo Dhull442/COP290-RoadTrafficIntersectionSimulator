@@ -4,7 +4,6 @@
 #include "RenderEngine.h"
 
 Road::Road() {
-  std::cout<<"This is the most general constructor"<<std::endl;
   #ifdef RENDER_ENGINE_H
   //new(&(this->engine)) RenderEngine(this);
   RenderEngine newengine(this);
@@ -35,7 +34,6 @@ Road::Road(int id, double length, double width):Road(){
 
 Road::Road(int id):Road(){
     this->id = id;
-    std::cout<<"Road with ID "<<this->id<<" initialized."<<std::endl;
 }
 
 void Road::setDefaults(double maxspeed, double acceleration,double length, double width,int skill){
@@ -49,7 +47,8 @@ void Road::setDefaults(double maxspeed, double acceleration,double length, doubl
 
 // For adding vehicle
 void Road::addVehicle(Vehicle* vehicle,std::string color) {  // Vehicle from template
-    Vehicle* newVehicle = vehicle; // Make a copy from vehicle template
+    Vehicle* newVehicle = new Vehicle(*vehicle); // Make a copy from vehicle template
+    std::cout<<"(New pointer = "<<newVehicle<<", template pointer="<<vehicle<<" )"<<std::endl;
     newVehicle->setColor(color);
     newVehicle->isOnRoad = true;
     newVehicle->parentRoad = this;
@@ -83,13 +82,21 @@ return;
 }
 
 void Road::updateSim(double delT){
-  std::cout << "updating Simulation positions" <<std::endl;
+  // std::cout << "updating Simulation positions" <<std::endl;
   this->updateUnrestrictedpositions(delT);
   // Update positions of each car
-  std::cout << "Updating restricted positions" <<std::endl;
+  // std::cout << "Updating restricted positions" <<std::endl;
   for(int i=0;i<this->vehicles.size();i++) {
-      std::cout << "Sending vehicle "<<vehicles[i]->type<<std::endl;
-      vehicles[i]->updatePos(delT,true);
+      // std::cout << "Sending vehicle "<<vehicles[i]->type<<std::endl;
+      if(vehicles[i]->isOnRoad)
+        {
+          vehicles[i]->updatePos(delT,true);
+        }
+      // else{
+      //   // Vehicle Removed;
+      //   // std::cout <<vehicles[i]->type<<" Removed"<<std::endl;
+      //   // vehicles.erase(vehicles.begin()+i);
+      // }
   }
 }
 
@@ -162,15 +169,9 @@ std::pair<double,double> Road::initPosition(){
   // obs.push_back(make_pair(posx,posy));
 
 }
-// std::vector<std::pair<double ,double> > Road::topedgeprofile(){
-//   std::vector<std::pair<double ,double> > tmp;
-// }
-// std::vector<std::pair<double ,double> > Road::botedgeprofile(){
-//
-// }
 // Gives first obstacle position in the given window
-double Road::firstObstacle(double startPos, double topRow, double botRow ){
-  double position=this->length;
+double Road::firstObstacle(double startPos,double length, double topRow, double botRow ){
+  double position=this->length+2*length;
   for(auto v : this->vehicles ){
     if(v->unrestrictedposition.second < topRow || (v->unrestrictedposition.second-v->width)>botRow){
       double back = (v->unrestrictedposition.first-v->length);
@@ -187,58 +188,8 @@ void Road::updateUnrestrictedpositions(double delT){
   for(auto v : this -> vehicles) {
     v->updatePos(delT,false);
   };
-  std::cout <<"Updated unrestricted positions for everyone" <<std::endl;
+  // std::cout <<"Updated unrestricted positions for everyone" <<std::endl;
 }
-// The error_callback function prints out the error and exits with non-zero status
-// static void Road::error_callback(int error, const char* description) {
-//     std::cerr << description << std::endl;
-//     std::exit(1);
-// }
-
-//
-// void Road::setupRoad() {
-//     // Initialize GLFW
-//     glfwInit();
-//     glEnable(GL_DEPTH_TEST);
-//     if (!glfwInit()) {
-//         exit(EXIT_FAILURE);
-//     }
-//
-//     // Set the error_callback function
-//     glfwSetErrorCallback(Road::error_callback);
-//
-//     // Create a new window
-//     this->window = glfwCreateWindow(this->window_length, this->window_height, "SimView", NULL, NULL);
-//     if (!this->window) {
-//         glfwTerminate();
-//         exit(EXIT_FAILURE);
-//     }
-//
-//     // Make this context current
-//     glfwMakeContextCurrent(this->window);
-//
-//     // Set the key_callback function
-//     glfwSetKeyCallback(window, Road::key_callback);
-// }
-//
-// void Road::renderRoad() {
-//     // Get frameBuffer attributes
-//     double ratio;
-//     int frame_height, frame_width;
-//     glfwGetFramebufferSize(this->window, &window_height, &window_width);
-//     ratio = frame_width/(double)frame_height;
-//
-//     // Create a blank viewport
-//     glViewport(0, 0, width, height);
-//     glClear(GL_COLOR_BUFFER_BIT);
-//
-//     // Render the road as a rectangle
-//
-//
-//     // Swap the buffers, to display rendered stuff on the screen
-//     glfwSwapBuffers(this->window);
-//     glfwPollEvents();
-// }
-// int main(){
-//    std::cout<<"compiles EXIT_SUCCESS"<<std::endl;
-// }
+bool Road::isRed(){
+  return (!this->signal.compare("RED"));
+}

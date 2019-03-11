@@ -35,7 +35,7 @@ void simulationActions(
   vv vehicles,
   // #endif
   std::vector<std::string> tokens){
-    std::cout <<"Road with ID "<<road -> id <<std::endl;
+    // std::cout <<"Road with ID "<<road -> id <<std::endl;
     double delT=0;
   for(int i=0;i<tokens.size();i++){
     // Parse the value and function
@@ -67,15 +67,12 @@ void simulationActions(
     // #ifdef IMPL
     bool found = false;
     for(int v = 0; v < vehicles.size(); v++ ){
-      std::cout << vehicles[v]->type <<",does it match "<<preprocess(function)<<std::endl;
       if(!vehicles[v]->type.compare(preprocess(function))){  // preprocessing to ignore any fuss due to Capitals
         road->addVehicle(vehicles[v],value);
         found = true;
         break;
       }
-      std::cout << "NO"  <<std::endl;
     }
-    std::cout << "YES" << std::endl;
     if(found)continue;
     // #else
     // #endif
@@ -346,7 +343,7 @@ int main(int argc, char **argv){
             // #ifdef IMPL
               simulationActions(road,vehicles,tokens);
             // #else
-              std::cout<<"Functions are going on with road" <<road_id<<std::endl;
+              // std::cout<<"Functions are going on with road" <<road_id<<std::endl;
               // simulationActions(tokens);
             // #endif
           }
@@ -358,11 +355,11 @@ int main(int argc, char **argv){
               }
               simulationActions(model.back(),vehicles,tokens);
             // #else
-              std::cout<<"Functions are going on with latest road added"<<std::endl;
+              // std::cout<<"Functions are going on with latest road added"<<std::endl;
               // simulationActions(tokens);
             // #endif
           }
-          std::cout << "* * * * * * * * * ~ ~ ~ ~ SIMULATION ~ ~ ~ ~ * * * * * * * * *"<<std::endl;
+          // std::cout << "* * * * * * * * * ~ ~ ~ ~ SIMULATION ~ ~ ~ ~ * * * * * * * * *"<<std::endl;
         }
       }
     }
