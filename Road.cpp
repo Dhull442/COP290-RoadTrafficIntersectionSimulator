@@ -50,7 +50,9 @@ void Road::addVehicle(Vehicle* vehicle,std::string color) {  // Vehicle from tem
     newVehicle->setColor(color);
     newVehicle->isOnRoad = true;
     newVehicle->parentRoad = this;
+    std::cout << "Initialize position"<<std::endl;
     newVehicle->currentPosition = this->initPosition(newVehicle);
+    std::cout << "Position intialized to ("<<newVehicle->currentPosition.first<<","<<newVehicle->currentPosition.second<<")"<<std::endl;
     newVehicle->reConstruct();
     std::cout << "Vehicle added" << std::endl;
     // push with insertion sort
@@ -149,25 +151,53 @@ std::pair<double,double> Road::initPosition(Vehicle* vehicle){
   double lanewidth = this->width / (double) this->lanes;
   double lanepos=this->width;
   int laneno=this->lanes - 1;
-  double posy=this->width,posx=0;
-  for( int i=0;laneno >= 0 ;i++ ){
-      if(i > this->vehicles.size()){
+  double posy=this->width,posx=-999;
+  for( int i=0;laneno >= 0; ){
+      if( i >= this->vehicles.size()){
+        // if(laneno)
+          {
+            // std::cout << " Vehicle in new lane "<<laneno<<std::endl;
           posx = 0;
-          posy = (laneno) * lanewidth;
+          posy = (laneno+1) * lanewidth;
+          }
+          // else
+          // std::cout<<"Vehicles exhausted but pos was set something earlier"<<std::endl;
           break;
       }
       else{
-           v = this->vehicles[i];
-      if(v->currentPosition.second <= lanewidth*laneno){
+          double localposx=0,localposy=0;
+          while(i<vehicles.size()){
+                Vehicle* v = this->vehicles[i];
+            if(v->currentPosition.second <= lanewidth*laneno){
+              // std::cout <<"shiftin to search in new lane "<<laneno-1<<std::endl;
+              laneno--;
+              break;
+            }
+            double back = (v->currentPosition.first-v->length);
+            // std::cout<<"Back at "<<back<<" in lane "<<laneno<<std::endl;
+            if(back < localposx){
+                // std::cout <<"POS = "<<back<<std::endl;
+                localposx = back;
+            }
+            localposy = (laneno + 1) * lanewidth;
+          i++;
+        }
+        if(i == vehicles.size() && localposx < 0){
+          // std::cout <<"lane num decreased because it can"<<std::endl;
           laneno--;
-      }
-      double back = (v->currentPosition.first-v->length);
-      if(posx < back && back <= 0){
-          posx = back;
-          posy = (laneno+1) * lanewidth;
-      }
+        }
+        if(posx < localposx){
+          // std::cout<<"setting pos from localpos "<<localposx<<" "<<posx<<std::endl;
+          posx = localposx;
+          posy = localposy;
+        }
+    }
+    if(posx == 0){
+      break;
+
     }
   }
+  end:
   return std::make_pair(posx,posy);
 }
 
