@@ -365,9 +365,9 @@ int main(int argc, char **argv){
     }
     // For each road in model, terminate the Road
     for(auto road: model) {
-        road->endSim();
+        road->engine.endSim();
     }
-    
+
     std::cout<<"* * * * * * * * * ~ ~ ~ ~ ~ THEEND ~ ~ ~ ~ ~ * * * * * * * * *"<<std::endl;
   }
 }

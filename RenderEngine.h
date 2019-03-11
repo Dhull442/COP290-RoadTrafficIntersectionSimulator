@@ -44,7 +44,7 @@ class RenderEngine {
     void render(double delT);
     void renderRoad();
     void renderVehicle(Vehicle* vehicle);
-
+    void endSim();
     // Returns the time since start
     float getTime();
 };
