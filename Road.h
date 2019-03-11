@@ -41,14 +41,15 @@ class Road {
         Road(int id, double length, double width);
         Road(int id);
         Road();
+        void updateSim(double delT);
         void setDefaults(double maxspeed, double acceleration,double length, double width,int skill);
         // Add a Vehicle to the road
         void addVehicle(Vehicle* vehicle,std::string color);
         void updateUnrestrictedpositions(double delT);
 
         // First vehicle obstacle in a lane
-        double firstObstacle(double startPos, double topRow, double botRow );
-
+        double firstObstacle(double startPos,double length, double topRow, double botRow );
+        bool isRed();
         // Run the simulation on the road for time t
         void runSim(double t);
         void setSignal(std::string signal);
