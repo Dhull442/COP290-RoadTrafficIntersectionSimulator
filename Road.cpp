@@ -4,26 +4,26 @@
 #include "RenderEngine.h"
 
 Road::Road() {
-  #ifdef RENDER_ENGINE_H
-  //new(&(this->engine)) RenderEngine(this);
-  RenderEngine newengine(this);
-  this->engine = newengine;
-  this->engine.setup();
-  #endif
-  this->id = 0;
-  this->length = 0.0;
-  this->width = 0.0;
-  // Signal is red by default
-  this->signal = "RED";
-  this->signal_rgb.push_back(0);
-  this->signal_rgb.push_back(0);
-  this->signal_rgb.push_back(0);
-  this->setSignal(this->signal);
-  this->signalPosition = 0.0;
-  // OpenGL part
-  // Default window lengths and widths
-  this->window_length = 640;
-  this->window_height = 480;
+    #ifdef RENDER_ENGINE_H
+    //new(&(this->engine)) RenderEngine(this);
+    RenderEngine newengine(this);
+    this->engine = newengine;
+    this->engine.setup();
+    #endif
+    this->id = 0;
+    this->length = 0.0;
+    this->width = 0.0;
+    // Signal is red by default
+    this->signal = "RED";
+    this->signal_rgb.push_back(0);
+    this->signal_rgb.push_back(0);
+    this->signal_rgb.push_back(0);
+    this->setSignal(this->signal);
+    this->signalPosition = 0.0;
+    // OpenGL part
+    // Default window lengths and widths
+    this->window_length = 640;
+    this->window_height = 480;
 }
 
 Road::Road(int id, double length, double width):Road(){
@@ -47,149 +47,93 @@ void Road::setDefaults(double maxspeed, double acceleration,double length, doubl
 
 // For adding vehicle
 void Road::addVehicle(Vehicle* vehicle,std::string color) {  // Vehicle from template
-    Vehicle* newVehicle = new Vehicle(*vehicle); // Make a copy from vehicle template
-    std::cout<<"(New pointer = "<<newVehicle<<", template pointer="<<vehicle<<" )"<<std::endl;
-    newVehicle->setColor(color);
-    newVehicle->isOnRoad = true;
-    newVehicle->parentRoad = this;
-    newVehicle->currentPosition = this->initPosition();
-    this->vehicles.push_back(newVehicle);
-    // Add the road to the vehicle
+Vehicle* newVehicle = new Vehicle(*vehicle); // Make a copy from vehicle template
+std::cout<<"(New pointer = "<<newVehicle<<", template pointer="<<vehicle<<" )"<<std::endl;
+newVehicle->setColor(color);
+newVehicle->isOnRoad = true;
+newVehicle->parentRoad = this;
+newVehicle->currentPosition = this->initPosition();
+this->vehicles.push_back(newVehicle);
+// Add the road to the vehicle
 
-    // To set defaults of road if not constructed
-    vehicles.back()->reConstruct();
-    std::cout <<this->vehicles.back()->type <<" of "<<color<<" added"<<std::endl;
+// To set defaults of road if not constructed
+vehicles.back()->reConstruct();
+std::cout <<this->vehicles.back()->type <<" of "<<color<<" added"<<std::endl;
 }
 
 void Road::setSignal(std::string signal){
-  if(!signal.compare("GREEN")){
-    this->signal = signal;
-    this->signal_rgb[0] = 11;
-    this->signal_rgb[1] = 229;
-    this->signal_rgb[2] = 8;
-return;
-  }
-  if(!signal.compare("RED")){
-    this->signal = signal;
-    this->signal_rgb[0] = 237;
-    this->signal_rgb[1] = 32;
-    this->signal_rgb[2] = 32;
-return;
-  }
-  {
-    std::cout<<"[ ERROR ] Signal can only be GREEN/RED";
-  }
+    if(!signal.compare("GREEN")){
+        this->signal = signal;
+        this->signal_rgb[0] = 11;
+        this->signal_rgb[1] = 229;
+        this->signal_rgb[2] = 8;
+        return;
+    }
+    if(!signal.compare("RED")){
+        this->signal = signal;
+        this->signal_rgb[0] = 237;
+        this->signal_rgb[1] = 32;
+        this->signal_rgb[2] = 32;
+        return;
+    }
+    {
+        std::cout<<"[ ERROR ] Signal can only be GREEN/RED";
+    }
 }
 
 void Road::updateSim(double delT){
-  // std::cout << "updating Simulation positions" <<std::endl;
-  this->updateUnrestrictedpositions(delT);
-  // Update positions of each car
-  // std::cout << "Updating restricted positions" <<std::endl;
-  for(int i=0;i<this->vehicles.size();i++) {
-      // std::cout << "Sending vehicle "<<vehicles[i]->type<<std::endl;
-      if(vehicles[i]->isOnRoad)
-        {
-          vehicles[i]->updatePos(delT,true);
+    this->updateUnrestrictedpositions(delT);
+    // Update positions of each car
+    for(int i=0;i<this->vehicles.size();i++) {
+        if(vehicles[i]->isOnRoad) {
+            vehicles[i]->updatePos(delT,true);
         }
-      // else{
-      //   // Vehicle Removed;
-      //   // std::cout <<vehicles[i]->type<<" Removed"<<std::endl;
-      //   // vehicles.erase(vehicles.begin()+i);
-      // }
-  }
+    }
 }
 
 // Runs the simulation and renders the road
 void Road::runSim(double delT) {
-    // Run until time is exhausted
-    // double beginTime =
-    // #ifdef RENDER_ENGINE_H
-    // this->engine.getTime();
-    // #else
-    // 0;
-    // #endif
-    // double oldTime;
-    // double currentTime =
-    // #ifdef RENDER_ENGINE_H
-    // this->engine.getTime();
-    // #else
-    // 0;
-    // #endif
-    // GLFWwindow* window;
-    // while(currentTime - beginTime < delT) {
-    //
-    //
-    //     oldTime = currentTime;
-    //     currentTime =
-    //     #ifdef RENDER_ENGINE_H
-    //     this->engine.getTime();
-    //     #else
-    //     0.1;
-    //     #endif
-    //     // Render the current state
-    //     #ifdef RENDER_ENGINE_H
-    //     this->engine.render();
-    //     #endif
-    // }
-    // return;
     this->engine.render(delT);
 }
 
 std::pair<double,double> Road::initPosition(){
 
-  // complex algorithm later
-  // std::vector<std::pair < std::pair<double,double>, double> > map; // ((top,bot),minposX)
-  double posx=this->length ;//, posy=this->width;
-  // std::vector< std::pair< double, double > > obs;
-  // posX is x co-ordinate on road, posY is y co-ordinate
-  // for(int i=0;i<this->vehicles.size();i++){
-  //   // Vehicle* v = vehicles[i];
-  //   // if(map.length == 0){
-  //   //   map.push_back(std::make_pair(v->currentPosition.second,v->currentPosition.first - v->length));
-  //   //   map.push_back(std::make_pair(v->currentPosition-v->width,v->currentPosition.first - v->length));
-  //   // }
-  //   // traverse through map;
-  //   // for(int k = 0;k<map.size();k++){
-  //   //
-  //   // }
-  // }
-  for(int i=0;i<this->vehicles.size();i++){
-    if((vehicles[i]->currentPosition.first - vehicles[i]->length) < posx ) // backEnd of vehicle
-    {
-      posx = (vehicles[i]->currentPosition.first - vehicles[i]->length);
-      // posy = vehicles[i]->currentPosition.second;
+    // complex algorithm later
+    double posx=this->length ;
+    for(int i=0;i<this->vehicles.size();i++){
+        if((vehicles[i]->currentPosition.first - vehicles[i]->length) < posx ) // backEnd of vehicle
+        {
+            posx = (vehicles[i]->currentPosition.first - vehicles[i]->length);
+        }
     }
-}
-  if(posx>0){
-    return std::make_pair(0,this->width);
-  }
-  else
+    if(posx>0){
+        return std::make_pair(0,this->width);
+    }
+    else
     return std::make_pair(posx,this->width);
-  // obs.push_back(make_pair(posx,posy));
-
 }
+
 // Gives first obstacle position in the given window
 double Road::firstObstacle(double startPos,double length, double topRow, double botRow ){
-  double position=this->length+2*length;
-  for(auto v : this->vehicles ){
-    if(v->unrestrictedposition.second < topRow || (v->unrestrictedposition.second-v->width)>botRow){
-      double back = (v->unrestrictedposition.first-v->length);
-      if(position > back && back > startPos ){
-        position = back;
-      }
+    double position=this->length+2*length;
+    for(auto v : this->vehicles ){
+        if(v->unrestrictedposition.second < topRow || (v->unrestrictedposition.second-v->width)>botRow){
+            double back = (v->unrestrictedposition.first-v->length);
+            if(position > back && back > startPos ){
+                position = back;
+            }
+        }
     }
-  }
-  return position;
+    return position;
 }
 
 // Updates the unrestricted new positions of every vehicle
 void Road::updateUnrestrictedpositions(double delT){
-  for(auto v : this -> vehicles) {
-    v->updatePos(delT,false);
-  };
-  // std::cout <<"Updated unrestricted positions for everyone" <<std::endl;
+    for(auto v : this -> vehicles) {
+        v->updatePos(delT,false);
+    };
 }
+
 bool Road::isRed(){
-  return (!this->signal.compare("RED"));
+    return (!this->signal.compare("RED"));
 }

@@ -141,6 +141,10 @@ void RenderEngine::renderRoad() {
     glRectd(xcoord, ycoord, 1.0f, -ycoord);
 }
 
+void RenderEngine::endSim() {
+    glfwTerminate();
+}
+
 void RenderEngine::renderVehicle(Vehicle* vehicle) {
     // std::cout << "Rendering the Vehicle" << std::endl;
     if (vehicle->isOnRoad) {
