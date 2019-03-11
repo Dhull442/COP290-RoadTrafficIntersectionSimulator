@@ -363,6 +363,6 @@ int main(int argc, char **argv){
         }
       }
     }
-    std::cout<<"* * * * * * * * * ~ ~ ~ ~ ~ THEEND ~ ~ ~ ~ ~ * * * * * * * * *"<<std::endl;
+    std::cout<<"/ \\ - / * * * * * * * * * ~ ~ ~ ~ ~ THEEND ~ ~ ~ ~ ~ * * * * * * * * * \\ - / \\"<<std::endl;
   }
 }

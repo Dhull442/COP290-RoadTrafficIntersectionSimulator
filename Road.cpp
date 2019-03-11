@@ -48,16 +48,32 @@ void Road::setDefaults(double maxspeed, double acceleration,double length, doubl
 // For adding vehicle
 void Road::addVehicle(Vehicle* vehicle,std::string color) {  // Vehicle from template
     Vehicle* newVehicle = new Vehicle(*vehicle); // Make a copy from vehicle template
-    std::cout<<"(New pointer = "<<newVehicle<<", template pointer="<<vehicle<<" )"<<std::endl;
+    // std::cout<<"(New pointer = "<<newVehicle<<", template pointer="<<vehicle<<" )"<<std::endl;
     newVehicle->setColor(color);
     newVehicle->isOnRoad = true;
     newVehicle->parentRoad = this;
-    newVehicle->currentPosition = this->initPosition();
-    this->vehicles.push_back(newVehicle);
+    newVehicle->currentPosition = this->initPosition(newVehicle);
+    newVehicle->reConstruct();
+
+    // push with insertion sort
+    if(this->vehicles.size() < 1){
+      this->vehicles.push_back(newVehicle);
+    }
+    else{
+      for(int i = 0; i< this->vehicles.size();i++){
+        if(newVehicle->currentPosition.second > this->vehicles[i]->currentPosition.second){
+          this->vehicles.insert(this->vehicles.begin()+i,newVehicle);
+          break;
+        }
+        if(i == this->vehicles.size() - 1){
+          this->vehicles.push_back(newVehicle);
+          break;
+        }
+      }
+    }
     // Add the road to the vehicle
 
     // To set defaults of road if not constructed
-    vehicles.back()->reConstruct();
     std::cout <<this->vehicles.back()->type <<" of "<<color<<" added"<<std::endl;
 }
 
@@ -82,83 +98,46 @@ return;
 }
 
 void Road::updateSim(double delT){
-  // std::cout << "updating Simulation positions" <<std::endl;
+
+  // Update unrestricted positions
   this->updateUnrestrictedpositions(delT);
+
   // Update positions of each car
-  // std::cout << "Updating restricted positions" <<std::endl;
   for(int i=0;i<this->vehicles.size();i++) {
-      // std::cout << "Sending vehicle "<<vehicles[i]->type<<std::endl;
-      if(vehicles[i]->isOnRoad)
-        {
-          vehicles[i]->updatePos(delT,true);
-        }
-      // else{
-      //   // Vehicle Removed;
-      //   // std::cout <<vehicles[i]->type<<" Removed"<<std::endl;
-      //   // vehicles.erase(vehicles.begin()+i);
-      // }
+    if(vehicles[i]->isOnRoad){
+      vehicles[i]->updatePos(delT,true);
+    }
   }
 }
 
 // Runs the simulation and renders the road
 void Road::runSim(double delT) {
-    // Run until time is exhausted
-    // double beginTime =
-    // #ifdef RENDER_ENGINE_H
-    // this->engine.getTime();
-    // #else
-    // 0;
-    // #endif
-    // double oldTime;
-    // double currentTime =
-    // #ifdef RENDER_ENGINE_H
-    // this->engine.getTime();
-    // #else
-    // 0;
-    // #endif
-    // GLFWwindow* window;
-    // while(currentTime - beginTime < delT) {
-    //
-    //
-    //     oldTime = currentTime;
-    //     currentTime =
-    //     #ifdef RENDER_ENGINE_H
-    //     this->engine.getTime();
-    //     #else
-    //     0.1;
-    //     #endif
-    //     // Render the current state
-    //     #ifdef RENDER_ENGINE_H
-    //     this->engine.render();
-    //     #endif
-    // }
-    // return;
     this->engine.render(delT);
 }
 
-std::pair<double,double> Road::initPosition(){
+std::pair<double,double> Road::initPosition(Vehicle* vehicle){
+  double posx = 0;
+  std::vector<Vehicle*> beforeLine;
+  for(auto v: this->vehicles){
+    if((v->unrestrictedposition.first - v->length)<0) // if back end of vehicle is beyond start.
+      beforeLine.push_back(v);
+  }
 
-  // complex algorithm later
-  // std::vector<std::pair < std::pair<double,double>, double> > map; // ((top,bot),minposX)
-  double posx=this->length ;//, posy=this->width;
-  // std::vector< std::pair< double, double > > obs;
-  // posX is x co-ordinate on road, posY is y co-ordinate
-  // for(int i=0;i<this->vehicles.size();i++){
-  //   // Vehicle* v = vehicles[i];
-  //   // if(map.length == 0){
-  //   //   map.push_back(std::make_pair(v->currentPosition.second,v->currentPosition.first - v->length));
-  //   //   map.push_back(std::make_pair(v->currentPosition-v->width,v->currentPosition.first - v->length));
-  //   // }
-  //   // traverse through map;
-  //   // for(int k = 0;k<map.size();k++){
-  //   //
-  //   // }
+  if(beforeLine.size()<1)
+    return std::make_pair(0,this->width);
+  // if(beforeLine[0]->currentPosition.second + vehicle->width <= this->width){
+  //
   // }
+  // for(int i=0;i<beforeLine.size();i++){
+  //   if(i == 0){
+  //     if()
+  //   }
+  // }
+  posx=this->length;
   for(int i=0;i<this->vehicles.size();i++){
-    if((vehicles[i]->currentPosition.first - vehicles[i]->length) < posx ) // backEnd of vehicle
+    if((vehicles[i]->currentPosition.first - vehicles[i]->length) < posx ) // back End of vehicle
     {
       posx = (vehicles[i]->currentPosition.first - vehicles[i]->length);
-      // posy = vehicles[i]->currentPosition.second;
     }
 }
   if(posx>0){
@@ -166,9 +145,9 @@ std::pair<double,double> Road::initPosition(){
   }
   else
     return std::make_pair(posx,this->width);
-  // obs.push_back(make_pair(posx,posy));
 
 }
+
 // Gives first obstacle position in the given window
 double Road::firstObstacle(double startPos,double length, double topRow, double botRow ){
   double position=this->length+2*length;
@@ -186,7 +165,8 @@ double Road::firstObstacle(double startPos,double length, double topRow, double 
 // Updates the unrestricted new positions of every vehicle
 void Road::updateUnrestrictedpositions(double delT){
   for(auto v : this -> vehicles) {
-    v->updatePos(delT,false);
+    if(v->isOnRoad)
+      v->updatePos(delT,false);
   };
   // std::cout <<"Updated unrestricted positions for everyone" <<std::endl;
 }
