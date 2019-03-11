@@ -78,25 +78,24 @@ float RenderEngine::getTime() {
 }
 
 void RenderEngine::render(double delT) {
-  double beginTime =
-  #ifdef RENDER_ENGINE_H
-  RenderEngine::getTime();
-  #else
-  0;
-  #endif
-  double oldTime;
-  double currentTime =
-  #ifdef RENDER_ENGINE_H
-  RenderEngine::getTime();
-  #else
-  0;
-  #endif
-  std::cout << "Starting Render routine"<< std::endl;
-  while((currentTime - beginTime < delT) && !glfwWindowShouldClose(RenderEngine::window)) {
-      this->targetRoad->updateSim(currentTime - beginTime);
+    double beginTime =
+    #ifdef RENDER_ENGINE_H
+    RenderEngine::getTime();
+    #else
+    0;
+    #endif
+    double oldTime;
+    double currentTime =
+    #ifdef RENDER_ENGINE_H
+    RenderEngine::getTime();
+    #else
+    0;
+    #endif
+    std::cout << "Starting Render routine"<< std::endl;
+    while((currentTime - beginTime < delT) && !glfwWindowShouldClose(RenderEngine::window)) {
+        this->targetRoad->updateSim(currentTime - beginTime);
         float ratio;
         int width=800, height=800;
-
         glfwGetFramebufferSize(RenderEngine::window, &width, &height);
 
         ratio = width / (float) height;
@@ -116,17 +115,15 @@ void RenderEngine::render(double delT) {
         // Swap buffers and check for events
         glfwSwapBuffers(RenderEngine::window);
         glfwPollEvents();
-      }
+    }
 
-      oldTime = currentTime;
-      currentTime =
-      #ifdef RENDER_ENGINE_H
-      RenderEngine::getTime();
-      #else
-      0.1;
-      #endif
-
-  }
+    oldTime = currentTime;
+    currentTime =
+    #ifdef RENDER_ENGINE_H
+    RenderEngine::getTime();
+    #else
+    0.1;
+    #endif
 }
 
 void RenderEngine::renderRoad() {
@@ -139,8 +136,8 @@ void RenderEngine::renderRoad() {
 
     // Render the signal in the remaining part
     glColor3f((float)this->targetRoad->signal_rgb[0]/255.0f,
-              (float)this->targetRoad->signal_rgb[1]/255.0f,
-              (float)this->targetRoad->signal_rgb[2]/255.0f);
+    (float)this->targetRoad->signal_rgb[1]/255.0f,
+    (float)this->targetRoad->signal_rgb[2]/255.0f);
     glRectd(xcoord, ycoord, 1.0f, -ycoord);
 }
 
@@ -155,8 +152,8 @@ void RenderEngine::renderVehicle(Vehicle* vehicle) {
         float dely = 2*vehicle->length*this->scaling/(float)this->monitorHeight;
         // Set the correct color
         glColor3f((float)vehicle->color_rgb[0]/255.0f,
-                  (float)vehicle->color_rgb[1]/255.0f,
-                  (float)vehicle->color_rgb[2]/255.0f);
+        (float)vehicle->color_rgb[1]/255.0f,
+        (float)vehicle->color_rgb[2]/255.0f);
         // Render the rectangle
         glRectd(x, y, x -  delx, y - dely);
     }
