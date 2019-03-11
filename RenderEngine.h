@@ -17,7 +17,7 @@ class RenderEngine {
     // The road that this will render
     Road* targetRoad;
     // The scaling factor
-    int scaling;
+    int scalex, scaley, signalSize;
     bool isInitialized;
     // Used to create a full screen simulation
     int monitorWidth, monitorHeight;
@@ -39,12 +39,12 @@ class RenderEngine {
 
     // Initialize the variables
     void setup();
-    // RenderEngine::window getWindow();
     // Clear the screen and render the road, vehicles afresh
     void render(double delT);
     void renderRoad();
     void renderVehicle(Vehicle* vehicle);
     void endSim();
+
     // Returns the time since start
     float getTime();
 };

@@ -55,9 +55,10 @@ void Road::addVehicle(Vehicle* vehicle,std::string color) {  // Vehicle from tem
     newVehicle->parentRoad = this;
     newVehicle->currentPosition = this->initPosition(newVehicle);
     newVehicle->reConstruct();
-
+    std::cout << "Vehicle added" << std::endl;
     // push with insertion sort
     if(this->vehicles.size() < 1){
+      std::cout << "Vector was empty" << std::endl;
       this->vehicles.push_back(newVehicle);
     }
     else{
@@ -119,7 +120,7 @@ void Road::runSim(double delT) {
 }
 
 
-std::pair<double,double> Road::initPosition(Vehicle* vehicle){
+std::pair<double,double> Road::initPosition(Vehicle* vehicle) {
   double posx = 0;
   std::vector<Vehicle*> beforeLine;
   for(auto v: this->vehicles){
@@ -147,15 +148,14 @@ std::pair<double,double> Road::initPosition(Vehicle* vehicle){
     if(posx>0){
         return std::make_pair(0,this->width);
     }
-    else
-    return std::make_pair(posx,this->width);
-
+    else {return std::make_pair(posx,this->width);}
+    }
 }
 
 // Gives first obstacle position in the given window
-double Road::firstObstacle(double startPos,double length, double topRow, double botRow ){
+double Road::firstObstacle(double startPos,double length, double topRow, double botRow) {
     double position=this->length+2*length;
-    for(auto v : this->vehicles ){
+    for(auto v : this->vehicles) {
         if(v->unrestrictedposition.second < topRow || (v->unrestrictedposition.second-v->width)>botRow){
             double back = (v->unrestrictedposition.first-v->length);
             if(position > back && back > startPos ){
@@ -177,6 +177,6 @@ void Road::updateUnrestrictedpositions(double delT){
 
 }
 
-bool Road::isRed(){
+bool Road::isRed() {
     return (!this->signal.compare("RED"));
 }
