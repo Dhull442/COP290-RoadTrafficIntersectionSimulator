@@ -73,12 +73,11 @@ void RenderEngine::setup() {
 
 float RenderEngine::getTime() {
     float time = glfwGetTime();
-    std::cout << "The current time is " << time << std::endl;
+    // std::cout << "The current time is " << time << std::endl;
     return time;
 }
 
 void RenderEngine::render(double delT) {
-  std::cout <<"Road is with "<< this->targetRoad->id <<std::endl;
   double beginTime =
   #ifdef RENDER_ENGINE_H
   RenderEngine::getTime();
@@ -93,30 +92,30 @@ void RenderEngine::render(double delT) {
   0;
   #endif
   std::cout<<"Starting Render routine"<<std::endl;
-  while((currentTime - beginTime < delT)) {
-      std::cout<<"Positions are being updated"<<std::endl;
+  while((currentTime - beginTime < delT)&&!glfwWindowShouldClose(RenderEngine::window)) {
+      // std::cout<<"Positions are being updated"<<std::endl;
       this->targetRoad->updateSim(currentTime - beginTime);
-      std::cout<<"Positions updated succesfully"<<std::endl;
+      // std::cout<<"Positions updated succesfully"<<std::endl;
       // RENDER engine
       {
-        std::cout << "Calling the render function" << std::endl;
+        // std::cout << "Calling the render function" << std::endl;
         // std::cout << glfwWindowShouldClose(RenderEngine::window) << std::endl;
-        std::cout << "Checking condition" << std::endl;
+        // std::cout << "Checking condition" << std::endl;
         // While the window is not closed do this
         // if(!glfwWindowShouldClose(RenderEngine::window)) {
             // Setup the frame
-            std::cout << "Setting up the frame here" << std::endl;
+            // std::cout << "Setting up the frame here" << std::endl;
             float ratio;
             int width=800, height=800;
-            std::cout << "Getting framebuffer size" << std::endl;
+            // std::cout << "Getting framebuffer size" << std::endl;
             glfwGetFramebufferSize(RenderEngine::window, &width, &height);
-            std::cout << "Framebuffer size obtained" << std::endl;
+            // std::cout << "Framebuffer size obtained" << std::endl;
 
             ratio = width / (float) height;
             glViewport(0, 0, width, height);
             glClear(GL_COLOR_BUFFER_BIT);
             // Render the background
-            std::cout << "Rendering the background" << std::endl;
+            // std::cout << "Rendering the background" << std::endl;
             glClearColor((float)this->bgcolor[0]/255.0f, (float)this->bgcolor[1]/255.0f, (float)this->bgcolor[2]/255.0f, 1.0f);
 
             // Render the road
@@ -130,7 +129,7 @@ void RenderEngine::render(double delT) {
             // Swap buffers and check for events
             glfwSwapBuffers(RenderEngine::window);
             glfwPollEvents();
-            std::cout << "Rendering Done..." << std::endl;
+            // std::cout << "Rendering Done..." << std::endl;
       }
 
       oldTime = currentTime;
@@ -142,7 +141,7 @@ void RenderEngine::render(double delT) {
       #endif
 
   }
-  std::cout <<"Rendered one more!"<<std::endl;
+  // std::cout <<"Rendered one more!"<<std::endl;
 
    // } else {
     //    std::cout << "Window is closed" << std::endl;
@@ -152,9 +151,9 @@ void RenderEngine::render(double delT) {
 }
 
 void RenderEngine::renderRoad() {
-    std::cout << "Rendering the road" << std::endl;
+    // std::cout << "Rendering the road" << std::endl;
     // Render the road in gray
-    glColor3f(0.1f, 0.1f, 0.1f);
+    glColor3f(0.2f, 0.2f, 0.2f);
     float ycoord = this->targetRoad->width*this->scaling/(float)this->monitorHeight;
     float xcoord = (this->targetRoad->length*this->scaling - (int)(this->monitorWidth/2))/(float)((int)(this->monitorWidth/2));
     glRectd(-1.0f, ycoord, xcoord, -ycoord);
@@ -167,9 +166,9 @@ void RenderEngine::renderRoad() {
 }
 
 void RenderEngine::renderVehicle(Vehicle* vehicle) {
-    std::cout << "Rendering the Vehicle" << std::endl;
+    // std::cout << "Rendering the Vehicle" << std::endl;
     if (vehicle->isOnRoad) {
-        std::cout << "The vehicle is on the road" << std::endl;
+        // std::cout << "The vehicle is on the road" << std::endl;
         // Render only if the vehicle is on the Road
         float x = -1.0 + (float)vehicle->currentPosition.first*this->scaling*2/(float)(this->monitorWidth);
         float y = (float)this->scaling*(this->targetRoad->width-2*vehicle->currentPosition.second)/(float)this->monitorHeight;
@@ -180,7 +179,7 @@ void RenderEngine::renderVehicle(Vehicle* vehicle) {
                   (float)vehicle->color_rgb[1]/255.0f,
                   (float)vehicle->color_rgb[2]/255.0f);
         // Render the rectangle
-        glRectd(x, y, x + delx, y + dely);
+        glRectd(x, y, x -  delx, y - dely);
     }
 }
 

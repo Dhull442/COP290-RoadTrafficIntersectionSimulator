@@ -116,13 +116,21 @@ void Vehicle::setColor(std::string color){
 void Vehicle::updatePos(double delT,bool limit){
   double unrestrictedNewPosition = this->currentPosition.first + (this->currentSpeed)*(delT) + (0.5)*(this->acceleration)*(delT)*(delT);
   if(limit){
-    double obstacle = this->parentRoad->firstObstacle(this->currentPosition.first,this->currentPosition.second,this->currentPosition.second-this->width);
-  if(obstacle>unrestrictedNewPosition){
-    this->currentPosition.first = unrestrictedNewPosition;
+    double obstacle = this->parentRoad->firstObstacle(this->currentPosition.first,this->length,this->currentPosition.second,this->currentPosition.second-this->width);
+  if(this->parentRoad->isRed()){
+    if(obstacle>this->parentRoad->signalPosition){
+      obstacle = this->parentRoad->signalPosition;
+    }
   }
+  {
+    if(obstacle>unrestrictedNewPosition){
+    this->currentPosition.first = unrestrictedNewPosition;
+    }
   else
     this->currentPosition.first = obstacle;
-  if(this->currentPosition.first - this->length > this->parentRoad->length){
+  }
+  if((this->currentPosition.first - this->length) >= this->parentRoad->length){
+    std::cout <<"Vehicle gone offroad"<<std::endl;
     this->isOnRoad = false;
   }
   }

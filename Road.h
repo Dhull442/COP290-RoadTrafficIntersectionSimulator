@@ -48,8 +48,8 @@ class Road {
         void updateUnrestrictedpositions(double delT);
 
         // First vehicle obstacle in a lane
-        double firstObstacle(double startPos, double topRow, double botRow );
-
+        double firstObstacle(double startPos,double length, double topRow, double botRow );
+        bool isRed();
         // Run the simulation on the road for time t
         void runSim(double t);
         void setSignal(std::string signal);
