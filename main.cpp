@@ -29,8 +29,6 @@ std::string preprocess(std::string a){
   }
   return ans;
 }
-
-
 void simulationActions(
   #ifdef IMPL
   Road* road,
@@ -45,15 +43,21 @@ void simulationActions(
 
     // Signal change routine
     if(!function.compare("Signal")){
+      #ifdef IMPL
       road->setSignal(value);
+      #else
+        std::cout<<"Road Signal = "<<value<<std::endl;
+      #endif
       continue;
     }
 
     // Passing time routine
     if(!function.compare("Pass")){
-      delT += std::atof(value.c_str());              
-  std::cout<<"Pass time = "<<time<<std::endl;
-      
+      delT += std::atof(value.c_str());
+      #ifdef IMPL
+      #else
+        std::cout<<"Pass time = "<<time<<std::endl;
+      #endif
       continue;
     }
 
@@ -68,6 +72,9 @@ void simulationActions(
       }
     }
     if(found)continue;
+    #else
+      std::cout<<function<<"="<<value<<std::endl;
+      continue;
     #endif
     // None found
     {
@@ -81,7 +88,6 @@ void simulationActions(
     std::cout<<"Running Simulation with ΔT = "<<delT<<std::endl;
   #endif
 }
-
 int main(int argc, char **argv){
   // Add a check here
   std::ifstream configFile;
@@ -212,15 +218,15 @@ int main(int argc, char **argv){
             std::cout << "Acceleration : "<<acc<< std::endl;
             #endif
           }
-          //if(line.find("Default_Type") != std::string::npos){
-            // Create and add new road;
-          //  std::string type = preprocess(line.substr(line.find("=") + 1));
-          //  #ifdef IMPL
-          //  model.back()->default_type = type;
-           // #else
-           // std::cout << "Type : "<<type<< std::endl;
-            //#endif
-          //}
+          // if(line.find("Default_Type") != std::string::npos){
+          //   // Create and add new road;
+          //   std::string type = preprocess(line.substr(line.find("=") + 1));
+          //   #ifdef IMPL
+          //   model.back()->default_type = type;
+          //   #else
+          //   std::cout << "Type : "<<type<< std::endl;
+          //   #endif
+          // }
           if(line.find("Default_Skill") != std::string::npos){
             // Create and add new road;
             int skill = std::atoi(line.substr(line.find("=") + 1).c_str());
