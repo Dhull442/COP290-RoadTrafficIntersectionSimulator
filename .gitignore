@@ -5,3 +5,4 @@ Parser.*
 check*
 check
 *.o
+.*.cpp.swp
