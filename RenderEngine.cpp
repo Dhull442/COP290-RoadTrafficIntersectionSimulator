@@ -16,8 +16,8 @@ RenderEngine::RenderEngine(Road* targetRoad) {
     this->bgcolor.push_back(0.968f);
     this->bgcolor.push_back(0.3529f);
     // Set the monitor Parameters
-    this->monitorWidth = 1280;
-    this->monitorHeight = 800;
+    this->monitorWidth = 1920;
+    this->monitorHeight = 1080;
 }
 
 // Default constructor
@@ -46,6 +46,7 @@ void RenderEngine::setup() {
     if (!glfwInit()) {
         exit(EXIT_FAILURE);
     }
+    // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,GL_TRUE);
 
     // Set the error_callback function
     glfwSetErrorCallback(RenderEngine::error_callback);
@@ -60,8 +61,8 @@ void RenderEngine::setup() {
         std::cout << "Could not create window" << std::endl;
         exit(EXIT_FAILURE);
     }
-    
-    
+
+
     RenderEngine::isInitialized = true;
     // Make the context current
     glfwMakeContextCurrent(RenderEngine::window);
@@ -84,9 +85,9 @@ void RenderEngine::render() {
     // While the window is not closed do this
     // if(!glfwWindowShouldClose(RenderEngine::window)) {
         // Setup the frame
-        std::cout << "Setting up the frame here" << std::endl;  
+        std::cout << "Setting up the frame here" << std::endl;
         float ratio;
-        int width, height;
+        int width=800, height=800;
         std::cout << "Getting framebuffer size" << std::endl;
         glfwGetFramebufferSize(RenderEngine::window, &width, &height);
         std::cout << "Framebuffer size obtained" << std::endl;
