@@ -137,6 +137,8 @@ void Vehicle::updatePos(double delT,bool limit){
   else{
     this->unrestrictedposition.first = unrestrictedNewPosition;
   }
+  std::cout <<"( "<< this->type <<", "<<this->color<<", "<<this->currentPosition.first<<", "<<this->currentPosition.second<<" )"<<std::endl;
+
 }
 // bool operator< (Vehicle v){
 //   return Vehicle::currentPosition.first < v.currentPosition.first;

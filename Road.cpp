@@ -50,14 +50,11 @@ void Road::addVehicle(Vehicle* vehicle,std::string color) {  // Vehicle from tem
     newVehicle->setColor(color);
     newVehicle->isOnRoad = true;
     newVehicle->parentRoad = this;
-    std::cout << "Initialize position"<<std::endl;
-    newVehicle->currentPosition = this->initPosition(newVehicle);
+    newVehicle->currentPosition = this->initPosition2(newVehicle);
     std::cout << "Position intialized to ("<<newVehicle->currentPosition.first<<","<<newVehicle->currentPosition.second<<")"<<std::endl;
     newVehicle->reConstruct();
-    std::cout << "Vehicle added" << std::endl;
     // push with insertion sort
     if(this->vehicles.size() < 1){
-      std::cout << "Vector was empty" << std::endl;
       this->vehicles.push_back(newVehicle);
     }
     else{
@@ -78,7 +75,10 @@ void Road::addVehicle(Vehicle* vehicle,std::string color) {  // Vehicle from tem
     std::cout <<this->vehicles.back()->type <<" of "<<color<<" added"<<std::endl;
 
 }
-
+void Road::error_callback(std::string errormsg){
+  std::cout <<"[ ERROR ] - "<< errormsg << std::endl;
+  std::exit(1);
+}
 void Road::setSignal(std::string signal){
     if(!signal.compare("GREEN")){
         this->signal = signal;
@@ -95,7 +95,7 @@ void Road::setSignal(std::string signal){
         return;
     }
     {
-        std::cout<<"[ ERROR ] Signal can only be GREEN/RED";
+        this->error_callback("Signal can only be GREEN/RED");
     }
 }
 
@@ -117,9 +117,59 @@ void Road::updateSim(double delT){
 void Road::runSim(double delT) {
     this->engine.render(delT);
 }
+void Road::initLanes(int lanes){
+  this->lanes = lanes;
+  std::vector<Vehicle*> tmp;
+  // Initialize empty lanes;
+  std::vector< std::pair<std::vector <Vehicle* >, double > > newtmp(this->lanes,std::make_pair(tmp,0)); // initial backend is 0 for all;
+  this->laneVehicles = newtmp;
+}
+double findLast(std::vector<Vehicle*> vehicles){
+  double pos = 0;
+  for(auto v: vehicles){
+    if((v->currentPosition.first - v->length) < pos){
+      pos = (v->currentPosition.first - v->length);
+    }
+  }
+  return pos;
+};
+void Road::addtoLanes(Vehicle* vehicle,int numlanesreq,int toplane){
+  for(int i=0;  i < numlanesreq; i++ ){
+    this->laneVehicles[toplane+i].first.push_back(vehicle);
+    this->laneVehicles[toplane+i].second -= vehicle->length;
+  }
+}
+// top is lane 0
+std::pair<double,double> Road::initPosition2(Vehicle* vehicle){
+  int numlanesreq = std::ceil(vehicle->width*this->lanes / (this->width));
+  int lane,positionx=-999;
+  if(this->laneVehicles.size()<1){
+    this->error_callback("No Lanes are present! (laneVehicles Vector wasn't initialized properly)");
+  }
+  if(numlanesreq > this->lanes){
+    this->error_callback("Vehicle can't be placed on the road! (TOO WIDE) ");
+  }
+  for(int i=0;i+numlanesreq <= this->laneVehicles.size();i++){
+    double back=0;
+    for(int j=0;j<numlanesreq;j++){
+      if(this->laneVehicles[i+j].second < back ){
+        back = this->laneVehicles[i+j].second;
+      };
+    }
+    if(back <= 0 && back > positionx){
+      positionx = back;
+      lane = i;
+      if(positionx == 0){
+        break;
+      }
+    }
+  }
+  this->addtoLanes(vehicle, numlanesreq, lane);
+  return std::make_pair(positionx,(this->lanes-lane)*(this->width/(double)this->lanes));
 
-
+}
 std::pair<double,double> Road::initPosition(Vehicle* vehicle){
+
   // double posx = 0;
   // std::vector<Vehicle*> beforeLine;
   // for(auto v: this->vehicles){
@@ -156,7 +206,6 @@ std::pair<double,double> Road::initPosition(Vehicle* vehicle){
       if( i >= this->vehicles.size()){
         // if(laneno)
           {
-            // std::cout << " Vehicle in new lane "<<laneno<<std::endl;
           posx = 0;
           posy = (laneno+1) * lanewidth;
           }
@@ -205,7 +254,7 @@ std::pair<double,double> Road::initPosition(Vehicle* vehicle){
 double Road::firstObstacle(double startPos,double length, double topRow, double botRow) {
     double position=this->length+2*length;
     for(auto v : this->vehicles) {
-        if(v->unrestrictedposition.second < topRow || (v->unrestrictedposition.second-v->width)>botRow){
+        if((v->unrestrictedposition.second < topRow && (v->unrestrictedposition.second)>botRow) || ((v->unrestrictedposition.second-v->width)>botRow) && (v->unrestrictedposition.second-v->width) < topRow){
             double back = (v->unrestrictedposition.first-v->length);
             if(position > back && back > startPos ){
                 position = back;
