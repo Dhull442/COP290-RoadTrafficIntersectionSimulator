@@ -21,6 +21,8 @@ class Vehicle {
         std::pair<double,double> unrestrictedposition;
         std::vector< int > color_rgb;
         bool isOnRoad;
+        bool processed;
+        double delT;
         Road* parentRoad; // Pointer to the road on which the vehicle is
 
 
@@ -34,7 +36,7 @@ class Vehicle {
         void setColor(std::string color);
 
         // Updates the position and velocity of the car based on delT
-        void updatePos(double delT,bool limit);
+        void updatePos(bool limit);
 };
 
 #endif

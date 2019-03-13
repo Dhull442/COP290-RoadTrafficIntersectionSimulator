@@ -43,7 +43,8 @@ class Road {
         void updateUnrestrictedpositions(double delT);
         void addtoLanes(Vehicle* vehicle,int numlanesreq,int toplane);
         // First vehicle obstacle in a lane
-        double firstObstacle(double startPos,double length, double topRow, double botRow );
+        // double firstObstacle(double startPos,double length, double topRow, double botRow );
+        double firstObstacle(Vehicle* vehicle);
         bool isRed();
         void initLanes(int lanes);
         std::pair<double,double> initPosition2(Vehicle* vehicle);

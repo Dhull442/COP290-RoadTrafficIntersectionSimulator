@@ -72,7 +72,7 @@ void Road::addVehicle(Vehicle* vehicle,std::string color) {  // Vehicle from tem
     // Add the road to the vehicle
 
     // To set defaults of road if not constructed
-    std::cout <<this->vehicles.back()->type <<" of "<<color<<" added"<<std::endl;
+    std::cout <<newVehicle->type <<" of "<<color<<" added"<<std::endl;
 
 }
 void Road::error_callback(std::string errormsg){
@@ -107,8 +107,9 @@ void Road::updateSim(double delT){
 
   // Update positions of each car
   for(int i=0;i<this->vehicles.size();i++) {
-    if(vehicles[i]->isOnRoad){
-      vehicles[i]->updatePos(delT,true);
+    if(vehicles[i]->isOnRoad && !vehicles[i]->processed){
+      vehicles[i]->delT = delT;
+      vehicles[i]->updatePos(true);
     }
   }
 }
@@ -117,6 +118,8 @@ void Road::updateSim(double delT){
 void Road::runSim(double delT) {
     this->engine.render(delT);
 }
+
+
 void Road::initLanes(int lanes){
   this->lanes = lanes;
   std::vector<Vehicle*> tmp;
@@ -124,6 +127,7 @@ void Road::initLanes(int lanes){
   std::vector< std::pair<std::vector <Vehicle* >, double > > newtmp(this->lanes,std::make_pair(tmp,0)); // initial backend is 0 for all;
   this->laneVehicles = newtmp;
 }
+
 double findLast(std::vector<Vehicle*> vehicles){
   double pos = 0;
   for(auto v: vehicles){
@@ -133,15 +137,17 @@ double findLast(std::vector<Vehicle*> vehicles){
   }
   return pos;
 };
+
 void Road::addtoLanes(Vehicle* vehicle,int numlanesreq,int toplane){
   for(int i=0;  i < numlanesreq; i++ ){
     this->laneVehicles[toplane+i].first.push_back(vehicle);
     this->laneVehicles[toplane+i].second -= vehicle->length;
   }
 }
+
 // top is lane 0
 std::pair<double,double> Road::initPosition2(Vehicle* vehicle){
-  int numlanesreq = std::ceil(vehicle->width*this->lanes / (this->width));
+  int numlanesreq = std::ceil(vehicle->width*(double)this->lanes / (this->width));
   int lane,positionx=-999;
   if(this->laneVehicles.size()<1){
     this->error_callback("No Lanes are present! (laneVehicles Vector wasn't initialized properly)");
@@ -168,35 +174,9 @@ std::pair<double,double> Road::initPosition2(Vehicle* vehicle){
   return std::make_pair(positionx,(this->lanes-lane)*(this->width/(double)this->lanes));
 
 }
+
+// Not useful anymore
 std::pair<double,double> Road::initPosition(Vehicle* vehicle){
-
-  // double posx = 0;
-  // std::vector<Vehicle*> beforeLine;
-  // for(auto v: this->vehicles){
-  //   if((v->currentPosition.first - v->length)<0) // if back end of vehicle will be beyond start.
-  //     beforeLine.push_back(v);
-  // }
-  //
-  // if(beforeLine.size()<1)
-  //   return std::make_pair(0,this->width);
-  // for(int i=0;i<beforeLine.size();i++){
-  //   if(i==0){
-  //       if()
-  //   }
-  // }
-  // posx=this->length;
-  // for(int i=0;i<this->vehicles.size();i++){
-  //   if((vehicles[i]->currentPosition.first - vehicles[i]->length) < posx ) // back End of vehicle
-  //   {
-  //     posx = (vehicles[i]->currentPosition.first - vehicles[i]->length);
-  //
-  //   }
-  //   if(posx>0){
-  //       return std::make_pair(0,this->width);
-  //   }
-  //   else
-  //   return std::make_pair(posx,this->width);
-
   // Lane implementation
   double lanewidth = this->width / (double) this->lanes;
   double lanepos=this->width;
@@ -204,13 +184,10 @@ std::pair<double,double> Road::initPosition(Vehicle* vehicle){
   double posy=this->width,posx=-999;
   for( int i=0;laneno >= 0; ){
       if( i >= this->vehicles.size()){
-        // if(laneno)
           {
           posx = 0;
           posy = (laneno+1) * lanewidth;
           }
-          // else
-          // std::cout<<"Vehicles exhausted but pos was set something earlier"<<std::endl;
           break;
       }
       else{
@@ -249,10 +226,32 @@ std::pair<double,double> Road::initPosition(Vehicle* vehicle){
   end:
   return std::make_pair(posx,posy);
 }
-
+// take care of how vehicles go into sort order into lane vehicles array ;
 // Gives first obstacle position in the given window
-double Road::firstObstacle(double startPos,double length, double topRow, double botRow) {
+double Road::firstObstacle(Vehicle* vehicle) {
     double position=this->length+2*length;
+    #ifndef NEW
+    for(auto laneinfo: this->laneVehicles){
+      if(std::find(laneinfo.first.begin(), laneinfo.first.end(), vehicle) != laneinfo.first.end()){
+        Vehicle* lastV=NULL;
+        for(auto v : laneinfo.first){
+          if(v == vehicle){
+            break;
+          }
+          else{
+            if(!v->processed){
+              v->updatePos(true);
+            }
+            lastV = v; // get the last element
+          }
+        }
+        if(lastV != NULL){
+          if( position > (lastV ->currentPosition.first - lastV->length) )
+            position = lastV ->currentPosition.first - lastV->length;
+        }
+      }
+    }
+    #else
     for(auto v : this->vehicles) {
         if((v->unrestrictedposition.second < topRow && (v->unrestrictedposition.second)>botRow) || ((v->unrestrictedposition.second-v->width)>botRow) && (v->unrestrictedposition.second-v->width) < topRow){
             double back = (v->unrestrictedposition.first-v->length);
@@ -261,6 +260,7 @@ double Road::firstObstacle(double startPos,double length, double topRow, double 
             }
         }
     }
+    #endif
     return position;
 }
 
@@ -269,7 +269,8 @@ void Road::updateUnrestrictedpositions(double delT){
 
   for(auto v : this -> vehicles) {
     if(v->isOnRoad)
-      v->updatePos(delT,false);
+      { v->delT=delT;
+        v->updatePos(false);}
   };
   // std::cout <<"Updated unrestricted positions for everyone" <<std::endl;
 

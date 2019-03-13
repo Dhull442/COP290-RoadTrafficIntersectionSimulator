@@ -9,10 +9,11 @@ SIM CITY
 - set default values to real life related
 - have added a set of basic safety rules above to specify global defaults of speeds and acceleration
 - -999 would be considered as not specified everywhere
+
 ### Issues
+- Rendering is not proportionate
 
 ### Enhancements
-- Make multiple incomes in one second on road;
 - can implement driving level as well: 0 - new, 1 - intermediate, 2 - expert;
 - can add deceleration as well.
 - [ DONE ]
