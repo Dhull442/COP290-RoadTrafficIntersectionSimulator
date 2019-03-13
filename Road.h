@@ -31,6 +31,7 @@ class Road {
         std::vector< int > signal_rgb;
         // Pointer to the Vehicle objects on the road
         std::vector<Vehicle*> vehicles;
+        std::vector< std::pair< std::vector<Vehicle*> , double > > laneVehicles; // a pair of vehicles in lane and it's back end;
         // Initialize the Road object
         Road(int id, double length, double width);
         Road(int id);
@@ -40,13 +41,17 @@ class Road {
         // Add a Vehicle to the road
         void addVehicle(Vehicle* vehicle,std::string color);
         void updateUnrestrictedpositions(double delT);
-
+        void addtoLanes(Vehicle* vehicle,int numlanesreq,int toplane);
         // First vehicle obstacle in a lane
         double firstObstacle(double startPos,double length, double topRow, double botRow );
         bool isRed();
+        void initLanes(int lanes);
+        std::pair<double,double> initPosition2(Vehicle* vehicle);
+        void error_callback(std::string errormsg);
         // Run the simulation on the road for time t
         void runSim(double t);
         void setSignal(std::string signal);
+        double findLast(std::vector<Vehicle*> vehicles);
         std::pair<double,double> initPosition(Vehicle* v);
 
     };

@@ -177,7 +177,7 @@ int main(int argc, char **argv){
             Road* newroad= new Road(id);
             newroad->setDefaults(safety_maxspeed,safety_acceleration,safety_length,safety_width,safety_skill);
             model.push_back(newroad);
-            model.back()->lanes = safety_lanes;
+            model.back()->initLanes(safety_lanes);
             // #else
             std::cout << "Road ID : " << newroad->id << std::endl;
             // #endif
@@ -204,7 +204,7 @@ int main(int argc, char **argv){
             // Create and add new road;
             int lanes = std::atoi(line.substr(line.find("=") + 1).c_str());
             // #ifdef IMPL
-            model.back()->lanes = lanes;
+            model.back()->initLanes(lanes);
             // #else
             std::cout << "Lanes : "<<lanes<< std::endl;
             // #endif
