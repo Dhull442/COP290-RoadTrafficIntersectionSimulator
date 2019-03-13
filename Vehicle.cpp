@@ -15,6 +15,8 @@ Vehicle::Vehicle(){
   // Intialize position
   this->currentPosition = std::make_pair(0,0);
   this->unrestrictedposition = this->currentPosition;
+  this->processed=false;
+  this->delT = 0;
 }
 
 Vehicle::Vehicle(std::string type, double length, double width): Vehicle(){
@@ -113,10 +115,12 @@ void Vehicle::setColor(std::string color){
   }
 }
 
-void Vehicle::updatePos(double delT,bool limit){
+void Vehicle::updatePos(bool limit){
+  double delT = this->delT;
   double unrestrictedNewPosition = this->currentPosition.first + (this->currentSpeed)*(delT) + (0.5)*(this->acceleration)*(delT)*(delT);
+
   if(limit){
-    double obstacle = this->parentRoad->firstObstacle(this->currentPosition.first,this->length,this->currentPosition.second,this->currentPosition.second-this->width);
+    double obstacle = this->parentRoad->firstObstacle(this);
   if(this->parentRoad->isRed()){
     if(obstacle>this->parentRoad->signalPosition){
       obstacle = this->parentRoad->signalPosition;
@@ -137,8 +141,8 @@ void Vehicle::updatePos(double delT,bool limit){
   else{
     this->unrestrictedposition.first = unrestrictedNewPosition;
   }
-  std::cout <<"( "<< this->type <<", "<<this->color<<", "<<this->currentPosition.first<<", "<<this->currentPosition.second<<" )"<<std::endl;
-
+  // std::cout <<"( "<< this->type <<", "<<this->color<<", "<<this->currentPosition.first<<", "<<this->currentPosition.second<<" )"<<std::endl;
+  this->processed = limit;
 }
 // bool operator< (Vehicle v){
 //   return Vehicle::currentPosition.first < v.currentPosition.first;

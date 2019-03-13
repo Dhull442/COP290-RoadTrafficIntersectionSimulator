@@ -6,4 +6,5 @@ check*
 check
 *.o
 .*.cpp.swp
-outputs.txt
+*.txt
+main
