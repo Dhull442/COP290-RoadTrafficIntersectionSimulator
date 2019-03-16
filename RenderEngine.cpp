@@ -17,9 +17,12 @@ RenderEngine::RenderEngine(Road* targetRoad) {
     this->bgcolor.push_back(1.0f);
     this->bgcolor.push_back(0.968f);
     this->bgcolor.push_back(0.3529f);
-    // Set the monitor Parameters
-    this->monitorWidth = 1920;
-    this->monitorHeight = 1080;
+    // Set the monitor Parameters - For Linux
+    // this->monitorWidth = 1920;
+    // this->monitorHeight = 1080;
+    // Monitor parameters - for mac
+    this->monitorWidth = 1280;
+    this->monitorHeight = 800;
 }
 
 // Default constructor
@@ -154,7 +157,7 @@ void RenderEngine::renderVehicle(Vehicle* vehicle) {
     if (vehicle->isOnRoad) {
         // Render only if the vehicle is on the Road
         float x = -1.0 + (float)vehicle->currentPosition.first/(float)this->scalex;
-        float y = ((float)this->targetRoad->width/2 - (float)vehicle->currentPosition.second)/(this->scaley);
+        float y = (-(float)this->targetRoad->width/2 + (float)vehicle->currentPosition.second)/(this->scaley);
         float delx = vehicle->width/(float)this->scalex;
         float dely = vehicle->length/(float)this->scaley;
 
