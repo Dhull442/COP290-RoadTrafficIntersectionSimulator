@@ -114,6 +114,9 @@ void RenderEngine::render(double delT) {
         float t = glfwGetTime();
         glRectd(t/10.0-1, 0.8, t/10.0-0.98, 0.75);
 
+        glColor3f(1.0f,1.0f,1.0f);
+        glRectd(0,0,-0.2,-0.2);
+
         // std::cout << "num vehicles; " << this->targetRoad->vehicles.size() << std::endl;
         // Iterate over the vehicles
         for(auto v: this->targetRoad->vehicles) {
@@ -136,10 +139,10 @@ void RenderEngine::render(double delT) {
 void RenderEngine::renderRoad() {
     // Render the road in gray
     glColor3f(0.2f, 0.2f, 0.2f);
-    float ycoord = this->targetRoad->width/(float)this->scaley*2;
+    float ycoord = this->targetRoad->width/((float)this->scaley);
     float xcoord = this->targetRoad->length/(float)this->scalex - 1.0;
     glRectd(-1.0f, ycoord, xcoord, -ycoord);
-
+    std::cout <<"Roadwa "<< ycoord<<" " << xcoord << std::endl;
     // Render the signal as a strip
     float xsignal = this->targetRoad->signalPosition/(float)this->scalex - 1.0;
     glColor3f((float)this->targetRoad->signal_rgb[0]/255.0f, (float)this->targetRoad->signal_rgb[1]/255.0f, (float)this->targetRoad->signal_rgb[2]/255.0f);
@@ -154,9 +157,9 @@ void RenderEngine::renderVehicle(Vehicle* vehicle) {
     if (vehicle->isOnRoad) {
         // Render only if the vehicle is on the Road
         float x = -1.0 + (float)vehicle->currentPosition.first/(float)this->scalex;
-        float y = ((float)this->targetRoad->width/2 - (float)vehicle->currentPosition.second)/(this->scaley);
-        float delx = vehicle->width/(float)this->scalex;
-        float dely = vehicle->length/(float)this->scaley;
+        float y = 2*( - (float)this->targetRoad->width/2 + (float)vehicle->currentPosition.second)/(this->scaley);
+        float delx = vehicle->length/(float)this->scalex;
+        float dely = 2*vehicle->width/(float)this->scaley;
 
         // Set the correct color
         glColor3f((float)vehicle->color_rgb[0]/255.0f,
@@ -164,7 +167,7 @@ void RenderEngine::renderVehicle(Vehicle* vehicle) {
         (float)vehicle->color_rgb[2]/255.0f);
 
         // Render the rectangle
-        // std::cout << "Vehicle rendered at " << x << " " << y << " " << x - delx << " " << y - dely << std::endl;
+        std::cout << "Vehiclewa "<<vehicle->type<<" "<<vehicle->width<<" "<<delx << " " <<dely << std::endl;
         glRectd(x, y, x -  delx, y - dely);
     }
 }

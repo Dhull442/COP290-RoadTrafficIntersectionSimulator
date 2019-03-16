@@ -72,7 +72,7 @@ void Road::addVehicle(Vehicle* vehicle,std::string color) {  // Vehicle from tem
     // Add the road to the vehicle
 
     // To set defaults of road if not constructed
-    std::cout <<newVehicle->type <<" of "<<color<<" added"<<std::endl;
+    std::cout <<newVehicle->type <<" of "<<newVehicle->width<<" added"<<std::endl;
 
 }
 void Road::error_callback(std::string errormsg){
@@ -153,7 +153,7 @@ std::pair<double,double> Road::initPosition2(Vehicle* vehicle){
     this->error_callback("No Lanes are present! (laneVehicles Vector wasn't initialized properly)");
   }
   if(numlanesreq > this->lanes){
-    this->error_callback("Vehicle can't be placed on the road! (TOO WIDE) ");
+    this->error_callback("Vehicle can't be placed on the road! (TOO WIDE)");
   }
   for(int i=0;i+numlanesreq <= this->laneVehicles.size();i++){
     double back=0;
