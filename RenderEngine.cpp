@@ -17,9 +17,12 @@ RenderEngine::RenderEngine(Road* targetRoad) {
     this->bgcolor.push_back(1.0f);
     this->bgcolor.push_back(0.968f);
     this->bgcolor.push_back(0.3529f);
-    // Set the monitor Parameters
-    this->monitorWidth = 1920;
-    this->monitorHeight = 1080;
+    // Set the monitor Parameters - For Linux
+    // this->monitorWidth = 1920;
+    // this->monitorHeight = 1080;
+    // Monitor parameters - for mac
+    this->monitorWidth = 1280;
+    this->monitorHeight = 800;
 }
 
 // Default constructor
