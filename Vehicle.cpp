@@ -125,37 +125,39 @@ void Vehicle::updatePos(bool limit){
   }
 
   if(limit){
+    int type = 0;
     bool free = true; // false when vehicle stopped due to another vehicle
     double delX= this->currentPosition.first;
     double obstacle = this->parentRoad->firstObstacle(this);
     if(this->parentRoad->isRed()){
       if(obstacle>this->parentRoad->signalPosition){
         obstacle = this->parentRoad->signalPosition;
+        std::cout << "Road sign"<<std::endl;
       }
     }
     {
       {
-      if(obstacle>unrestrictedNewPosition){
+        std::cout << this->type << " has obs at "<<obstacle<<" and free at "<<unrestrictedNewPosition<<" s = "<<this->acceleration<<std::endl;
+      if(obstacle-this->currentPosition.first>2){
+        type = 1;
         this->currentPosition.first = unrestrictedNewPosition;
         }
       else{
-        this->currentPosition.first = obstacle;
+        type = 2;
+        std::cout << "Decelerate ";
+        double d = obstacle - this->currentPosition.first;
+        std::cout << d <<" ";
+        double a = std::pow(this -> currentSpeed,2)/(2*d);
+        double change = this->currentSpeed*delT - (0.5)*a*delT*delT;
+        if(change > 0)
+          this->currentPosition.first += change;
+        std::cout <<this->currentPosition.first<<" "<<std::endl;
         free = false;
       }
     }
-    double prevspeed = this->currentSpeed;
-    // Update speed
-
-    // update acceleration
-    double acctmp = 2*prevspeed*delT + this->acceleration *delT*delT;
-    this->a = -acctmp + sqrt(acctmp*acctmp - 4*delT*delT*(prevspeed*prevspeed - 2*this->acceleration*(obstacle - 1)+2*this->acceleration*prevspeed*delT));
-    if(this->a>this->acceleration){
-      this->a=this->acceleration;
-    }
-    this->currentPosition.first += ((this->currentSpeed)*(delT) + (0.5)*(this->a)*(delT)*(delT));
-    this->currentSpeed += this->a*delT;
-    if(this->currentSpeed > this->maxspeed){
-      this->currentSpeed -= this->a*delT;
+    delX -= this->currentPosition.first;
+    if(delT > 0){
+      this->currentSpeed = (-1*delX)/delT;
     }
     if(!free){
       if(this->currentSpeed > 0){

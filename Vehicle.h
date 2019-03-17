@@ -25,7 +25,7 @@ class Vehicle {
         double delT;
         Road* parentRoad; // Pointer to the road on which the vehicle is
         std::pair<int,int> currentLane;
-        double stopdist;
+        double stopdist = 1;
         // bool hasStopped = true;
 
         // Initializes a Vehicle object with default values
