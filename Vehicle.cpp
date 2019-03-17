@@ -17,6 +17,7 @@ Vehicle::Vehicle(){
   this->unrestrictedposition = this->currentPosition;
   this->processed=false;
   this->delT = 0;
+  this->currentLane = std::make_pair(0,0);
 }
 
 Vehicle::Vehicle(std::string type, double length, double width): Vehicle(){
@@ -52,6 +53,7 @@ void Vehicle::reConstruct(){
     }
   }
 }
+
 void Vehicle::setColor(std::string color){
   // COLORS: GREEN,RED,BLUE,ORANGE,PINK,YELLOW,PURPLE,WHITE
   if(!color.compare("GREEN")){
@@ -118,31 +120,61 @@ void Vehicle::setColor(std::string color){
 void Vehicle::updatePos(bool limit){
   double delT = this->delT;
   double unrestrictedNewPosition = this->currentPosition.first + (this->currentSpeed)*(delT) + (0.5)*(this->acceleration)*(delT)*(delT);
+  if(this->currentSpeed + (this->acceleration)*(delT) >= this->maxspeed){
+    unrestrictedNewPosition = this->currentPosition.first + (this->currentSpeed)*delT;
+  }
 
   if(limit){
+    bool free = true; // false when vehicle stopped due to another vehicle
+    double delX= this->currentPosition.first;
     double obstacle = this->parentRoad->firstObstacle(this);
-  if(this->parentRoad->isRed()){
-    if(obstacle>this->parentRoad->signalPosition){
-      obstacle = this->parentRoad->signalPosition;
+    if(this->parentRoad->isRed()){
+      if(obstacle>this->parentRoad->signalPosition){
+        obstacle = this->parentRoad->signalPosition;
+      }
     }
-  }
-  {
-    if(obstacle>unrestrictedNewPosition){
-    this->currentPosition.first = unrestrictedNewPosition;
+    {
+      {
+      if(obstacle>unrestrictedNewPosition){
+        this->currentPosition.first = unrestrictedNewPosition;
+        }
+      else{
+        this->currentPosition.first = obstacle;
+        free = false;
+      }
     }
-  else
-    this->currentPosition.first = obstacle;
-  }
+    double prevspeed = this->currentSpeed;
+    // Update speed
+
+    // update acceleration
+    double acctmp = 2*prevspeed*delT + this->acceleration *delT*delT;
+    this->a = -acctmp + sqrt(acctmp*acctmp - 4*delT*delT*(prevspeed*prevspeed - 2*this->acceleration*(obstacle - 1)+2*this->acceleration*prevspeed*delT));
+    if(this->a>this->acceleration){
+      this->a=this->acceleration;
+    }
+    this->currentPosition.first += ((this->currentSpeed)*(delT) + (0.5)*(this->a)*(delT)*(delT));
+    this->currentSpeed += this->a*delT;
+    if(this->currentSpeed > this->maxspeed){
+      this->currentSpeed -= this->a*delT;
+    }
+    if(!free){
+      if(this->currentSpeed > 0){
+      // this->parentRoad->changeLane(this);
+
+    }}}
   if((this->currentPosition.first - this->length) >= this->parentRoad->length){
-    // std::cout <<"Vehicle gone offroad"<<std::endl;
     this->isOnRoad = false;
   }
+  // this->stopdist = this->activation_function(this->currentSpeed);
   }
   else{
     this->unrestrictedposition.first = unrestrictedNewPosition;
   }
-  // std::cout <<"( "<< this->type <<", "<<this->color<<", "<<this->currentPosition.first<<", "<<this->currentPosition.second<<" )"<<std::endl;
   this->processed = limit;
+}
+
+double Vehicle::activation_function(double speed){ // equivalent to newton's 3rd law
+  return speed + 0.5;
 }
 // bool operator< (Vehicle v){
 //   return Vehicle::currentPosition.first < v.currentPosition.first;

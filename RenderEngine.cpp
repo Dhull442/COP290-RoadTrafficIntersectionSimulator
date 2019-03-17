@@ -21,8 +21,8 @@ RenderEngine::RenderEngine(Road* targetRoad) {
     // this->monitorWidth = 1920;
     // this->monitorHeight = 1080;
     // Monitor parameters - for mac
-    this->monitorWidth = 1280;
-    this->monitorHeight = 800;
+    this->monitorWidth = 1920;
+    this->monitorHeight = 1080;
 }
 
 // Default constructor
@@ -117,9 +117,6 @@ void RenderEngine::render(double delT) {
         float t = glfwGetTime();
         glRectd(t/10.0-1, 0.8, t/10.0-0.98, 0.75);
 
-        glColor3f(1.0f,1.0f,1.0f);
-        glRectd(0,0,-0.2,-0.2);
-
         // std::cout << "num vehicles; " << this->targetRoad->vehicles.size() << std::endl;
         // Iterate over the vehicles
         for(auto v: this->targetRoad->vehicles) {
@@ -145,7 +142,7 @@ void RenderEngine::renderRoad() {
     float ycoord = this->targetRoad->width/((float)this->scaley);
     float xcoord = this->targetRoad->length/(float)this->scalex - 1.0;
     glRectd(-1.0f, ycoord, xcoord, -ycoord);
-    std::cout <<"Roadwa "<< ycoord<<" " << xcoord << std::endl;
+    // std::cout <<"Roadwa "<< ycoord<<" " << xcoord << std::endl;
     // Render the signal as a strip
     float xsignal = this->targetRoad->signalPosition/(float)this->scalex - 1.0;
     glColor3f((float)this->targetRoad->signal_rgb[0]/255.0f, (float)this->targetRoad->signal_rgb[1]/255.0f, (float)this->targetRoad->signal_rgb[2]/255.0f);
@@ -170,7 +167,7 @@ void RenderEngine::renderVehicle(Vehicle* vehicle) {
         (float)vehicle->color_rgb[2]/255.0f);
 
         // Render the rectangle
-        std::cout << "Vehiclewa "<<vehicle->type<<" "<<vehicle->width<<" "<<delx << " " <<dely << std::endl;
+        // std::cout << "Vehiclewa "<<vehicle->type<<" "<<vehicle->width<<" "<<delx << " " <<dely << std::endl;
         glRectd(x, y, x -  delx, y - dely);
     }
 }
