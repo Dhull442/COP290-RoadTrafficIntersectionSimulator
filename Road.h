@@ -47,13 +47,17 @@ class Road {
         double firstObstacle(Vehicle* vehicle);
         bool isRed();
         void initLanes(int lanes);
-        std::pair<double,double> initPosition2(Vehicle* vehicle);
+        std::pair<double,double> initPosition(Vehicle* vehicle);
         void error_callback(std::string errormsg);
         // Run the simulation on the road for time t
         void runSim(double t);
         void setSignal(std::string signal);
         double findLast(std::vector<Vehicle*> vehicles);
-        std::pair<double,double> initPosition(Vehicle* v);
+        void changeLane(Vehicle* vehicle);
+        void updateLane(int a,Vehicle* b);
+        void removeFromLane(int lane,Vehicle* v);
+        bool hasSpace(std::vector<Vehicle*> Vehicles,double front,double back);
+        // std::pair<double,double> initPosition(Vehicle* v);
 
     };
 
