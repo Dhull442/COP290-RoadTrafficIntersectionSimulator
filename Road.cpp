@@ -112,6 +112,7 @@ void Road::updateSim(double delT){
       vehicles[i]->updatePos(true);
     }
   }
+  this->printLanes();
 }
 
 // Runs the simulation and renders the road
@@ -215,6 +216,15 @@ void Road::changeLane(Vehicle* vehicle){
   }
 }
 
+void Road::printLanes(){
+  for(auto lane : this->laneVehicles){
+    for(auto v : lane.first){
+      std::cout <<"("<< v->type <<","<<v->currentPosition.first<<");";
+    }
+    std::cout << "end="<<lane.second<<std::endl;
+  }
+}
+
 void Road::updateLane(int lane,Vehicle* v){
   std::cout <<"Updating Lane to "<<lane << std::endl;
   // no change for intermediate lanes;
@@ -292,8 +302,10 @@ double Road::firstObstacle(Vehicle* vehicle) {
           }}
         }
         if(lastV != NULL){
+          std::cout << "last for "<<  vehicle->type << "="<<lastV->type<<std::endl;
           if( position > (lastV ->currentPosition.first - lastV->length) )
             position = lastV ->currentPosition.first - lastV->length;
+          std::cout << "OBSTACLE == "<<position<<std::endl;
         }
       }
     }

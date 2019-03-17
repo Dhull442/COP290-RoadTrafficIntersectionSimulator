@@ -113,9 +113,9 @@ void RenderEngine::render(double delT) {
         RenderEngine::renderRoad();
 
         // Render a rectangle moving at constant speed
-        glColor3f(0.0f, 0.0f, 0.0f);
-        float t = glfwGetTime();
-        glRectd(t/10.0-1, 0.8, t/10.0-0.98, 0.75);
+        // glColor3f(0.0f, 0.0f, 0.0f);
+        // float t = glfwGetTime();
+        // glRectd(t/10.0-1, 0.8, t/10.0-0.98, 0.75);
 
         // std::cout << "num vehicles; " << this->targetRoad->vehicles.size() << std::endl;
         // Iterate over the vehicles
