@@ -56,6 +56,7 @@ class Road {
         void changeLane(Vehicle* vehicle);
         void updateLane(int a,Vehicle* b);
         void removeFromLane(int lane,Vehicle* v);
+        void printLanes();
         bool hasSpace(std::vector<Vehicle*> Vehicles,double front,double back);
         // std::pair<double,double> initPosition(Vehicle* v);
 

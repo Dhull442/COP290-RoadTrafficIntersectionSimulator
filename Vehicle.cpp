@@ -120,38 +120,40 @@ void Vehicle::setColor(std::string color){
 void Vehicle::updatePos(bool limit){
   double delT = this->delT;
   double unrestrictedNewPosition = this->currentPosition.first + (this->currentSpeed)*(delT) + (0.5)*(this->acceleration)*(delT)*(delT);
-  if(this->currentSpeed + (this->acceleration)*(delT) >= this->maxspeed){
+  if(this->currentSpeed >= this->maxspeed){
     unrestrictedNewPosition = this->currentPosition.first + (this->currentSpeed)*delT;
   }
 
   if(limit){
-    int type = 0;
     bool free = true; // false when vehicle stopped due to another vehicle
     double delX= this->currentPosition.first;
     double obstacle = this->parentRoad->firstObstacle(this);
     if(this->parentRoad->isRed()){
       if(obstacle>this->parentRoad->signalPosition){
-        obstacle = this->parentRoad->signalPosition;
+        obstacle = this->parentRoad->signalPosition-0.5;
         std::cout << "Road sign"<<std::endl;
       }
     }
     {
       {
-        std::cout << this->type << " has obs at "<<obstacle<<" and free at "<<unrestrictedNewPosition<<" s = "<<this->acceleration<<std::endl;
+        std::cout << this->type << " has obs at "<<this->currentSpeed<<" and free at "<<this->acceleration<<" s = "<<this->currentPosition.first<<std::endl;
       if(obstacle-this->currentPosition.first>2){
-        type = 1;
-        this->currentPosition.first = unrestrictedNewPosition;
+        unrestrictedNewPosition = (this->currentSpeed)*(delT) + (0.5)*(this->acceleration)*(delT)*(delT);
+        if(this->currentSpeed >= this->maxspeed){
+          unrestrictedNewPosition = (this->currentSpeed)*delT;
+        }
+        this->currentPosition.first += unrestrictedNewPosition;
         }
       else{
-        type = 2;
         std::cout << "Decelerate ";
         double d = obstacle - this->currentPosition.first;
         std::cout << d <<" ";
-        double a = std::pow(this -> currentSpeed,2)/(2*d);
+        double a = std::pow(this -> currentSpeed,2)/(2*(d));
         double change = this->currentSpeed*delT - (0.5)*a*delT*delT;
         if(change > 0)
           this->currentPosition.first += change;
         std::cout <<this->currentPosition.first<<" "<<std::endl;
+        this->stoped = true;
         free = false;
       }
     }
@@ -159,9 +161,10 @@ void Vehicle::updatePos(bool limit){
     if(delT > 0){
       this->currentSpeed = (-1*delX)/delT;
     }
-    if(!free){
+    std::cout << "after change "<<this->currentPosition.first<<" "<<this->currentSpeed<<" "<<this->acceleration << std::endl;
+    if(!free && !(this->parentRoad->isRed())){
       if(this->currentSpeed > 0){
-      // this->parentRoad->changeLane(this);
+      this->parentRoad->changeLane(this);
 
     }}}
   if((this->currentPosition.first - this->length) >= this->parentRoad->length){
