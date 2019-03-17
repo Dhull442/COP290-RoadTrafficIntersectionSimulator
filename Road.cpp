@@ -51,7 +51,7 @@ void Road::addVehicle(Vehicle* vehicle,std::string color) {  // Vehicle from tem
     newVehicle->isOnRoad = true;
     newVehicle->parentRoad = this;
     newVehicle->currentPosition = this->initPosition(newVehicle);
-    std::cout << "Position intialized to ("<<newVehicle->currentPosition.first<<","<<newVehicle->currentPosition.second<<")"<<std::endl;
+    // std::cout << "Position intialized to ("<<newVehicle->currentPosition.first<<","<<newVehicle->currentPosition.second<<")"<<std::endl;
     newVehicle->reConstruct();
     // push with insertion sort
     if(this->vehicles.size() < 1){
@@ -274,7 +274,7 @@ void Road::removeFromLane(int lane,Vehicle* v){
 }
 // Gives first obstacle position in the given window
 double Road::firstObstacle(Vehicle* vehicle) {
-    double position=this->length;
+    double position=9999;
     #ifndef NEW
     for(auto laneinfo: this->laneVehicles){
       if(std::find(laneinfo.first.begin(), laneinfo.first.end(), vehicle) != laneinfo.first.end()){
