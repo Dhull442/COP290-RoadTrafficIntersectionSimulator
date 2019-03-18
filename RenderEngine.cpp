@@ -17,12 +17,8 @@ RenderEngine::RenderEngine(Road* targetRoad) {
     this->bgcolor.push_back(1.0f);
     this->bgcolor.push_back(0.968f);
     this->bgcolor.push_back(0.3529f);
-    // Set the monitor Parameters - For Linux
-    // this->monitorWidth = 1920;
-    // this->monitorHeight = 1080;
-    // Monitor parameters - for mac
-    this->monitorWidth = 1920;
-    this->monitorHeight = 1080;
+    this->monitorWidth = 800;
+    this->monitorHeight = 600;
 }
 
 // Default constructor
@@ -57,7 +53,7 @@ void RenderEngine::setup() {
 
     // Create a window, context
     std::cout << "Creating a window" << std::endl;
-    RenderEngine::window = glfwCreateWindow(this->monitorWidth, this->monitorHeight, "TrafficSim", glfwGetPrimaryMonitor(), NULL);
+    RenderEngine::window = glfwCreateWindow(this->monitorWidth, this->monitorHeight, "TrafficSim", NULL, NULL);
 
     if (!RenderEngine::window) {
         // Context creation failed
