@@ -161,7 +161,7 @@ void Vehicle::updatePos(double delT) {
     this->a = (-B + Disc)/(2*A);
 
     // Check if the accleration exceeds a_max
-    if (this->a > this->accleration) {
+    if (this->a > this->acceleration) {
         this->a = this->acceleration;
     }
 
