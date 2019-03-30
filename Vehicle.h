@@ -15,6 +15,7 @@ class Vehicle {
         double velLimit;
         bool useLimit;
         double length, width, safedistance;
+        double closestDistance;
         int skill;
         double maxspeed;
         double acceleration, a;

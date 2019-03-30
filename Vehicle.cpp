@@ -145,12 +145,12 @@ void Vehicle::updatePos(double delT) {
     }
 
     // Get the distance between this and next nearest obstacle
-    double D = this->parentRoad->firstObstacle(this, delT);
+    this->closestDistance = this->parentRoad->firstObstacle(this, delT);
 
     // Now we need to find the value of acceleration
     double A = delT*delT/(2*this->acceleration);
     double B = (delT*delT/2) + (this->currentSpeed*delT/this->acceleration);
-    double C = this->currentSpeed*this->currentSpeed/(2*this->acceleration) + this->currentSpeed*delT - D;
+    double C = this->currentSpeed*this->currentSpeed/(2*this->acceleration) + this->currentSpeed*delT - this->closestDistance;
     // Sqrt Discriminant of above QE
     double Disc = sqrt(B*B - 4*A*C);
 
