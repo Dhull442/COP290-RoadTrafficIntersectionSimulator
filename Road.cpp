@@ -34,7 +34,7 @@ Road::Road(int id):Road(){
 }
 
 void Road::setDefaults(double maxspeed, double acceleration,double length, double width,int skill,double sdistance){
-    // Input correclty < No checks here >
+    // Input correctly < No checks here >
     this->default_maxspeed = maxspeed;
     this->default_acceleration = acceleration;
     this->default_length = length;
@@ -51,12 +51,16 @@ void Road::addVehicle(Vehicle* vehicle,std::string color) {
     newVehicle->isOnRoad = true;
     newVehicle->parentRoad = this;
     newVehicle->currentPosition = this->initPosition(newVehicle);
+    // Set the new acceleration and velocities to zero
+    this->a = 0;
+    this->currentSpeed = 0;
+    // Constructs the parameters of the vehicle from either the template or the defaults
     newVehicle->reConstruct();
-    // push with insertion sort
+
+    // Pushes into the vector of vehicles sorted by position
     if(this->vehicles.size() < 1){
       this->vehicles.push_back(newVehicle);
-    }
-    else{
+    } else {
       for(int i = 0; i< this->vehicles.size();i++){
         if(newVehicle->currentPosition.second > this->vehicles[i]->currentPosition.second){
           this->vehicles.insert(this->vehicles.begin()+i,newVehicle);
@@ -68,11 +72,7 @@ void Road::addVehicle(Vehicle* vehicle,std::string color) {
         }
       }
     }
-    // Add the road to the vehicle
-
-    // To set defaults of road if not constructed
-    std::cout <<newVehicle->type <<" of "<<newVehicle->width<<" added"<<std::endl;
-
+    std::cout << newVehicle->type <<" of "<< newVehicle->width<<" added"<<std::endl;
 }
 
 void Road::error_callback(std::string errormsg){
@@ -80,6 +80,7 @@ void Road::error_callback(std::string errormsg){
   std::exit(1);
 }
 
+// Set the signal color, and value
 void Road::setSignal(std::string signal){
     if(!signal.compare("GREEN")){
         this->signal = signal;
@@ -88,29 +89,35 @@ void Road::setSignal(std::string signal){
         this->signal_rgb[2] = 8;
         return;
     }
-    if(!signal.compare("RED")){
+
+    if(!signal.compare("RED")) {
         this->signal = signal;
         this->signal_rgb[0] = 237;
         this->signal_rgb[1] = 32;
         this->signal_rgb[2] = 32;
         return;
-    }
-    {
+    } else {
         this->error_callback("Signal can only be GREEN/RED");
     }
 }
 
 void Road::updateSim(double delT){
+    // Make the processed variable false for all cars
+    for(int i = 0; i < this->vehicles.size(); i++) {
+        vehicles[i]->processed = false;
+    }
 
-
-  // Update unrestricted positions
-  this->updateUnrestrictedpositions(delT);
-
+    // Update the positions of each once
+    for(int i = 0; i < this->vehicles.size(); i++) {
+        if (vehicles[i]->isOnRoad && !vehicles[i]->processed) {
+            vehicles[i]->updatePos(delT);
+        }
+    }
   // Update positions of each car
   for(int i=0;i<this->vehicles.size();i++) {
-    if(vehicles[i]->isOnRoad && !vehicles[i]->processed){
-      vehicles[i]->delT = delT;
-      vehicles[i]->updatePos(true);
+    if(vehicles[i]->isOnRoad){
+        // Update positions based on previous parameters and update parameters
+        vehicles[i]->updatePos(delT);
     }
   }
   this->printLanes();
@@ -121,15 +128,16 @@ void Road::runSim(double delT) {
     this->engine.render(delT);
 }
 
-
+// Initializes empty Lanes
 void Road::initLanes(int lanes){
   this->lanes = lanes;
   std::vector<Vehicle*> tmp;
   // Initialize empty lanes;
-  std::vector< std::vector <Vehicle* > > newtmp(this->lanes,tmp); // initial backend is 0 for all;
+  std::vector< std::vector <Vehicle* > > newtmp(this->lanes, tmp);
   this->laneVehicles = newtmp;
 }
 
+// Finds the vehicle the most back on the road
 double findLast(std::vector<Vehicle*> vehicles){
   double pos = 0;
   for(auto v: vehicles){
@@ -140,14 +148,17 @@ double findLast(std::vector<Vehicle*> vehicles){
   return pos;
 };
 
-void Road::addtoLanes(Vehicle* vehicle,int numlanesreq,int toplane){
-  for(int i=0;  i < numlanesreq; i++ ){
+// Add the Vehicle to all lanes; right at the end of each one
+void Road::addtoLanes(Vehicle* vehicle, int numlanesreq, int toplane){
+  for(int i=0;  i < numlanesreq; i++ ) {
     this->laneVehicles[toplane+i].push_back(vehicle);
   }
+
   vehicle->currentLane.first = toplane;
   vehicle->currentLane.second = toplane + numlanesreq - 1;
 }
 
+// Calculates the back ends of each lane
 std::vector<double> Road::calculateBackEnds(){
   std::vector<double> result;
   for(int i=0;i<this->lanes;i++){
@@ -162,24 +173,28 @@ std::vector<double> Road::calculateBackEnds(){
   return result;
 }
 
-// top is lane 0
+// Get the position of the vehicle on the road
 std::pair<double,double> Road::initPosition(Vehicle* vehicle){
   int numlanesreq = std::ceil(vehicle->width*(double)this->lanes / (this->width));
-  int lane,positionx=-999;
+  int lane, positionx=-999;
   if(this->laneVehicles.size()<1){
     this->error_callback("No Lanes are present! (laneVehicles Vector wasn't initialized properly)");
   }
   if(numlanesreq > this->lanes){
     this->error_callback("Vehicle can't be placed on the road! (TOO WIDE)");
   }
+
+  // Calculate the back ends of each lane
   std::vector<double> backEnd = this->calculateBackEnds();
-  for(int i=0;i+numlanesreq <= this->laneVehicles.size();i++){
+  for(int i = 0; i + numlanesreq <= this->laneVehicles.size(); i++){
     double back=0;
-    for(int j=0;j<numlanesreq;j++){
+    for(int j = 0; j < numlanesreq; j++) {
       if(backEnd[i+j] < back ){
         back = backEnd[i+j];
       };
     }
+
+    // Place in the first available lane from the top
     if(back <= 0 && back > positionx){
       positionx = back;
       lane = i;
@@ -188,49 +203,55 @@ std::pair<double,double> Road::initPosition(Vehicle* vehicle){
       }
     }
   }
+
+  // Add the vehicle to the lane, at the end of each one
   this->addtoLanes(vehicle, numlanesreq, lane);
-  return std::make_pair(positionx,(this->lanes-lane)*(this->width/(double)this->lanes));
+  // This return value is assigned to the current position - and a buffer is added
+  return std::make_pair(positionx-vehicle->safedistance, (this->lanes-lane)*(this->width/(double)this->lanes));
 }
 
+// Checks if there is space on an adjacent Lane -- WILL BE EDITED
 bool Road::hasSpace(std::vector<Vehicle*> laneVehicles,double front,double back){
-  std::cout << "Checking for space"<<std::endl;
-  for(auto v: laneVehicles){
-    if(v->currentPosition.first >= back && v->currentPosition.first <= front)
-      return false;
-    if(v->currentPosition.first - v->length <= front && v->currentPosition.first - v->length >= back)
-      return false;
-  }
+  // std::cout << "Checking for space"<<std::endl;
+  // for(auto v: laneVehicles){
+  //   if(v->currentPosition.first >= back && v->currentPosition.first <= front)
+  //     return false;
+  //   if(v->currentPosition.first - v->length <= front && v->currentPosition.first - v->length >= back)
+  //     return false;
+  // }
   return true;
 }
 
+// CHANGES THE LANE - WILL BE EDITED
 void Road::changeLane(Vehicle* vehicle){
-  // =================
-  //       LEFT       0
-  //       ----       1
-  //       vvvv->     2
-  //       ----       3
-  //       RIGHT      4
-  // =================
-  std::cout << "Current "<<vehicle->type<<" at "<<vehicle->currentLane.first<<" "<<vehicle->currentLane.second<<std::endl;
-  bool checkRight = true, checkLeft = true;
-  if(vehicle->currentLane.first == 0){
-    checkLeft = false;
-  }
-  if(vehicle->currentLane.second == this->lanes - 1){
-    checkRight = false;
-  }
-  std::cout<<"checkLeft:"<<checkLeft<<" checkRight:"<<checkRight<<std::endl;
-  if(checkLeft){
-
-    if(this->hasSpace(this->laneVehicles[vehicle->currentLane.first - 1], vehicle->currentPosition.first, vehicle->currentPosition.first - vehicle->length))
-      {this->updateLane(vehicle->currentLane.first -1, vehicle);vehicle->currentPosition.second+=(this->width/(double)this->lanes);return;} // go back after
-  }
-  if(checkRight){
-    if(this->hasSpace(this->laneVehicles[vehicle->currentLane.second + 1], vehicle->currentPosition.first, vehicle->currentPosition.first - vehicle->length))
-      {this->updateLane(vehicle->currentLane.second + 1, vehicle);vehicle->currentPosition.second-=(this->width/(double)this->lanes);return;} // go back after
-  }
+  // // =================
+  // //       LEFT       0
+  // //       ----       1
+  // //       vvvv->     2
+  // //       ----       3
+  // //       RIGHT      4
+  // // =================
+  // std::cout << "Current "<<vehicle->type<<" at "<<vehicle->currentLane.first<<" "<<vehicle->currentLane.second<<std::endl;
+  // bool checkRight = true, checkLeft = true;
+  // if(vehicle->currentLane.first == 0){
+  //   checkLeft = false;
+  // }
+  // if(vehicle->currentLane.second == this->lanes - 1){
+  //   checkRight = false;
+  // }
+  // std::cout<<"checkLeft:"<<checkLeft<<" checkRight:"<<checkRight<<std::endl;
+  // if(checkLeft){
+  //
+  //   if(this->hasSpace(this->laneVehicles[vehicle->currentLane.first - 1], vehicle->currentPosition.first, vehicle->currentPosition.first - vehicle->length))
+  //     {this->updateLane(vehicle->currentLane.first -1, vehicle);vehicle->currentPosition.second+=(this->width/(double)this->lanes);return;} // go back after
+  // }
+  // if(checkRight){
+  //   if(this->hasSpace(this->laneVehicles[vehicle->currentLane.second + 1], vehicle->currentPosition.first, vehicle->currentPosition.first - vehicle->length))
+  //     {this->updateLane(vehicle->currentLane.second + 1, vehicle);vehicle->currentPosition.second-=(this->width/(double)this->lanes);return;} // go back after
+  // }
 }
 
+// Prints the lanes for debugging
 void Road::printLanes(){
   for(auto lane : this->laneVehicles){
     for(auto v : lane){
@@ -240,96 +261,104 @@ void Road::printLanes(){
   }
 }
 
+// Updates lanes after shifting -- WILL BE EDITED
 void Road::updateLane(int lane,Vehicle* v){
-  std::cout <<"Updating Lane to "<<lane << std::endl;
-  // no change for intermediate lanes;
-  if(lane < v->currentLane.first){ // shifting to left
-    std::cout << "Shifting "<<v->type<<" to Left"<<std::endl;
-  int index = -1;
-  for(int i=0;i< this->laneVehicles[lane].size();i++){
-    Vehicle* tmpv = this->laneVehicles[lane][i];
-    if(tmpv->currentPosition.first >= v->currentPosition.first){
-      index = i;
-    }
-  }
-  this->laneVehicles[lane].insert(this->laneVehicles[lane].begin()+index+1,v);
-  v->currentLane.first = lane;
-  this->removeFromLane(v->currentLane.second,v);
-  v->currentLane.second--;
+//   std::cout <<"Updating Lane to "<<lane << std::endl;
+//   // no change for intermediate lanes;
+//   if(lane < v->currentLane.first){ // shifting to left
+//     std::cout << "Shifting "<<v->type<<" to Left"<<std::endl;
+//   int index = -1;
+//   for(int i=0;i< this->laneVehicles[lane].size();i++){
+//     Vehicle* tmpv = this->laneVehicles[lane][i];
+//     if(tmpv->currentPosition.first >= v->currentPosition.first){
+//       index = i;
+//     }
+//   }
+//   this->laneVehicles[lane].insert(this->laneVehicles[lane].begin()+index+1,v);
+//   v->currentLane.first = lane;
+//   this->removeFromLane(v->currentLane.second,v);
+//   v->currentLane.second--;
+// }
+//   else{
+//     std::cout << "Shifting "<<v->type<<" to Right"<<std::endl;
+//
+//   int index = -1;
+//   for(int i=0;i<this->laneVehicles[lane].size();i++){
+//     Vehicle* tmpv = this->laneVehicles[lane][i];
+//     if(tmpv->currentPosition.first >= v->currentPosition.first){
+//       index = i;
+//     }
+//   }
+//   this->laneVehicles[lane].insert(this->laneVehicles[lane].begin()+index+1,v);
+//     v->currentLane.second = lane;
+//     this->removeFromLane(v->currentLane.first,v);
+//     v->currentLane.first++;
+//   }
+// }
+//
+// void Road::removeFromLane(int lane,Vehicle* v){
+//     double back = this->length;int index=0;
+//     if(this->laneVehicles[lane].size()<1){
+//       this->error_callback("Lane Size shouldn\'t be zero!");
+//     }
+//     for(int i=0;i<this->laneVehicles[lane].size();i++){
+//       Vehicle* tmpv = this->laneVehicles[lane][i];
+//       if(tmpv==v){
+//         index = i;
+//         continue;
+//       }
+//     }
+//     this->laneVehicles[lane].erase(this->laneVehicles[lane].begin() + index);
 }
-  else{
-    std::cout << "Shifting "<<v->type<<" to Right"<<std::endl;
 
-  int index = -1;
-  for(int i=0;i<this->laneVehicles[lane].size();i++){
-    Vehicle* tmpv = this->laneVehicles[lane][i];
-    if(tmpv->currentPosition.first >= v->currentPosition.first){
-      index = i;
-    }
-  }
-  this->laneVehicles[lane].insert(this->laneVehicles[lane].begin()+index+1,v);
-    v->currentLane.second = lane;
-    this->removeFromLane(v->currentLane.first,v);
-    v->currentLane.first++;
-  }
-}
-
-void Road::removeFromLane(int lane,Vehicle* v){
-    double back = this->length;int index=0;
-    if(this->laneVehicles[lane].size()<1){
-      this->error_callback("Lane Size shouldn\'t be zero!");
-    }
-    for(int i=0;i<this->laneVehicles[lane].size();i++){
-      Vehicle* tmpv = this->laneVehicles[lane][i];
-      if(tmpv==v){
-        index = i;
-        continue;
-      }
-    }
-    this->laneVehicles[lane].erase(this->laneVehicles[lane].begin() + index);
-}
-
-// Gives first obstacle position in the given window
-double Road::firstObstacle(Vehicle* vehicle) {
+// Find the first obstacle in front of an object in the updated state -- WILL BE EDITED
+double Road::firstObstacle(Vehicle* vehicle, double delT) {
+    // This is the position of the first Obstacle in front
     double position=9999;
-    #ifndef NEW
-    for(auto laneinfo: this->laneVehicles){
-      if(std::find(laneinfo.begin(), laneinfo.end(), vehicle) != laneinfo.end()){
-        Vehicle* lastV=NULL;
-        for(auto v : laneinfo){
-          if(v->isOnRoad){
-          if(v == vehicle){
-            break;
-          }
-          else{
-            if(!v->processed){
-              v->updatePos(true);
-            }
-            lastV = v; // get the last element
-          }}
+    // Cycle over all lanes
+    for(auto laneinfo: this->laneVehicles) {
+      if(std::find(laneinfo.begin(), laneinfo.end(), vehicle) != laneinfo.end()) {
+        // If vehicle exists in this lane, execute
+        // Pointer to the last vehicle in the lane in front if this one
+        Vehicle* lastV = NULL
+        // Iterate over the vehicles in the lanes
+        for(auto v : laneinfo) {
+              if(v->isOnRoad) {
+                  if(v == vehicle) {
+                    // If we reach this vehicle, break out
+                    break;
+                  } else {
+                    if (!v->processed) {
+                        // If this Vehicle is not processed, update the Positions
+                        v->updatePos(delT);
+                    }
+                    // Get the last element
+                    lastV = v;
+                 }
+             }
         }
-        if(lastV != NULL){
-          std::cout << "last for "<<  vehicle->type << "="<<lastV->type<<std::endl;
-          if( position > (lastV ->currentPosition.first - lastV->length) )
-            position = lastV ->currentPosition.first - lastV->length;
-          std::cout << "OBSTACLE == "<<position<<std::endl;
+
+        // After the loop
+        if(lastV != NULL) {
+            // There is some Vehicle in the front of this one, in current lane
+            std::cout << "last for "<<  vehicle->type << "="<<lastV->type<<std::endl;
+            if (position > (lastV ->currentPosition.first - lastV->length)) {
+                // Update the position
+                position = lastV ->currentPosition.first - lastV->length;
+            }
+            std::cout << "OBSTACLE == "<<position<<std::endl;
+        } else {
+            // Check the signal position
+            if (position > this->signalPosition) {
+                position = this->signalPosition;
+            }
         }
       }
     }
-    #else
-    for(auto v : this->vehicles) {
-        if((v->unrestrictedposition.second < topRow && (v->unrestrictedposition.second)>botRow) || ((v->unrestrictedposition.second-v->width)>botRow) && (v->unrestrictedposition.second-v->width) < topRow){
-            double back = (v->unrestrictedposition.first-v->length);
-            if(position > back && back > startPos ){
-                position = back;
-            }
-        }
-    }
-    #endif
-    return position;
+    return position - this->currentPosition.first;
 }
 
-// Updates the unrestricted new positions of every vehicle
+// Updates the unrestricted new positions of every vehicle -- WILL BE EDITED
 void Road::updateUnrestrictedpositions(double delT){
 
   for(auto v : this -> vehicles) {
@@ -341,6 +370,7 @@ void Road::updateUnrestrictedpositions(double delT){
 
 }
 
+// Checks if the signal is RED
 bool Road::isRed() {
     return (!this->signal.compare("RED"));
 }

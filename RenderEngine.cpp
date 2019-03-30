@@ -93,7 +93,7 @@ void RenderEngine::render(double delT) {
     #endif
     std::cout << "Starting Render routine"<< std::endl;
     while((currentTime - beginTime < delT) && !glfwWindowShouldClose(RenderEngine::window)) {
-        // std::cout << "Rendering now..." << std::endl;
+        // Update the simulation based on previously decided parameters, set new parameters
         this->targetRoad->updateSim(currentTime - beginTime);
         float ratio;
         int width=800, height=800;
@@ -102,17 +102,12 @@ void RenderEngine::render(double delT) {
         ratio = width / (float) height;
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT);
+
         // Render the background
         glClearColor((float)this->bgcolor[0], (float)this->bgcolor[1], (float)this->bgcolor[2], 1.0f);
         // Render the road
         RenderEngine::renderRoad();
 
-        // Render a rectangle moving at constant speed
-        // glColor3f(0.0f, 0.0f, 0.0f);
-        // float t = glfwGetTime();
-        // glRectd(t/10.0-1, 0.8, t/10.0-0.98, 0.75);
-
-        // std::cout << "num vehicles; " << this->targetRoad->vehicles.size() << std::endl;
         // Iterate over the vehicles
         for(auto v: this->targetRoad->vehicles) {
             renderVehicle(v);

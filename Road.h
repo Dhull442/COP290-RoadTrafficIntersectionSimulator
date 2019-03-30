@@ -49,7 +49,7 @@ class Road {
         void addVehicle(Vehicle* vehicle,std::string color);
         // First vehicle obstacle in a lane
         // double firstObstacle(double startPos,double length, double topRow, double botRow );
-        double firstObstacle(Vehicle* vehicle);
+        double firstObstacle(Vehicle* vehicle, double delT);
         bool isRed();
         void initLanes(int lanes);
         std::pair<double,double> initPosition(Vehicle* vehicle);
