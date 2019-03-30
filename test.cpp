@@ -43,12 +43,17 @@ GLFWwindow* initWindow(const int resX, const int resY)
     glCullFace(GL_BACK);
     return window;
 }
-
+void generateColorPointer(int size,std:: vector<float> color_rgb, GLfloat* mat){
+  for(int i=0;i<size;i++){
+    mat[3*i] = color_rgb[0];
+    mat[3*i+1] = color_rgb[1];
+    mat[3*i+2] = color_rgb[2];
+  }
+}
 void drawCube(int x)
 {
     GLfloat vertices[] =
-    {
-        -1, -1, -0.5,   -1,  1,-0.5,    -1,   1, 0.5,   -1, -1, 0.5, // back
+    {  -1, -1, -0.5,   -1,  1,-0.5,    -1,   1, 0.5,   -1, -1, 0.5, // back
        -1,  1,  0.5,     1,  1,  0.5,   1,0.8,0.5,      -1,0.8,0.5,
        -1,0.8,0.5,     1.5,0.8,0.5,    1.5,  -1, 0.5,   -1, -1, 0.5,
        -1,  1,  -0.5,     1,  1,  -0.5,   1,0.8,-0.5,      -1,0.8,-0.5,
@@ -59,27 +64,18 @@ void drawCube(int x)
         1.5, -1, 0.5, 1.5,-1, -0.5,   -1, -1, -0.5,    -1, -1, 0.5,
       1.5, 0.8, 0.5,    1.5, 0.8, -0.5,   1.5, -1, -0.5,    1.5, -1, 0.5
     };
-
-    static const GLfloat color[] = {0.1, 0.9, 0.9,    0.1, 0.9, 0.9,    0.1, 0.9, 0.9,    0.1, 0.9, 0.9,
-                                    0.1, 0.9, 0.9,    0.1, 0.9, 0.9,    0.1, 0.9, 0.9,    0.1, 0.9, 0.9,
-                                    0.1, 0.9, 0.9,    0.1, 0.9, 0.9,    0.1, 0.9, 0.9,    0.1, 0.9, 0.9,
-                                    0.1, 0.9, 0.9,0.1, 0.9, 0.9,0.1, 0.9, 0.9,0.1, 0.9, 0.9,
-                                  0.1, 0.9, 0.9,0.1, 0.9, 0.9,0.1, 0.9, 0.9,0.1, 0.9, 0.9,
-                                0.1, 0.9, 0.9,0.1, 0.9, 0.9,0.1, 0.9, 0.9,0.1, 0.9, 0.9,
-                              0.1, 0.9, 0.9,0.1, 0.9, 0.9,0.1, 0.9, 0.9,0.1, 0.9, 0.9,
-                            0.1, 0.9, 0.9,0.1, 0.9, 0.9,0.1, 0.9, 0.9,0.1, 0.9, 0.9,
-                          0.1, 0.9, 0.9,0.1, 0.9, 0.9,0.1, 0.9, 0.9,0.1, 0.9, 0.9,
-                        0.1, 0.9, 0.9,0.1, 0.9, 0.9,0.1, 0.9, 0.9,0.1, 0.9, 0.9};
-
+    std::vector<float> c(3,0); c[0]= 0.5, c[1]=0.4, c[2] = 0.4;
+    GLfloat colors[40*3];
+    generateColorPointer(40,c,colors);
     static float alpha = 0;
     //attempt to rotate cube
     /* We have a color array and a vertex array */
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, vertices);
-    glTranslatef(x/(float)20, 0, -1);
+    // glTranslatef(x/(float)20, 0, -1);
 
-    glColorPointer(3, GL_FLOAT, 0, color);
+    glColorPointer(3, GL_FLOAT, 0, colors);
 
     glDrawArrays(GL_POLYGON, 0, 40);
 
@@ -89,9 +85,7 @@ void drawCube(int x)
     alpha += 1;
 }
 void display( GLFWwindow* window )
-{   float x = 0;
-    double xpos=0, ypos=0;double newx=0, newy=0;
-    std::cout << xpos << " "<< ypos << std::endl;
+{   float x = 0, newx=0, newy=0,angleX=0,angleY=0,zoom = -10 ;
     while(!glfwWindowShouldClose(window))
     {
         // Scale to window size
@@ -103,9 +97,9 @@ void display( GLFWwindow* window )
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         // glutMouseFunc(mouse_click);
         // glfwGetCursorPos(window,&newx, &newy);
-        double horizontalAngle, verticalAngle,mouseSpeed = 1, deltaTime = 0.05;
-        horizontalAngle += mouseSpeed * deltaTime * float(1024/2 - xpos );
-        verticalAngle   += mouseSpeed * deltaTime * float( 768/2 - ypos );
+        // double horizontalAngle, verticalAngle,mouseSpeed = 1, deltaTime = 0.05;
+        // horizontalAngle += mouseSpeed * deltaTime * float(1024/2 - xpos );
+        // verticalAngle   += mouseSpeed * deltaTime * float( 768/2 - ypos );
         glMatrixMode(GL_PROJECTION_MATRIX);
         glLoadIdentity();
         gluPerspective( 90, (double)windowWidth / (double)windowHeight, 0.1, 100 );
@@ -115,8 +109,7 @@ void display( GLFWwindow* window )
 //     sin(verticalAngle),
 //     cos(verticalAngle) * cos(horizontalAngle)
 // );
-// Move forward
-if (glfwGetKey( window, GLFW_KEY_UP ) == GLFW_PRESS){
+        if (glfwGetKey( window, GLFW_KEY_UP ) == GLFW_PRESS){
         newy -= 0.1;
         }
         // Move backward
@@ -130,10 +123,40 @@ if (glfwGetKey( window, GLFW_KEY_UP ) == GLFW_PRESS){
         // Strafe left
         if (glfwGetKey(window, GLFW_KEY_LEFT ) == GLFW_PRESS){
         newx += 0.1;
-      }
+        }
+        if (glfwGetKey(window, GLFW_KEY_W ) == GLFW_PRESS){
+        angleX += 0.5;
+        // glRotatef(angleX,1,0,0);
+        }
+        if (glfwGetKey(window, GLFW_KEY_S ) == GLFW_PRESS){
+        angleX -= 0.5;
+        // glRotatef(angleX,1,0,0);
+        }
+        if (glfwGetKey(window, GLFW_KEY_A ) == GLFW_PRESS){
+        angleY += 0.5;
+        // glRotatef(angleY,0,1,0);
+        }
+        if (glfwGetKey(window, GLFW_KEY_D ) == GLFW_PRESS){
+        angleY -= 0.5;
+        }
+        if (glfwGetKey(window, GLFW_KEY_Z ) == GLFW_PRESS){
+        zoom += 1;
+        }
+        if (glfwGetKey(window, GLFW_KEY_X ) == GLFW_PRESS){
+        zoom -= 1;
+        }
 
+        if (glfwGetKey(window, GLFW_KEY_R ) == GLFW_PRESS){
+        zoom = -10;
+        angleX = 0;
+        angleY = 0;
+        newx = 0;
+        newy = 0;
+        }
+        double angle = sqrt(pow(angleX,2)+pow(angleY,2));
+        glTranslatef(newx,newy,zoom);
+        glRotatef(angle,(angleX/angle),(angleY/angle),0);
         glMatrixMode(GL_MODELVIEW_MATRIX);
-        glTranslatef(newx,newy,-10);
 
         drawCube(x);
 
