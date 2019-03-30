@@ -157,7 +157,7 @@ void Vehicle::updatePos(bool limit){
         if(change > 0)
           this->currentPosition.first += change;
         std::cout <<this->currentPosition.first<<" "<<std::endl;
-        this->stoped = true;
+        this->stopped = true;
         free = false;
       }
     }

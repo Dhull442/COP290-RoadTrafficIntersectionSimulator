@@ -12,10 +12,10 @@ class Vehicle {
 
     public:
         std::string type;
-        double length, width,safedistance;
+        double length, width, safedistance;
         int skill;
         double maxspeed;
-        double acceleration,a;
+        double acceleration, a;
         double currentSpeed;
         std::pair<double,double> currentPosition; // The coordinate of the front-top of the vehicle
         std::pair<double,double> unrestrictedposition;
@@ -25,8 +25,7 @@ class Vehicle {
         double delT;
         Road* parentRoad; // Pointer to the road on which the vehicle is
         std::pair<int,int> currentLane;
-        bool stoped = false;
-        // bool hasStopped = true;
+        bool stopped = false;
 
         // Initializes a Vehicle object with default values
         Vehicle();
