@@ -1,4 +1,6 @@
-#include < bits / stdc++.h > #include "Vehicle.h"#include "Road.h"
+#include <bits/stdc++.h>
+#include "Vehicle.h"
+#include "Road.h"
 typedef std::vector < Road * > Model;
 typedef std::vector < Vehicle * > vv;
 

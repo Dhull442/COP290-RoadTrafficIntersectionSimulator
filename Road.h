@@ -59,7 +59,6 @@ class Road {
         void runSim(double t);
         void setSignal(std::string signal);
         void printLanes();
-
     };
 
 #endif
