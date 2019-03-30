@@ -51,6 +51,7 @@ void Road::addVehicle(Vehicle* vehicle,std::string color) {
     newVehicle->isOnRoad = true;
     newVehicle->parentRoad = this;
     newVehicle->currentPosition = this->initPosition(newVehicle);
+    newVehicle->setColor(color);
     // Set the new acceleration and velocities to zero
     newVehicle->a = 0;
     newVehicle->currentSpeed = 0;
