@@ -39,7 +39,7 @@ class Vehicle {
         void setColor(std::string color);
         double activation_function(double speed);
         // Updates the position and velocity of the car based on delT
-        void updatePos(bool limit);
+        void updatePos(double delT);
 };
 
 #endif

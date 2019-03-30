@@ -52,8 +52,8 @@ void Road::addVehicle(Vehicle* vehicle,std::string color) {
     newVehicle->parentRoad = this;
     newVehicle->currentPosition = this->initPosition(newVehicle);
     // Set the new acceleration and velocities to zero
-    this->a = 0;
-    this->currentSpeed = 0;
+    newVehicle->a = 0;
+    newVehicle->currentSpeed = 0;
     // Constructs the parameters of the vehicle from either the template or the defaults
     newVehicle->reConstruct();
 
@@ -320,7 +320,7 @@ double Road::firstObstacle(Vehicle* vehicle, double delT) {
       if(std::find(laneinfo.begin(), laneinfo.end(), vehicle) != laneinfo.end()) {
         // If vehicle exists in this lane, execute
         // Pointer to the last vehicle in the lane in front if this one
-        Vehicle* lastV = NULL
+        Vehicle* lastV = NULL;
         // Iterate over the vehicles in the lanes
         for(auto v : laneinfo) {
               if(v->isOnRoad) {
@@ -355,7 +355,7 @@ double Road::firstObstacle(Vehicle* vehicle, double delT) {
         }
       }
     }
-    return position - this->currentPosition.first;
+    return position - vehicle->currentPosition.first;
 }
 
 // Updates the unrestricted new positions of every vehicle -- WILL BE EDITED
