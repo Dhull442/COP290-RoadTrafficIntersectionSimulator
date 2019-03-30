@@ -8,6 +8,7 @@ Vehicle::Vehicle(){
   this->maxspeed = -1;
   this->acceleration = -1;
   this->skill = -1;
+  this->safedistance = -1;
   this->parentRoad = NULL;
   this->color_rgb.push_back(0);
   this->color_rgb.push_back(0);
@@ -50,6 +51,9 @@ void Vehicle::reConstruct(){
     }
     if(this->skill == -1){
       this->skill = this->parentRoad->default_skill;
+    }
+    if(this->safedistance == -1){
+      this->safedistance = this->parentRoad->default_safety_distance;
     }
   }
 }
@@ -130,14 +134,14 @@ void Vehicle::updatePos(bool limit){
     double obstacle = this->parentRoad->firstObstacle(this);
     if(this->parentRoad->isRed()){
       if(obstacle>this->parentRoad->signalPosition){
-        obstacle = this->parentRoad->signalPosition-0.5;
+        obstacle = this->parentRoad->signalPosition-this->safedistance;
         std::cout << "Road sign"<<std::endl;
       }
     }
     {
       {
         std::cout << this->type << " has obs at "<<this->currentSpeed<<" and free at "<<this->acceleration<<" s = "<<this->currentPosition.first<<std::endl;
-      if(obstacle-this->currentPosition.first>2){
+      if(obstacle-this->currentPosition.first>this->safedistance){
         unrestrictedNewPosition = (this->currentSpeed)*(delT) + (0.5)*(this->acceleration)*(delT)*(delT);
         if(this->currentSpeed >= this->maxspeed){
           unrestrictedNewPosition = (this->currentSpeed)*delT;
@@ -162,10 +166,10 @@ void Vehicle::updatePos(bool limit){
       this->currentSpeed = (-1*delX)/delT;
     }
     std::cout << "after change "<<this->currentPosition.first<<" "<<this->currentSpeed<<" "<<this->acceleration << std::endl;
-    if(!free && !(this->parentRoad->isRed())){
-      if(this->currentSpeed > 0){
+    if(!free){
+      std::cout << "checking lane!"<<this->currentSpeed<<"Checking"<<this->maxspeed<<std::endl;
+      if(this->currentSpeed > 0&& this->currentSpeed < this->maxspeed){
       this->parentRoad->changeLane(this);
-
     }}}
   if((this->currentPosition.first - this->length) >= this->parentRoad->length){
     this->isOnRoad = false;
@@ -181,10 +185,3 @@ void Vehicle::updatePos(bool limit){
 double Vehicle::activation_function(double speed){ // equivalent to newton's 3rd law
   return speed + 0.5;
 }
-// bool operator< (Vehicle v){
-//   return Vehicle::currentPosition.first < v.currentPosition.first;
-// }
-// int main(){
-//   Vehicle mine("Car",2,2);
-//   std::cout << mine.skill << std::endl;
-// }

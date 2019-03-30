@@ -105,7 +105,7 @@ int main(int argc, char **argv){
     // #endif
     std::string line;
     int num_rules=0,safety_skill;
-    double safety_maxspeed,safety_acceleration,safety_length,safety_width,safety_lanes;
+    double safety_maxspeed,safety_acceleration,safety_length,safety_width,safety_lanes,safety_distance;
     while(std::getline(configFile,line)){
       if (! line.length()) continue;  // IGN empty
       if (line[0] == '#') continue;  // IGN with #
@@ -166,16 +166,25 @@ int main(int argc, char **argv){
             std::cout << "Safety_Lanes : " << safety_skill << std::endl;
             // #endif
           }
+          if(line.find("Safety_Distance") != std::string::npos){
+            // Create and add new road;
+            safety_distance = std::atof(line.substr(line.find("=") + 1).c_str());
+            num_rules++;
+            // #ifdef IMPL
+            // #else
+            std::cout << "Safety_Acceleration : " << safety_acceleration << std::endl;
+            // #endif
+          }
           if(line.find("Road_Id") != std::string::npos){
             // Create and add new road;
-            if(num_rules!= 6){
+            if(num_rules!= 7){
               std::cout << "[ ERROR ] Please Specify all the rules."<<std::endl;
               std::exit(1);
             }
             int id = std::atoi(line.substr(line.find("=") + 1).c_str());
             // #ifdef IMPL
             Road* newroad= new Road(id);
-            newroad->setDefaults(safety_maxspeed,safety_acceleration,safety_length,safety_width,safety_skill);
+            newroad->setDefaults(safety_maxspeed,safety_acceleration,safety_length,safety_width,safety_skill,safety_distance);
             model.push_back(newroad);
             model.back()->initLanes(safety_lanes);
             // #else
@@ -306,6 +315,15 @@ int main(int argc, char **argv){
             vehicles.back()->acceleration = acc;
             // #else
             std::cout << "Vehicle Acceleration : "<<acc<< std::endl;
+            // #endif
+          }
+          if(line.find("Vehicle_SafetyDistance") != std::string::npos){
+            // Create and add new road;
+            double sdistance = std::atof(line.substr(line.find("=") + 1).c_str());
+            // #ifdef IMPL
+            vehicles.back()->safedistance = sdistance;
+            // #else
+            std::cout << "Vehicle Safety Distance : "<<sdistance<< std::endl;
             // #endif
           }
           // CHANGE MODE

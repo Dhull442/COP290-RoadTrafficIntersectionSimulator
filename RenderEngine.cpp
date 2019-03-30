@@ -104,7 +104,6 @@ void RenderEngine::render(double delT) {
         glClear(GL_COLOR_BUFFER_BIT);
         // Render the background
         glClearColor((float)this->bgcolor[0], (float)this->bgcolor[1], (float)this->bgcolor[2], 1.0f);
-
         // Render the road
         RenderEngine::renderRoad();
 
@@ -143,6 +142,14 @@ void RenderEngine::renderRoad() {
     float xsignal = this->targetRoad->signalPosition/(float)this->scalex - 1.0;
     glColor3f((float)this->targetRoad->signal_rgb[0]/255.0f, (float)this->targetRoad->signal_rgb[1]/255.0f, (float)this->targetRoad->signal_rgb[2]/255.0f);
     glRectd(xsignal, ycoord, xsignal + this->signalSize/(float)this->scalex, -ycoord);
+    int lanes = this->targetRoad->lanes;
+    double lanewidth = this->targetRoad->width/(double)this->targetRoad->lanes;
+    for(int i=0;i<lanes-1;i++){
+      glColor3f(1.0f,1.0f,1.0f);
+      float ystart = -ycoord + 2*(i+1)*lanewidth/(float)this->scaley;
+      float width = 0.01f;
+      glRectd(-1.0f, ystart, xcoord, ystart + width);
+    }
 }
 
 void RenderEngine::endSim() {

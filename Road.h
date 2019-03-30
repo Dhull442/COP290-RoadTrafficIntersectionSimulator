@@ -12,6 +12,7 @@ class Road {
     private:
         std::string signal; // The signal value at this time
         std::vector<std::pair<double, double> > map;
+        std::vector<double> calculateBackEnds();
     public:
         // default vehicle Parameters
         #ifdef RENDER_ENGINE_H
@@ -21,6 +22,7 @@ class Road {
         double default_acceleration = 1;
         double default_length = 2;
         double default_width = 2;
+        double default_safety_distance = 1;
         int default_skill = 1;
 
         double length;
@@ -31,13 +33,13 @@ class Road {
         std::vector< int > signal_rgb;
         // Pointer to the Vehicle objects on the road
         std::vector<Vehicle*> vehicles;
-        std::vector< std::pair< std::vector<Vehicle*> , double > > laneVehicles; // a pair of vehicles in lane and it's back end;
+        std::vector< std::vector<Vehicle*> > laneVehicles; // a pair of vehicles in lane and it's back end;
         // Initialize the Road object
         Road(int id, double length, double width);
         Road(int id);
         Road();
         void updateSim(double delT);
-        void setDefaults(double maxspeed, double acceleration,double length, double width,int skill);
+        void setDefaults(double maxspeed, double acceleration,double length, double width,int skill, double sdistance);
         // Add a Vehicle to the road
         void addVehicle(Vehicle* vehicle,std::string color);
         void updateUnrestrictedpositions(double delT);
