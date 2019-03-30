@@ -12,6 +12,10 @@ SIM CITY
 
 ### Issues
 - Rendering is not proportionate
+- Rendering models to be added.
+- Rendering translation should be from the center
+- Rendering size should be normalized.
+- vertices should be initialized in model;
 
 ### Enhancements
 - can implement driving level as well: 0 - new, 1 - intermediate, 2 - expert;

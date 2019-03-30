@@ -1,4 +1,3 @@
-#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <GL/glut.h>
 #include <bits/stdc++.h>
@@ -21,7 +20,7 @@ GLFWwindow* initWindow(const int resX, const int resY)
     glfwWindowHint(GLFW_SAMPLES, 4); // 4x antialiasing
 
     // Open a window and create its OpenGL context
-    GLFWwindow* window = glfwCreateWindow(resX, resY, "TEST", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(resX, resY, "ROAD TRAFFIC SIMULATOR v1.0", NULL, NULL);
 
     if(window == NULL)
     {
@@ -64,6 +63,9 @@ void drawCube(int x)
         1.5, -1, 0.5, 1.5,-1, -0.5,   -1, -1, -0.5,    -1, -1, 0.5,
       1.5, 0.8, 0.5,    1.5, 0.8, -0.5,   1.5, -1, -0.5,    1.5, -1, 0.5
     };
+    GLfloat vertices2[] =
+    {  -10,-1.2,-2, -10,-1.2,2, 10,-1.2, 2, 10, -1.2, -2
+    };
     std::vector<float> c(3,0); c[0]= 0.5, c[1]=0.4, c[2] = 0.4;
     GLfloat colors[40*3];
     generateColorPointer(40,c,colors);
@@ -72,12 +74,21 @@ void drawCube(int x)
     /* We have a color array and a vertex array */
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
+    glPushMatrix();
     glVertexPointer(3, GL_FLOAT, 0, vertices);
+    // std::cout << sizeof(vertices)/sizeof(GLfloat)<<std::endl;
     // glTranslatef(x/(float)20, 0, -1);
-
+    glScalef(1,1.0,2.0);
     glColorPointer(3, GL_FLOAT, 0, colors);
 
     glDrawArrays(GL_POLYGON, 0, 40);
+    glPopMatrix();
+    glVertexPointer(3, GL_FLOAT, 0, vertices2);
+    // glTranslatef(x/(float)20, 0, -1);
+
+    glColorPointer(3, GL_FLOAT, 0,NULL);
+
+    glDrawArrays(GL_POLYGON, 0, 4);
 
     /* Cleanup states */
     glDisableClientState(GL_COLOR_ARRAY);
@@ -145,7 +156,6 @@ void display( GLFWwindow* window )
         if (glfwGetKey(window, GLFW_KEY_X ) == GLFW_PRESS){
         zoom -= 1;
         }
-
         if (glfwGetKey(window, GLFW_KEY_R ) == GLFW_PRESS){
         zoom = -10;
         angleX = 0;
