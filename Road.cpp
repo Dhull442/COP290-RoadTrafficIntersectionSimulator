@@ -73,7 +73,7 @@ void Road::addVehicle(Vehicle* vehicle,std::string color) {
         }
       }
     }
-    std::cout << newVehicle->type <<" of "<< newVehicle->width<<" added"<<std::endl;
+    std::cout << newVehicle->type << " of " << newVehicle->width<<" added"<<std::endl;
 }
 
 void Road::error_callback(std::string errormsg){
@@ -256,7 +256,7 @@ void Road::changeLane(Vehicle* vehicle){
 void Road::printLanes(){
   for(auto lane : this->laneVehicles){
     for(auto v : lane){
-      std::cout <<"("<< v->type <<","<<v->currentPosition.first<<");";
+      std::cout << "(" << v->type << ", " << v->currentPosition.first << ", " << v->currentSpeed << ", " << v->closestDistance << "," << v->a << ");";
     }
     std::cout<<std::endl;
   }
