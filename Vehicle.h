@@ -12,7 +12,7 @@ class Vehicle {
 
     public:
         std::string type;
-        double length, width,actualLength;
+        double length, width,safedistance;
         int skill;
         double maxspeed;
         double acceleration,a;
@@ -25,7 +25,6 @@ class Vehicle {
         double delT;
         Road* parentRoad; // Pointer to the road on which the vehicle is
         std::pair<int,int> currentLane;
-        double stopdist = 1;
         bool stoped = false;
         // bool hasStopped = true;
 
