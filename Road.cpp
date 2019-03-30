@@ -44,15 +44,13 @@ void Road::setDefaults(double maxspeed, double acceleration,double length, doubl
 }
 
 // For adding vehicle
-void Road::addVehicle(Vehicle* vehicle,std::string color) {  // Vehicle from template
-
-    Vehicle* newVehicle = new Vehicle(*vehicle); // Make a copy from vehicle template
-    // std::cout<<"(New pointer = "<<newVehicle<<", template pointer="<<vehicle<<" )"<<std::endl;
-    newVehicle->setColor(color);
+void Road::addVehicle(Vehicle* vehicle,std::string color) {
+    // Vehicle from template
+    // Make a copy from the Vehicle template
+    Vehicle* newVehicle = new Vehicle(*vehicle);
     newVehicle->isOnRoad = true;
     newVehicle->parentRoad = this;
     newVehicle->currentPosition = this->initPosition(newVehicle);
-    // std::cout << "Position intialized to ("<<newVehicle->currentPosition.first<<","<<newVehicle->currentPosition.second<<")"<<std::endl;
     newVehicle->reConstruct();
     // push with insertion sort
     if(this->vehicles.size() < 1){
