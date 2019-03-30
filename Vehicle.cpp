@@ -19,6 +19,8 @@ Vehicle::Vehicle(){
   this->processed=false;
   this->delT = 0;
   this->currentLane = std::make_pair(0,0);
+  this->velLimit = this->maxspeed;
+  this->useLimit = false;
 }
 
 Vehicle::Vehicle(std::string type, double length, double width): Vehicle(){
@@ -31,14 +33,14 @@ Vehicle::Vehicle(std::string type):Vehicle(){
   this->type = type;
 }
 
+// Constructs a copy of the Vehicle
 void Vehicle::reConstruct(){
-  if(parentRoad == NULL){
+  if (parentRoad == NULL) {
     std::cout << "[ ERROR ] Road is not specified for this vehicle" <<std::endl;
     std::exit(1);
-  }
-  else{
+  } else {
     if(this->length == -1){
-    this->length = this->parentRoad->default_length;
+        this->length = this->parentRoad->default_length;
     }
     if(this->width  == -1){
       this->width = this->parentRoad->default_width;
@@ -58,6 +60,7 @@ void Vehicle::reConstruct(){
   }
 }
 
+// Sets the color of the vehicle
 void Vehicle::setColor(std::string color){
   // COLORS: GREEN,RED,BLUE,ORANGE,PINK,YELLOW,PURPLE,WHITE
   if(!color.compare("GREEN")){
@@ -121,67 +124,63 @@ void Vehicle::setColor(std::string color){
   }
 }
 
-void Vehicle::updatePos(bool limit){
-  double delT = this->delT;
-  double unrestrictedNewPosition = this->currentPosition.first + (this->currentSpeed)*(delT) + (0.5)*(this->acceleration)*(delT)*(delT);
-  if(this->currentSpeed >= this->maxspeed){
-    unrestrictedNewPosition = this->currentPosition.first + (this->currentSpeed)*delT;
-  }
+// Update the parameters of the Vehicles based on the time increment -- TO BE EDITED
+void Vehicle::updatePos(double delT) {
+    // Firstly, update the velocities and positionx
+    // Check if the velocity limit is, in fact, exceeded
+    if (this->useLimit) {
+        // If we are using the limit, get the part time until it accelerates
+        double partTime = (this->velLimit - this->currentSpeed)/(this->a);
+        this->currentPosition.first += (this->currentSpeed)*partTime + 0.5*(this->a)*(partTime)*(partTime) + (this->velLimit)*(delT - partTime);
+    } else {
+        this->currentPosition.first += (this->currentSpeed)*delT + 0.5*(this->a)*(delT)*(delT);
+    }
 
-  if(limit){
-    bool free = true; // false when vehicle stopped due to another vehicle
-    double delX= this->currentPosition.first;
-    double obstacle = this->parentRoad->firstObstacle(this);
-    if(this->parentRoad->isRed()){
-      if(obstacle>this->parentRoad->signalPosition){
-        obstacle = this->parentRoad->signalPosition-this->safedistance;
-        std::cout << "Road sign"<<std::endl;
-      }
+    if (this->useLimit) {
+        // If the limit is being breached, this is the new max speed
+        this->currentSpeed = this->velLimit;
+    } else {
+        // If no breach, the usual laws hold
+        this->currentSpeed += (this->a)*delT;
     }
-    {
-      {
-        std::cout << this->type << " has obs at "<<this->currentSpeed<<" and free at "<<this->acceleration<<" s = "<<this->currentPosition.first<<std::endl;
-      if(obstacle-this->currentPosition.first>this->safedistance){
-        unrestrictedNewPosition = (this->currentSpeed)*(delT) + (0.5)*(this->acceleration)*(delT)*(delT);
-        if(this->currentSpeed >= this->maxspeed){
-          unrestrictedNewPosition = (this->currentSpeed)*delT;
-        }
-        this->currentPosition.first += unrestrictedNewPosition;
-        }
-      else{
-        std::cout << "Decelerate ";
-        double d = obstacle - this->currentPosition.first;
-        std::cout << d <<" ";
-        double a = std::pow(this -> currentSpeed,2)/(2*(d));
-        double change = this->currentSpeed*delT - (0.5)*a*delT*delT;
-        if(change > 0)
-          this->currentPosition.first += change;
-        std::cout <<this->currentPosition.first<<" "<<std::endl;
-        this->stopped = true;
-        free = false;
-      }
+
+    // Get the distance between this and next nearest obstacle
+    double D = this->parentRoad->firstObstacle(this, delT);
+
+    // Now we need to find the value of acceleration
+    double A = delT*delT/(2*this->acceleration);
+    double B = (delT*delT/2) + (this->currentSpeed*delT/this->acceleration);
+    double C = this->currentSpeed*this->currentSpeed/(2*this->acceleration) + this->currentSpeed*delT - D;
+    // Sqrt Discriminant of above QE
+    double Disc = sqrt(B*B - 4*A*C);
+
+    // Define the limit on the velocity
+    this->velLimit = D/(2*delT);
+    this->useLimit = false;
+    // Get the accleration value from the equation
+    this->a = (-B + Disc)/(2*A);
+
+    // Check if the accleration exceeds a_max
+    if (this->a > this->accleration) {
+        this->a = this->acceleration;
     }
-    delX -= this->currentPosition.first;
-    if(delT > 0){
-      this->currentSpeed = (-1*delX)/delT;
+
+    // Look at the future speed and its bounds
+    double futureSpeed = this->currentSpeed + this->a*delT;
+
+    if (futureSpeed > this->velLimit) {
+        this->useLimit = true;
     }
-    std::cout << "after change "<<this->currentPosition.first<<" "<<this->currentSpeed<<" "<<this->acceleration << std::endl;
-    if(!free){
-      std::cout << "checking lane!"<<this->currentSpeed<<"Checking"<<this->maxspeed<<std::endl;
-      if(this->currentSpeed > 0&& this->currentSpeed < this->maxspeed){
-      this->parentRoad->changeLane(this);
-    }}}
-  if((this->currentPosition.first - this->length) >= this->parentRoad->length){
-    this->isOnRoad = false;
-  }
-  // this->stopdist = this->activation_function(this->currentSpeed);
-  }
-  else{
-    this->unrestrictedposition.first = unrestrictedNewPosition;
-  }
-  this->processed = limit;
+
+    if (futureSpeed > this->maxspeed && this->maxspeed < this->velLimit) {
+        this->useLimit = true;
+        this->velLimit = this->maxspeed;
+    }
+
+    this->processed = true;
 }
 
+// DK what this does -- WILL BE EDITED
 double Vehicle::activation_function(double speed){ // equivalent to newton's 3rd law
   return speed + 0.5;
 }

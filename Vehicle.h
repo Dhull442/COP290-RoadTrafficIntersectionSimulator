@@ -12,6 +12,8 @@ class Vehicle {
 
     public:
         std::string type;
+        double velLimit;
+        bool useLimit;
         double length, width, safedistance;
         int skill;
         double maxspeed;
