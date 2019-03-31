@@ -27,7 +27,7 @@ private:
     bool isInitialized;
     // Used to create a full screen simulation
     int monitorWidth, monitorHeight;
-    std::vector<std::pair<std::string,GLfloat*> > models;
+    std::vector<std::pair<std::string,std::vector<float> > > models;
     // Set the background color
     std::vector<float> bgcolor;
 
