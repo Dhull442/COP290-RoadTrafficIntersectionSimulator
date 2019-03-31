@@ -50,14 +50,15 @@ void Road::addVehicle(Vehicle* vehicle,std::string color) {
     Vehicle* newVehicle = new Vehicle(*vehicle);
     newVehicle->isOnRoad = true;
     newVehicle->parentRoad = this;
-    newVehicle->currentPosition = this->initPosition(newVehicle);
+    
     newVehicle->setColor(color);
     // Set the new acceleration and velocities to zero
     newVehicle->a = 0;
     newVehicle->currentSpeed = 0;
     // Constructs the parameters of the vehicle from either the template or the defaults
     newVehicle->reConstruct();
-
+    newVehicle->currentPosition = this->initPosition(newVehicle);
+    
     // Pushes into the vector of vehicles sorted by position
     if(this->vehicles.size() < 1){
       this->vehicles.push_back(newVehicle);
@@ -178,8 +179,11 @@ std::vector<double> Road::calculateBackEnds(){
 std::pair<double,double> Road::initPosition(Vehicle* vehicle) {
   std::cout << "Finding a position for this Vehicle" << std::endl;
   int numlanesreq = std::ceil(vehicle->width*(double)this->lanes / (this->width));
-  std::cout << "This Vehicle spans " << numlanesreq << "lanes" << std::endl;
-  int lane, positionx = -999;
+
+  std::cout << "This Vehicle spans " << numlanesreq << " lanes" << std::endl;
+  int lane;
+  double positionx = -999;
+
   if( this->laneVehicles.size() < 1){
     this->error_callback("No Lanes are present! (laneVehicles Vector wasn't initialized properly)");
   }
@@ -190,20 +194,23 @@ std::pair<double,double> Road::initPosition(Vehicle* vehicle) {
 
   // Calculate the back ends of each lane
   std::vector<double> backEnd = this->calculateBackEnds();
-  std::cout << "Backends of each lane: "; 
+  std::cout << "Backends of each lane: " << this->laneVehicles.size() << " "; 
   for(auto x: backEnd) {std::cout << x << ", ";}
   std::cout << std::endl;
+  
   // Iterate over the bunch of lanes
   for(int i = 0; i + numlanesreq <= this->laneVehicles.size(); i++) {
     double back=0;
+    // Find the final car in this lane
     for(int j = 0; j < numlanesreq; j++) {
-      if(backEnd[i+j] < back ){
+      if(backEnd[i+j] < back){
         back = backEnd[i+j];
-      };
+      }
     }
 
     // Place in the first available lane from the top
-    if(back <= 0 && back > positionx){
+    if(back <= 0 && back > positionx) {
+      std::cout << "Update positionx with " << back << std::endl;
       positionx = back;
       lane = i;
     }
@@ -213,7 +220,7 @@ std::pair<double,double> Road::initPosition(Vehicle* vehicle) {
   // Add the vehicle to the lane, at the end of each one
   this->addtoLanes(vehicle, numlanesreq, lane);
   // This return value is assigned to the current position - and a buffer is added
-  std::cout << "Final value " << positionx-vehicle->safedistance*2 << ", " << (this->lanes-lane)*(this->width/(double)this->lanes) << std::endl;
+  std::cout << "Final value " << positionx - vehicle->safedistance*2 << ", " << (this->lanes-lane)*(this->width/(double)this->lanes) << std::endl;
   return std::make_pair(positionx-vehicle->safedistance*2, (this->lanes-lane)*(this->width/(double)this->lanes));
 }
 
