@@ -404,7 +404,8 @@ void Road::removeFromLane(Vehicle* v, int laneno) {
 }
 
 void Road::insertInLane(Vehicle* front, int laneno, Vehicle* v) {
-  std::cout << "INSERT CALL" << std::endl;
+  std::cout << " INSERT CALL for " << v->color << " " << v->type << " in " << laneno << " behind ";
+  if (front != NULL) {std::cout << front->color << " " << front->type;} else {std::cout << "NULL";} std::cout << std::endl;
   std::vector<Vehicle*>::iterator it = this->laneVehicles[laneno].begin();
   std::vector<Vehicle*> newLane;
 
@@ -425,7 +426,8 @@ void Road::insertInLane(Vehicle* front, int laneno, Vehicle* v) {
   }
 
   while(it != this->laneVehicles[laneno].end()) {
-    if (*it = front) {
+    std::cout << "Processing " << (*it)->color << " " << (*it)->type << std::endl;
+    if (*it == front) {
       std::cout << "Inserting in between" << std::endl;
       newLane.push_back(*it);
       newLane.push_back(v);
@@ -435,5 +437,8 @@ void Road::insertInLane(Vehicle* front, int laneno, Vehicle* v) {
       it++;
     }
   }
-  this->laneVehicles[laneno] = newLane;
+  this->laneVehicles[laneno].clear();
+  for(auto v: newLane) {this->laneVehicles[laneno].push_back(v);}
+  std::cout << "Exiting after insertion" << std::endl;
+  return;
 }

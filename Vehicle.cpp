@@ -249,6 +249,10 @@ void Vehicle::changeLane(double delT, double globalTime) {
       this->front = NULL;
       this->back = NULL;
       bool hasSpace = this->parentRoad->getAdjVehicles(this, 1, delT, globalTime);
+      std::cout << "Adjacent vehicles are ";
+      if (this->front != NULL) {std::cout << front->color << " " << front->type << " ";} else {std::cout << "NULL ";}
+      if (this->back != NULL) {std::cout << back->color << " " << back->type << " ";} else {std::cout << "NULL ";}
+      std::cout << std::endl;
       if (hasSpace && Vehicle::isPossible(delT)) {
         std::cout << "Lane change is possible - Lane change downwards" << std::endl; 
         this->changingLane = true;
@@ -268,6 +272,7 @@ void Vehicle::changeLane(double delT, double globalTime) {
       std::cout << "Adjacent vehicles are ";
       if (this->front != NULL) {std::cout << front->color << " " << front->type << " ";} else {std::cout << "NULL ";}
       if (this->back != NULL) {std::cout << back->color << " " << back->type << " ";} else {std::cout << "NULL ";}
+      std::cout << std::endl;
       if (hasSpace && Vehicle::isPossible(delT)) {
         std::cout << "Lane change is possible - Lane change upwards" << std::endl;
         this->changingLane = true;
