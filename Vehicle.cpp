@@ -184,6 +184,9 @@ void Vehicle::updatePos(double delT) {
     }
 
     this->processed = true;
+    if(this->currentPosition.first - this->length > this->parentRoad->length){
+      this->isOnRoad = false;
+    };
 }
 
 // DK what this does -- WILL BE EDITED

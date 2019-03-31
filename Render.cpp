@@ -204,19 +204,33 @@ void RenderEngine::renderRoad() {
     // Render the road in gray
     float l = (float) this->targetRoad->length, w = (float) this->targetRoad->width, s = (float) this->targetRoad->signalPosition;
     float roadvertices[] =
-    {  -(l)/2,-1.1,-(w)/2, -l/2,-1.1,w/2, l/2,-1.1,w/2, l/2,-1.1, -w/2,
+    {  -(l)/2,-1.1,-(w)/2, -l/2,-1.1,w/2, l/2,-1.1,w/2, l/2,-1.1, -w/2
     };
     glVertexPointer(3, GL_FLOAT, 0, roadvertices);
     glColorPointer(3, GL_FLOAT, 0,NULL);
     glDrawArrays(GL_POLYGON, 0, 4);
+
+    // Draw Lanes Markers
+    float lanewidth = this->targetRoad->width/(float)this->targetRoad->lanes;
+    float lanecolors[4*3];
+    std::vector<int> c(3,255);
+    this->generateColorPointer(4,c,lanecolors);
+    for(int i=0;i<this->targetRoad->lanes-1;i++){
+      float lanevertices[] =
+      {  -(l)/2,-1.09,((i+1)*lanewidth)-(w)/2-0.05f, -l/2,-1.09,((i+1)*lanewidth)-(w)/2+0.05f, l/2,-1.09,((i+1)*lanewidth)-(w)/2+0.05f, l/2,-1.09, ((i+1)*lanewidth)-(w)/2-0.05f
+      };
+      glVertexPointer(3, GL_FLOAT, 0, lanevertices);
+      glColorPointer(3, GL_FLOAT, 0, lanecolors);
+      glDrawArrays(GL_POLYGON, 0, 4);
+    }
     // Draw Signal
     float signalvertices[] =
     {  (s-(l)/2),1.1,-(w)/2, (s-(l)/2),1.1,w/2, (s-(l)/2),1.5,w/2, (s-(l)/2),1.5, -w/2,
-       (float)(s-(l)/2)+0.5,1.1,-(w)/2, (float)(s-(l)/2)+0.5,1.1,w/2, (float)(s-(l)/2)+0.5,1.5,w/2, (float)(s-(l)/2)+0.5, 1.5, -w/2,
-       (float)(s-(l)/2),1.1,-(w)/2, (float)(s-(l)/2),1.1,w/2, (float)(s-(l)/2)+0.5,1.1,w/2, (float)(s-(l)/2)+0.5, 1.1, -w/2,
-       (float)(s-(l)/2),1.5,-(w)/2, (float)(s-(l)/2),1.5,w/2, (float)(s-(l)/2)+0.5,1.5,w/2, (float)(s-(l)/2)+0.5, 1.5, -w/2,
-       (float)(s-(l)/2),1.1,(w)/2, (float)(s-(l)/2),1.5,w/2, (float)(s-(l)/2)+0.5,1.5,w/2, (float)(s-(l)/2)+0.5, 1.1, w/2,
-       (float)(s-(l)/2),1.1,-(w)/2, (float)(s-(l)/2),1.5,-w/2, (float)(s-(l)/2)+0.5,1.5,-w/2, (float)(s-(l)/2)+0.5, 1.1, -w/2
+       (float)(s-(l)/2)+0.5f,1.1,-(w)/2, (float)(s-(l)/2)+0.5f,1.1,w/2, (float)(s-(l)/2)+0.5f,1.5,w/2, (float)(s-(l)/2)+0.5f, 1.5, -w/2,
+       (float)(s-(l)/2),1.1,-(w)/2, (float)(s-(l)/2),1.1,w/2, (float)(s-(l)/2)+0.5f,1.1,w/2, (float)(s-(l)/2)+0.5f, 1.1, -w/2,
+       (float)(s-(l)/2),1.5,-(w)/2, (float)(s-(l)/2),1.5,w/2, (float)(s-(l)/2)+0.5f,1.5,w/2, (float)(s-(l)/2)+0.5f, 1.5, -w/2,
+       (float)(s-(l)/2),1.1,(w)/2, (float)(s-(l)/2),1.5,w/2, (float)(s-(l)/2)+0.5f,1.5,w/2, (float)(s-(l)/2)+0.5f, 1.1, w/2,
+       (float)(s-(l)/2),1.1,-(w)/2, (float)(s-(l)/2),1.5,-w/2, (float)(s-(l)/2)+0.5f,1.5,-w/2, (float)(s-(l)/2)+0.5f, 1.1, -w/2
     };
 
     glVertexPointer(3, GL_FLOAT, 0, signalvertices);
@@ -246,8 +260,28 @@ void RenderEngine::initializeModels(){
       1.5/2.5, 0.8, 0.5,    1.5/2.5, 0.8, -0.5,   1.5/2.5, -1, -0.5,    1.5/2.5, -1, 0.5
     };
     std::vector<float> v (vertices,vertices+sizeof(vertices)/sizeof(float));
-    // std::cout << typeid(vertices)<<std::endl;
     this->models.push_back(std::make_pair("truck",std::make_pair(v,v.size())));
+
+    // CAR
+    // float verticesc[] =
+    // {
+    //   -1.5/2, -1, -0.5,  -1.5/2, 0, -0.5,  -1.5/2, 0, 0.5,  -1.5/2, -1, 0.5,
+    // -1.5/2, 0, 0.5,    -1.5/2, 0, -0.5,  -1/2, 0, -0.5,   -1/2, 0, 0.5,
+    // -1.5/2, 0, 0.5,    -1.5/2, -1, 0.5,  -1/2, -1, 0.5,   -1/2, 0, 0.5,
+    // -1.5/2, 0, -0.5,    -1.5/2, -1, -0.5,  -1/2, -1,- 0.5,   -1/2, 0, -0.5,
+    // -1/2, 0, -0.5,   -1/2,  1,-0.5,    -1,   1/2, 0.5,   -1/2, 0, 0.5, // back
+    //  -1/2,  1,  0.5,     1/2,  1,  0.5,   1/2,0,0.5,      -1/2,0,0.5,
+    //  -1/2,0,0.5,     1.5/2,0,0.5,    1.5/2,  -1/2, 0.5,   -1/2, -1, 0.5,
+    //  -1/2,  1,  -0.5,     1/2,  1,  -0.5,   1/2,0,-0.5,      -1/2,0,-0.5,
+    //  -1/2,0,- 0.5,     1.5/2,0,-0.5,    1.5/2,  -1, -0.5,   -1/2, -1, -0.5,
+    //  1/2,0,0.5,      1/2 , 0, -0.5,     1/2, 1, -0.5,       1/2,1,0.5,
+    //  1/2,0,0.5,     1.5/2, 0, 0.5,     1.5/2, 0, -0.5,   1/2, 0, -0.5,
+    //   1/2, 1,  0.5,   1/2,  1,  -0.5,    -1/2,  1,  -0.5,     -1/2, 1,  0.5,  // top
+    //   1.5/2, -1, 0.5, 1.5/2,-1, -0.5,   -1.5/2, -1, -0.5,    -1.5/2, -1, 0.5,
+    // 1.5/2, 0, 0.5,    1.5/2, 0, -0.5,   1.5/2, -1, -0.5,    1.5/2, -1, 0.5
+    // };
+    // std::vector<float> vd (verticesc,verticesc+sizeof(verticesc)/sizeof(float));
+    // this->models.push_back(std::make_pair("car",std::make_pair(vd,vd.size())));
 }
 
 void RenderEngine::addModel(std::string type,float* vertices, int size){
@@ -264,6 +298,10 @@ void RenderEngine::addModel(std::string type,float* vertices, int size){
 }
 
 void RenderEngine::renderVehicle(Vehicle* vehicle) {
+    if(this->models.size()<1){
+      std::cout << "[ ERROR ] - No Models for Rendering!"<<std::endl;
+      std::exit(1);
+    }
     if (vehicle->isOnRoad) {
       std::vector<float> tmp;
       int size = -1;
