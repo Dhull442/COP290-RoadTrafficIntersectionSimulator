@@ -17,7 +17,7 @@ class RenderEngine {
 private:
   float CamX, CamY, CamAngleX, CamAngleY, CamZoom, CamTranslationSpeed, CamZoomSpeed, CamRotationSpeed;
   void UpdateCamera(double delT);
-  void generateColorPointer(int size,std:: vector<int> color_rgb, GLfloat* mat);
+  void generateColorPointer(int size,std:: vector<int> color_rgb, float* mat);
   void initializeModels();
   public:
     // The road that this will render
@@ -27,7 +27,7 @@ private:
     bool isInitialized;
     // Used to create a full screen simulation
     int monitorWidth, monitorHeight;
-    std::vector<std::pair<std::string,std::vector<float> > > models;
+    std::vector<std::pair<std::string,std::pair<std::vector<float>,int> > > models;
     // Set the background color
     std::vector<float> bgcolor;
 
@@ -50,7 +50,7 @@ private:
     // Clear the screen and render the road, vehicles afresh
     void render(double delT);
     void renderRoad();
-    void addModel(std::string type,GLfloat* vertices);
+    void addModel(std::string type,float* vertices, int size);
     void renderVehicle(Vehicle* vehicle);
     void endSim();
 
