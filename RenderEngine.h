@@ -18,6 +18,7 @@ class RenderEngine {
     Road* targetRoad;
     // The scaling factor
     int scalex, scaley, signalSize;
+    double fps; // The framerate
     bool isInitialized;
     // Used to create a full screen simulation
     int monitorWidth, monitorHeight;

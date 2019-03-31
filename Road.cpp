@@ -41,6 +41,8 @@ void Road::setDefaults(double maxspeed, double acceleration,double length, doubl
     this->default_width = width;
     this->default_skill = skill;
     this->default_safety_distance = sdistance;
+    // ADD TO CONFIG FILE LATER
+    this->sideClearance = 0.4;
 }
 
 // For adding vehicle
@@ -178,7 +180,7 @@ std::vector<double> Road::calculateBackEnds(){
 // Get the position of the vehicle on the road
 std::pair<double,double> Road::initPosition(Vehicle* vehicle) {
   std::cout << "Finding a position for this Vehicle" << std::endl;
-  int numlanesreq = std::ceil(vehicle->width*(double)this->lanes / (this->width));
+  int numlanesreq = std::ceil((vehicle->width + 2*this->sideClearance)*(double)this->lanes / (this->width));
 
   std::cout << "This Vehicle spans " << numlanesreq << " lanes" << std::endl;
   int lane;
@@ -219,13 +221,15 @@ std::pair<double,double> Road::initPosition(Vehicle* vehicle) {
   std::cout << "Final position " << positionx << std::endl;
   // Add the vehicle to the lane, at the end of each one
   this->addtoLanes(vehicle, numlanesreq, lane);
+  double xcoord = positionx-vehicle->safedistance*2;
+  double ycoord = (this->lanes-lane)*(this->width/(double)this->lanes) - this->sideClearance;
   // This return value is assigned to the current position - and a buffer is added
-  std::cout << "Final value " << positionx - vehicle->safedistance*2 << ", " << (this->lanes-lane)*(this->width/(double)this->lanes) << std::endl;
-  return std::make_pair(positionx-vehicle->safedistance*2, (this->lanes-lane)*(this->width/(double)this->lanes));
+  std::cout << "Final value " << xcoord << ", " << ycoord << std::endl;
+  return std::make_pair(xcoord, ycoord);
 }
 
 // Checks if there is space on an adjacent Lane -- WILL BE EDITED
-bool Road::hasSpace(std::vector<Vehicle*> laneVehicles,double front,double back){
+bool Road::hasSpace(std::vector<Vehicle*> laneVehicles,double front,double back) {
   // std::cout << "Checking for space"<<std::endl;
   // for(auto v: laneVehicles){
   //   if(v->currentPosition.first >= back && v->currentPosition.first <= front)
@@ -269,7 +273,7 @@ void Road::changeLane(Vehicle* vehicle){
 void Road::printLanes(){
   for(auto lane : this->laneVehicles){
     for(auto v : lane){
-      std::cout << "(" << v->type << ", " << v->currentPosition.first << ", " << v->currentSpeed << ", " << v->closestDistance << "," << v->a << ", " << v->delT  << ");";
+      std::cout << "(" << v->color << " " << v->type << ", " << v->currentPosition.first << ", " << v->currentSpeed << ", " << v->closestDistance << "," << v->a << ", " << v->delT  << ");";
     }
     std::cout<<std::endl;
   }
@@ -319,7 +323,7 @@ void Road::updateLane(int lane,Vehicle* v){
 //       Vehicle* tmpv = this->laneVehicles[lane][i];
 //       if(tmpv==v){
 //         index = i;
-//         continue;
+//         continue;up
 //       }
 //     }
 //     this->laneVehicles[lane].erase(this->laneVehicles[lane].begin() + index);
@@ -327,7 +331,7 @@ void Road::updateLane(int lane,Vehicle* v){
 
 // Find the first obstacle in front of an object in the updated state -- WILL BE EDITED
 double Road::firstObstacle(Vehicle* vehicle, double delT) {
-    std::cout << "Detecting obstacle for" << vehicle->type << std::endl;
+    std::cout << "Detecting obstacle for " <<vehicle->color << " " << vehicle->type << std::endl;
     // This is the position of the first Obstacle in front
     double position=9999;
     // Cycle over all lane
@@ -355,9 +359,9 @@ double Road::firstObstacle(Vehicle* vehicle, double delT) {
         }
 
         // After the loop
-        if(lastV != NULL) {
+        if(lastV != NULL && position > lastV->currentPosition.first - lastV->length) {
             // There is some Vehicle in the front of this one, in current lane
-            std::cout << "last for "<<  vehicle->type << "=" << lastV->type << std::endl;
+            std::cout << "last for "<< vehicle->color << " " << vehicle->type << "=" << lastV->type << std::endl;
             position = lastV ->currentPosition.first - lastV->length;
             std::cout << "OBSTACLE == "<< position << std::endl;
         } else {

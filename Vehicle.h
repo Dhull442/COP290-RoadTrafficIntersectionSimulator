@@ -8,10 +8,11 @@ class Road;
 
 class Vehicle {
     private:
-        std::string color;
+        
 
     public:
         std::string type;
+        std::string color;
         double velLimit;
         bool useLimit;
         double length, width, safedistance;
