@@ -55,7 +55,8 @@ void simulationActions(
     // Addition of vehicles routine
     bool found = false;
     for (int v = 0; v < vehicles.size(); v++) {
-      if (!vehicles[v] -> type.compare(preprocess(function))) { // preprocessing to ignore any fuss due to Capitals
+      if (!vehicles[v] -> type.compare(preprocess(function))) { // prepnrocessing to ignore any fuss due to Capitals
+        std::cout << "ADDING " << vehicles[v]->type << std::endl;
         road -> addVehicle(vehicles[v], value);
         found = true;
         break;
@@ -70,9 +71,11 @@ void simulationActions(
     }
   }
 
-  // Run the simulation
-  std::cout << "Running Simulation with ΔT = " << delT << std::endl;
-  road->runSim(delT);
+  if (delT > 0) {
+    // Run the simulation
+    std::cout << "Running Simulation with ΔT = " << delT << std::endl;
+    road->runSim(delT);
+  }
 }
 int main(int argc, char ** argv) {
   // Add a check here
