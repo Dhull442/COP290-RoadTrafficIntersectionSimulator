@@ -61,7 +61,7 @@ void Road::addVehicle(Vehicle* vehicle,std::string color) {
     newVehicle->reConstruct();
     newVehicle->currentPosition = this->initPosition(newVehicle);
     newVehicle->changingLane = false;
-    newVehicle->speedRatio = 10;
+    newVehicle->speedRatio = 3;
     newVehicle->lastLaneChange = -100;
     newVehicle->timeGap = 2;
     newVehicle->verticalSpeed = 0;
@@ -123,6 +123,7 @@ void Road::updateSim(double delT, double globalTime){
           // Update positions based on previous parameters and update parametersin 
           std::cout << "Updating from the main function " << std::endl;
           vehicles[i]->updatePos(delT, globalTime);
+          // this->printLanes();
       }
     }
 
@@ -311,9 +312,11 @@ void Road::changeLane(Vehicle* vehicle){}
 
 // Prints the lanes for debugging
 void Road::printLanes(){
+  int i = 0;
   for(auto lane : this->laneVehicles){
+    std::cout << "LANE #" << i << ":"; i++;
     for(auto v : lane){
-      std::cout << "(" << v->color << " " << v->type << ", (" << v->currentPosition.first << " " << v->currentPosition.second << "), (" << v->currentSpeed << " " << v->verticalSpeed << "), " << v->closestDistance << "," << v->a << ", " << v->currentLane.first  << " " << v->currentLane.second << " " << v->changingLane << ");";
+      std::cout << "(" << v->color << " " << v->type << ", (" << v->currentPosition.first << " " << v->currentPosition.second << "), (" << v->currentSpeed << " " << v->verticalSpeed << "), " << v->closestDistance << "," << v->a << ", " << v->currentLane.first  << " " << v->currentLane.second << " " << v->changingLane << " " << v->delT << ");";
     }
     std::cout<<std::endl;
   }
@@ -326,7 +329,7 @@ void Road::updateLane(int lane,Vehicle* v){
 
 // Find the first obstacle in front of an object in the updated state -- WILL BE EDITED
 double Road::firstObstacle(Vehicle* vehicle, double delT, double globalTime) {
-    std::cout << "Detecting obstacle for " <<vehicle->color << " " << vehicle->type << std::endl;
+    std::cout << "Detecting obstacle for " <<vehicle->color << " " << vehicle->type << " at " << vehicle->currentPosition.first << std::endl;
     // This is the position of the first Obstacle in front
     double position=9999;
     // Cycle over all lane
@@ -347,6 +350,7 @@ double Road::firstObstacle(Vehicle* vehicle, double delT, double globalTime) {
                         std::cout << "Updating from firstObstacle" << std::endl;
                         v->updatePos(delT, globalTime);
                         std::cout << "Updated " << v->processed << std::endl;
+                        // Road::printLanes();
                     }
                      
                     // Get the last element in
