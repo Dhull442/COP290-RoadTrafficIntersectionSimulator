@@ -349,8 +349,8 @@ double Road::firstObstacle(Vehicle* vehicle, double delT) {
             }
             std::cout << "OBSTACLE == "<<position<<std::endl;
         } else {
-            // Check the signal position
-            if (position > this->signalPosition) {
+            // Check the signal position, if signal is RED
+            if (position > this->signalPosition && this->signal.compare("RED") == 0) {
                 position = this->signalPosition;
             }
         }
