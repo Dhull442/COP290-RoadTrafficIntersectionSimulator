@@ -65,7 +65,7 @@ void RenderEngine::setup() {
 
     RenderEngine::isInitialized = true;
     // Set framerate to 25
-    this->fps = 10;
+    this->fps = 25;
     // Make the context current
     glfwMakeContextCurrent(RenderEngine::window);
     // Set the swap interval
@@ -88,7 +88,7 @@ void RenderEngine::render(double delT) {
     while((currentTime - beginTime < delT) && !glfwWindowShouldClose(RenderEngine::window)) {
     	if (currentTime - oldTime >= 1/fps) {
         	// Update the simulation based on previously decided parameters, set new parameters
-        	this->targetRoad->updateSim(currentTime - oldTime);
+        	this->targetRoad->updateSim(currentTime - oldTime, RenderEngine::getTime());
     		update = true;
     	}
 
