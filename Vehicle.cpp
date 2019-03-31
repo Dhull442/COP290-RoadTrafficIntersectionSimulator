@@ -146,7 +146,7 @@ void Vehicle::updatePos(double delT) {
     }
 
     // Get the distance between this and next nearest obstacle
-    this->closestDistance = this->parentRoad->firstObstacle(this, delT);
+    this->closestDistance = this->parentRoad->firstObstacle(this, delT) - this->safedistance;
 
     // Now we need to find the value of acceleration
     double A = delT*delT/(2*this->acceleration);
@@ -164,6 +164,11 @@ void Vehicle::updatePos(double delT) {
     // Check if the accleration exceeds a_max
     if (this->a > this->acceleration) {
         this->a = this->acceleration;
+    }
+
+    if (this->closestDistance < this->safedistance/20) {
+        this->a = 0;
+        this->currentSpeed = 0;
     }
 
     // Look at the future speed and its bounds

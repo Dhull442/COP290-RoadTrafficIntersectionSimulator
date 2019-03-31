@@ -78,27 +78,17 @@ float RenderEngine::getTime() {
 }
 
 void RenderEngine::render(double delT) {
-    double beginTime =
-    #ifdef RENDER_ENGINE_H
-    RenderEngine::getTime();
-    #else
-    0;
-    #endif
-    double oldTime;
-    double currentTime = glfwGetTime();
-    #ifdef RENDER_ENGINE_H
-    RenderEngine::getTime();
-    #else
-    0;
-    #endif
+    double beginTime = RenderEngine::getTime();
+    double oldTime = RenderEngine::getTime();
+    double currentTime = RenderEngine::getTime();
     std::cout << "Starting Render routine"<< std::endl;
     bool update = false;
     while((currentTime - beginTime < delT) && !glfwWindowShouldClose(RenderEngine::window)) {
-	if (currentTime - oldTime >= 0.04) {
+    	if (currentTime - oldTime >= 0.04) {
         	// Update the simulation based on previously decided parameters, set new parameters
         	this->targetRoad->updateSim(currentTime - oldTime);
-		update = true;
-	}
+    		update = true;
+    	}
 
         float ratio;
         int width=800, height=800;

@@ -72,7 +72,7 @@ void simulationActions(
 
   // Run the simulation
   std::cout << "Running Simulation with ΔT = " << delT << std::endl;
-  road -> runSim(delT);
+  road->runSim(delT);
 }
 int main(int argc, char ** argv) {
   // Add a check here
