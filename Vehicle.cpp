@@ -296,7 +296,7 @@ bool Vehicle::isPossible(double delT) {
       // There is a signal in the front
       double d1 = this->parentRoad->signalPosition - this->currentPosition.first;
       double d1p = d1 - this->safedistance - (this->currentSpeed)*delT - 0.5*(delT)*(delT)*(this->a);
-      if (d1p >= 0.01*this->safedistance && d1p >= 2*delT*(this->currentSpeed+this->a*delT)) {
+      if (d1p >= 0.01*this->safedistance) {
         std::cout << "Front OK" << std::endl;
         if (this->back == NULL) {
           std::cout << "There is nothing in the back" << std::endl;
@@ -305,7 +305,7 @@ bool Vehicle::isPossible(double delT) {
           std::cout << "There is a vehicle at the back" << std::endl;
           double d2 = this->currentPosition.first - this->length-back->currentPosition.first;
           double d2p = d1p - this->back->safedistance - (this->back->currentSpeed*delT + 0.5*delT*delT*this->back->a) + (this->currentSpeed*delT + 0.5*delT*delT*this->a);
-          if (d2p >= 0.01*this->back->safedistance && d2p >= 2*delT*(this->back->currentSpeed+this->back->a*delT)) {
+          if (d2p >= 0.01*this->back->safedistance) {
             std::cout << "Back vehicle is OK" << std::endl;
             return true;
           } else {
@@ -328,7 +328,7 @@ bool Vehicle::isPossible(double delT) {
       // There is no signal'
       double d2 = this->currentPosition.first - this->length-this->back->currentPosition.first;
       double d2p = d2 - this->back->safedistance - (this->back->currentSpeed*delT + 0.5*delT*delT*this->back->a) + (this->currentSpeed*delT + 0.5*delT*delT*this->a);
-      if (d2p >= 0.01*this->back->safedistance && d2p >= 2*delT*(this->back->currentSpeed+this->back->a*delT)) {
+      if (d2p >= 0.01*this->back->safedistance) {
         std::cout << "Back vehicle is OK" << std::endl;
         return true;
       } else {
@@ -340,7 +340,7 @@ bool Vehicle::isPossible(double delT) {
     std::cout << "There is a car in the front " << std::endl;
     double d1 = this->front->currentPosition.first - this->front->length - this->currentPosition.first;
     double d1p = d1 - this->safedistance - (this->currentSpeed)*delT - 0.5*(delT)*(delT)*(this->a) + (this->front->currentSpeed*delT + 0.5*delT*delT*this->front->a);
-    if (d1p < 0.01*this->safedistance || d1p < 2*delT*(this->currentSpeed+this->a*delT)) {
+    if (d1p < 0.01*this->safedistance) {
       std::cout << "Failed for the front " << std::endl;
       return false;
     }
@@ -352,7 +352,7 @@ bool Vehicle::isPossible(double delT) {
 
     double d2 = this->currentPosition.first - this->length - back->currentPosition.first;
     double d2p = d1p - this->back->safedistance - (this->back->currentSpeed*delT + 0.5*delT*delT*this->back->a*this->back->a) + (this->currentSpeed*delT + 0.5*delT*delT*this->a);
-    if (d2p >= 0.01*back->safedistance && d2p >= 2*delT*(this->back->currentSpeed+this->back->a*delT)) {
+    if (d2p >= 0.01*back->safedistance) {
       std::cout << "Back OK" << std::endl;
       return true;
     } else {
