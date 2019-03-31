@@ -1,6 +1,7 @@
 #include <bits/stdc++.h>
 #include "Vehicle.h"
 #include "Road.h"
+
 Vehicle::Vehicle(){
   // Initializing defaults to -1, reinitialize on adding to a road
   this->length = -1;
@@ -125,7 +126,8 @@ void Vehicle::setColor(std::string color){
 }
 
 // Update the parameters of the Vehicles based on the time increment -- TO BE EDITED
-void Vehicle::updatePos(double delT) {
+void Vehicle::updatePos(double delT, double globalTime) {
+    this->processed = true;
     this->delT = delT;
     // Firstly, update the velocities and positionx
     // Check if the velocity limit is, in fact, exceeded
@@ -146,7 +148,7 @@ void Vehicle::updatePos(double delT) {
     }
 
     // Get the distance between this and next nearest obstacle
-    this->closestDistance = this->parentRoad->firstObstacle(this, delT) - this->safedistance;
+    this->closestDistance = this->parentRoad->firstObstacle(this, delT, globalTime) - this->safedistance;
 
     // Now we need to find the value of acceleration
     double A = delT*delT/(2*this->acceleration);
@@ -154,6 +156,8 @@ void Vehicle::updatePos(double delT) {
     double C = this->currentSpeed*this->currentSpeed/(2*this->acceleration) + this->currentSpeed*delT - this->closestDistance;
     // Sqrt Discriminant of above QE
     double Disc = sqrt(B*B - 4*A*C);
+
+    std::cout << "Defined A, B, C, D" << std::endl;
 
     // Define the limit on the velocity
     this->velLimit = this->closestDistance/(2*delT);
@@ -183,10 +187,159 @@ void Vehicle::updatePos(double delT) {
         this->velLimit = this->maxspeed;
     }
 
-    this->processed = true;
-    if(this->currentPosition.first - this->length > this->parentRoad->length){
-      this->isOnRoad = false;
-    };
+
+    // Check if we are changing the Lane, update stuff
+    if (this->changingLane) {
+      // The total distance to be travelled
+      double delY = this->parentRoad->width/(float)this->parentRoad->lanes*1.16;
+
+      // Update the positions
+      this->verticalPosition += delT*this->verticalSpeed;
+      this->currentPosition.second += this->changeDirection*delT*this->verticalSpeed;
+
+      // Check if lane changing is complete
+      if (abs(delY-this->verticalPosition) < 0.001*delY) {
+        // Lane changing is complete
+        std::cout << "Lange changing is complete " << this->color << " " << this->type << std::endl;
+        this->changingLane = false;
+        this->verticalPosition = 0;
+        this->lastLaneChange = globalTime;
+
+        if (this->changeDirection == -1) {
+          // The shift was toward the bottom
+          // Update the lanes
+          std::cout << "Bottom shift" << std::endl;
+          this->parentRoad->removeFromLane(this, this->currentLane.first);
+          this->currentLane.first++;
+        } else {
+          // Shift was toward the top
+          std::cout << "top shift " << std::endl;
+          this->parentRoad->removeFromLane(this, this->currentLane.second);
+          this->currentLane.second--;
+
+        }
+      } else {
+        // Update the parameters -- otherwise
+        this->verticalSpeed = this->speedRatio*this->currentSpeed;
+        double limSpeed = (delY-this->verticalPosition)/delT;
+        if (this->verticalSpeed > limSpeed) {
+          this->verticalSpeed = limSpeed;
+        }
+      }
+    }
+    std::cout << "Update complete" << std::endl;
+}
+
+void Vehicle::changeLane(double delT, double globalTime) {
+  std::cout << "CHANGING LANES" << std::endl;
+  if (globalTime - this->lastLaneChange >= this->timeGap && !this->changingLane && this->currentPosition.first >= 0) {
+      // Check if a lane change is isPossible -- downwards
+      this->front = NULL;
+      this->back = NULL;
+      bool hasSpace = this->parentRoad->getAdjVehicles(this, 1, delT, globalTime);
+      if (hasSpace && Vehicle::isPossible(delT)) {
+        std::cout << "Lane change is possible - Lane change downwards" << std::endl;
+        this->changingLane = true;
+        this->verticalPosition = 0;
+        this->verticalSpeed = 0;
+        this->currentLane.second++;
+        this->changeDirection = -1;
+        // Update the lanes
+        this->parentRoad->insertInLane(front, this->currentLane.second, this);
+        // Lane change code goes here
+        return;
+      }
+
+      // Check if it is possible to change in the other direction
+
+      hasSpace = this->parentRoad->getAdjVehicles(this, -1, delT, globalTime);
+      if (hasSpace && Vehicle::isPossible(delT)) {
+        std::cout << "Lane change is possible - Lane change upwards" << std::endl;
+        this->changingLane = true;
+        this->verticalPosition = 0;
+        this->verticalSpeed = 0;
+        this->currentLane.first--;
+        this->changeDirection = 1;
+        this->parentRoad->insertInLane(front, this->currentLane.first, this);
+        // Lane change code goes here
+        return;
+      }
+    }
+}
+
+bool Vehicle::isPossible(double delT) {
+  std::cout << "Checking possibility for " << this->color << " " << this->type << std::endl;
+  if (this->front == NULL) {
+    std::cout << "There is nothing in the front " << std::endl;
+    if (this->parentRoad->isRed()) {
+      std::cout << "Signal found in the front" << std::endl;
+      // There is a signal in the front
+      double d1 = this->parentRoad->signalPosition - this->currentPosition.first;
+      double d1p = d1 - this->safedistance - (this->currentSpeed)*delT - 0.5*(delT)*(delT)*(this->a);
+      if (d1p >= 0.01*this->safedistance && d1p >= this->currentSpeed*this->currentSpeed/2/this->acceleration) {
+        std::cout << "Front OK" << std::endl;
+        if (this->back == NULL) {
+          std::cout << "There is nothing in the back" << std::endl;
+          return true;
+        } else {
+          std::cout << "There is a vehicle at the back" << std::endl;
+          double d2 = this->currentPosition.first - this->length-back->currentPosition.first;
+          double d2p = d1p - this->back->safedistance - (this->back->currentSpeed*delT + 0.5*delT*delT*this->back->a) + (this->currentSpeed*delT + 0.5*delT*delT*this->a);
+          if (d2p >= 0.01*this->back->safedistance && d2p >= this->back->currentSpeed*this->back->currentSpeed/2/this->back->acceleration) {
+            std::cout << "Back vehicle is OK" << std::endl;
+            return true;
+          } else {
+            std::cout << "Back vehicle is not OK" << std::endl;
+            return false;
+          }
+        }
+      } else {
+        std::cout << "Signal failed " << std::endl;
+        return false;
+      }
+    } else {
+      std::cout << "There is nothing in the front" << std::endl;
+      if (this->back == NULL) {
+        std::cout << "There is nothing in the back" << std::endl;
+        return true;
+      }
+
+
+      // There is no signal'
+      double d2 = this->currentPosition.first - this->length-this->back->currentPosition.first;
+      double d2p = d2 - this->back->safedistance - (this->back->currentSpeed*delT + 0.5*delT*delT*this->back->a) + (this->currentSpeed*delT + 0.5*delT*delT*this->a);
+      if (d2p >= 0.01*this->back->safedistance && d2p >= this->back->currentSpeed*this->back->currentSpeed/2/this->back->acceleration) {
+        std::cout << "Back vehicle is OK" << std::endl;
+        return true;
+      } else {
+        std::cout << "Back vehicle is not OK" << std::endl;
+        return false;
+      }
+    }
+  } else {
+    std::cout << "There is a car in the front " << std::endl;
+    double d1 = this->front->currentPosition.first - this->front->length - this->currentPosition.first;
+    double d1p = d1 - this->safedistance - (this->currentSpeed)*delT - 0.5*(delT)*(delT)*(this->a) + (this->front->currentSpeed*delT + 0.5*delT*delT*this->front->a);
+    if (d1p < 0.01*this->safedistance || d1p < this->currentSpeed*this->currentSpeed/2/this->acceleration) {
+      std::cout << "Failed for the front " << std::endl;
+      return false;
+    }
+
+    if (back == NULL) {
+      std::cout << "There is nothing in the back" << std::endl;
+      return true;
+    }
+
+    double d2 = this->currentPosition.first - this->length - back->currentPosition.first;
+    double d2p = d1p - this->back->safedistance - (this->back->currentSpeed*delT + 0.5*delT*delT*this->back->a*this->back->a) + (this->currentSpeed*delT + 0.5*delT*delT*this->a);
+    if (d2p >= 0.01*back->safedistance && d2p >= this->back->currentSpeed*this->back->currentSpeed/2/this->back->acceleration) {
+      std::cout << "Back OK" << std::endl;
+      return true;
+    } else {
+      std::cout << "Back fails" << std::endl;
+      return false;
+    }
+  }
 }
 
 // DK what this does -- WILL BE EDITED

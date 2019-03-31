@@ -13,7 +13,6 @@ class Road {
         std::string signal; // The signal value at this time
         std::vector<std::pair<double, double> > map;
         std::vector<double> calculateBackEnds();
-        void updateUnrestrictedpositions(double delT);
         void addtoLanes(Vehicle* vehicle,int numlanesreq,int toplane);
         double findLast(std::vector<Vehicle*> vehicles);
         void updateLane(int a,Vehicle* b);
@@ -35,6 +34,7 @@ class Road {
         double signalPosition;
         int lanes;
         int id=-1;
+        bool getAdjVehicles(Vehicle* vehicle, int dir, double delT, double globalTime);
         std::vector< int > signal_rgb;
         // Pointer to the Vehicle objects on the road
         std::vector<Vehicle*> vehicles;
@@ -45,14 +45,13 @@ class Road {
         Road(int id);
         Road();
         // Update the simulation in a step of delT
-        void updateSim(double delT);
+        void updateSim(double delT, double globalTime);
         void setDefaults(double maxspeed, double acceleration,double length, double width,int skill, double sdistance);
         // Add a Vehicle to the road
         void addVehicle(Vehicle* vehicle,std::string color);
         // First vehicle obstacle in a lane
         // double firstObstacle(double startPos,double length, double topRow, double botRow );
-        double firstObstacle(Vehicle* vehicle, double delT);
-        bool isRed();
+        double firstObstacle(Vehicle* vehicle, double delT, double globalTime);
         void initLanes(int lanes);
         std::pair<double,double> initPosition(Vehicle* vehicle);
         void error_callback(std::string errormsg);
@@ -61,6 +60,9 @@ class Road {
         void runSim(double t);
         void setSignal(std::string signal);
         void printLanes();
+        bool isRed();
+        void removeFromLane(Vehicle* v, int laneno);
+        void insertInLane(Vehicle* front, int laneno, Vehicle* v);
     };
 
 #endif
