@@ -22,6 +22,8 @@ class Road {
     public:
         // default vehicle Parameters
         RenderEngine engine;
+        // The clearance required on either side of the vehicle
+        double sideClearance; 
         double default_maxspeed = 1;
         double default_acceleration = 1;
         double default_length = 2;

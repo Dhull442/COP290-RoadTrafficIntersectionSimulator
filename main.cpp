@@ -53,7 +53,7 @@ void simulationActions(
     }
 
     // Addition of vehicles routine
-    bool found = false;
+    bool found = false; 
     for (int v = 0; v < vehicles.size(); v++) {
       if (!vehicles[v] -> type.compare(preprocess(function))) { // prepnrocessing to ignore any fuss due to Capitals
         std::cout << "ADDING " << vehicles[v]->type << std::endl;
