@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 #include "Vehicle.h"
 #include "Road.h"
-#include "RenderEngine.h"
+#include "Render.h"
 
 Road::Road() {
     #ifdef RENDER_ENGINE_H
@@ -52,7 +52,7 @@ void Road::addVehicle(Vehicle* vehicle,std::string color) {
     Vehicle* newVehicle = new Vehicle(*vehicle);
     newVehicle->isOnRoad = true;
     newVehicle->parentRoad = this;
-    
+
     newVehicle->setColor(color);
     // Set the new acceleration and velocities to zero
     newVehicle->a = 0;
@@ -60,7 +60,7 @@ void Road::addVehicle(Vehicle* vehicle,std::string color) {
     // Constructs the parameters of the vehicle from either the template or the defaults
     newVehicle->reConstruct();
     newVehicle->currentPosition = this->initPosition(newVehicle);
-    
+
     // Pushes into the vector of vehicles sorted by position
     if(this->vehicles.size() < 1){
       this->vehicles.push_back(newVehicle);
@@ -196,10 +196,10 @@ std::pair<double,double> Road::initPosition(Vehicle* vehicle) {
 
   // Calculate the back ends of each lane
   std::vector<double> backEnd = this->calculateBackEnds();
-  std::cout << "Backends of each lane: " << this->laneVehicles.size() << " "; 
+  std::cout << "Backends of each lane: " << this->laneVehicles.size() << " ";
   for(auto x: backEnd) {std::cout << x << ", ";}
   std::cout << std::endl;
-  
+
   // Iterate over the bunch of lanes
   for(int i = 0; i + numlanesreq <= this->laneVehicles.size(); i++) {
     double back=0;
@@ -351,7 +351,7 @@ double Road::firstObstacle(Vehicle* vehicle, double delT) {
                         // If this Vehicle is not processed, update the Positions
                         v->updatePos(delT);
                     }
-                     
+
                     // Get the last elementin
                     lastV = v;
                  }
