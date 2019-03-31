@@ -256,7 +256,7 @@ void Road::changeLane(Vehicle* vehicle){
 void Road::printLanes(){
   for(auto lane : this->laneVehicles){
     for(auto v : lane){
-      std::cout << "(" << v->type << ", " << v->currentPosition.first << ", " << v->currentSpeed << ", " << v->closestDistance << "," << v->a << ");";
+      std::cout << "(" << v->type << ", " << v->currentPosition.first << ", " << v->currentSpeed << ", " << v->closestDistance << "," << v->a << ", " << v->delT  << ");";
     }
     std::cout<<std::endl;
   }

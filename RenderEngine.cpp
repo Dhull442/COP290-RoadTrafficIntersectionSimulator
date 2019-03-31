@@ -85,16 +85,21 @@ void RenderEngine::render(double delT) {
     0;
     #endif
     double oldTime;
-    double currentTime =
+    double currentTime = glfwGetTime();
     #ifdef RENDER_ENGINE_H
     RenderEngine::getTime();
     #else
     0;
     #endif
     std::cout << "Starting Render routine"<< std::endl;
+    bool update = false;
     while((currentTime - beginTime < delT) && !glfwWindowShouldClose(RenderEngine::window)) {
-        // Update the simulation based on previously decided parameters, set new parameters
-        this->targetRoad->updateSim(currentTime - beginTime);
+	if (currentTime - oldTime >= 0.04) {
+        	// Update the simulation based on previously decided parameters, set new parameters
+        	this->targetRoad->updateSim(currentTime - oldTime);
+		update = true;
+	}
+
         float ratio;
         int width=800, height=800;
         glfwGetFramebufferSize(RenderEngine::window, &width, &height);
@@ -116,9 +121,11 @@ void RenderEngine::render(double delT) {
         // Swap buffers and check for events
         glfwSwapBuffers(RenderEngine::window);
         glfwPollEvents();
-
-        oldTime = currentTime;
-        currentTime =
+	if (update) {
+		update = false;
+        	oldTime = currentTime;
+	}	
+        currentTime = glfwGetTime();
         #ifdef RENDER_ENGINE_H
         RenderEngine::getTime();
         #else

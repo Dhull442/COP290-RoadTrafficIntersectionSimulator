@@ -126,6 +126,7 @@ void Vehicle::setColor(std::string color){
 
 // Update the parameters of the Vehicles based on the time increment -- TO BE EDITED
 void Vehicle::updatePos(double delT) {
+    this->delT = delT;
     // Firstly, update the velocities and positionx
     // Check if the velocity limit is, in fact, exceeded
     if (this->useLimit) {
@@ -155,7 +156,7 @@ void Vehicle::updatePos(double delT) {
     double Disc = sqrt(B*B - 4*A*C);
 
     // Define the limit on the velocity
-    this->velLimit = D/(2*delT);
+    this->velLimit = this->closestDistance/(2*delT);
     this->useLimit = false;
     // Get the accleration value from the equation
     this->a = (-B + Disc)/(2*A);
