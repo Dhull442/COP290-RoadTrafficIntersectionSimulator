@@ -32,6 +32,7 @@ class Road {
         double length;
         double width;
         double signalPosition;
+        std::string ascii_signalcolor;
         int lanes;
         int id=-1;
         bool getAdjVehicles(Vehicle* vehicle, int dir, double delT, double globalTime);

@@ -8,7 +8,7 @@ class Road;
 
 class Vehicle {
     private:
-        
+
 
     public:
         std::string type;
@@ -21,6 +21,7 @@ class Vehicle {
         Vehicle* front;
         Vehicle* back;
         int skill;
+        std::string ascii_color;
         double maxspeed;
         double acceleration, a;
         double currentSpeed;

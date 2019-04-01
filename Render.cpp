@@ -4,7 +4,18 @@
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <cstdio>
 #include "Render.h"
+
+#define ANSI_COLOR_RED     "\033[1;31m"
+#define ANSI_COLOR_GREEN   "\033[1;32m"
+#define ANSI_COLOR_YELLOW  "\033[1;33m"
+#define ANSI_COLOR_BLUE    "\033[1;34m"
+#define ANSI_COLOR_MAGENTA "\033[1;35m"
+#define ANSI_COLOR_CYAN    "\033[1;36m"
+#define ANSI_COLOR_WHITE   "\033[1;37m"
+#define ANSI_COLOR_BLACK   "\033[1;1m"
+#define ANSI_COLOR_RESET   "\033[0m"
 
 RenderEngine::RenderEngine(Road* targetRoad) {
     std::cout << "Instantiated RenderEngine for road " << targetRoad->id << std::endl;
@@ -23,6 +34,8 @@ RenderEngine::RenderEngine(Road* targetRoad) {
     this->CamAngleX=0;
     this->CamAngleY=0;
     this->CamZoom = -20;
+
+
     this->setCameraSpeed(1.0f,1.0f,1.0f); // Change defaults according to need
     this->initializeModels();
 }
@@ -82,6 +95,14 @@ void RenderEngine::setup() {
     glCullFace(GL_BACK);
     this->window = window;
     this->isInitialized = true;
+    std::cout << this->map.size() << std::endl;
+}
+
+void RenderEngine::initializeMap(){
+  // this->fout.open("output.txt");
+  std::vector< std::pair<char,std::string> > tmp((int)this->targetRoad->length,std::make_pair(' ',ANSI_COLOR_BLACK));
+  std::vector< std::vector <std::pair<char,std::string> > > tmp2((int)this->targetRoad->width, tmp);
+  this->map = tmp2;
 }
 
 float RenderEngine::getTime() {
@@ -97,7 +118,7 @@ void RenderEngine::render(double delT) {
     bool update = false;
     while((currentTime - beginTime < delT) && !glfwWindowShouldClose(RenderEngine::window)) {
         // std::cout << "Rendering now..." << std::endl;
-        std::cout << currentTime - oldTime << " >= "<< 1/fps << std::endl;
+        // std::cout << currentTime - oldTime << " >= "<< 1/fps << std::endl;
         if(currentTime - oldTime >= 1/fps){
         	// Update the simulation based on previously decided parameters, set new parameters
         	this->targetRoad->updateSim(currentTime - oldTime, RenderEngine::getTime());
@@ -122,6 +143,9 @@ void RenderEngine::render(double delT) {
         glfwPollEvents();
 
         if (update) {
+          // if((int)1000*((currentTime-beginTime)-floor(currentTime-beginTime))  < 100)
+          {this->generateMap();
+          this->renderMap();}
       		update = false;
           oldTime = currentTime;
       	}
@@ -135,6 +159,66 @@ void RenderEngine::setCameraSpeed(float translationspeed, float rotationspeed, f
   this->CamZoomSpeed = zoomspeed;
 }
 
+void RenderEngine::renderMap(){
+  std::ofstream fout("output.txt", std::ios_base::app);
+  if(this->map.size()<1){
+    std::cout << "[ ERROR ] - Map was not initialized properly!"<<std::endl;
+    std::exit(1);
+  }
+  for(int i=0;i<this->map[0].size();i++){ // print top boundary
+    fout << ANSI_COLOR_YELLOW <<"=" << ANSI_COLOR_RESET;
+    if(i == (int)this->targetRoad->signalPosition ){
+      fout<< this->targetRoad->ascii_signalcolor << "|" << ANSI_COLOR_RESET;
+    }
+    else
+      fout << " ";
+  }
+  fout << "\n";;
+
+  for(int i=0;i<this->map.size();i++){
+    for(int j = 0 ; j < this->map[i].size();j++){
+      fout << this->map[i][j].second << this->map[i][j].first << ANSI_COLOR_RESET;
+      if(j == (int)this->targetRoad->signalPosition ){
+        fout<< this->targetRoad->ascii_signalcolor << "|" << ANSI_COLOR_RESET;
+      }
+      else
+        fout << " ";
+    }
+    fout << "\n";
+  }
+
+  for(int i=0;i<this->map[0].size();i++){ // print bottom boundary
+    fout << ANSI_COLOR_YELLOW <<"=" << ANSI_COLOR_RESET;
+    if(i == (int)this->targetRoad->signalPosition ){
+      fout<< this->targetRoad->ascii_signalcolor << "|" << ANSI_COLOR_RESET;
+    }
+    else
+      fout << " ";
+  }
+  fout <<"\n\n\n";;
+}
+
+void RenderEngine::generateMap(){
+  // Refresh Everything
+  for(int i=0;i<this->map.size();i++){
+    for(int j=0;j<this->map[0].size();j++){
+      this->map[i][j].first = ' ';
+    }
+  }
+  std::cout << "Generating Map"<<std::endl;
+  for(auto v: this->targetRoad->vehicles){
+    for(int i=(int)(v->currentPosition.first-v->length); i<(int)v->currentPosition.first; i++){
+      if(i>=0 && i< this->map[0].size()){
+        for(int j = (int)(v->currentPosition.second - v->width); j < (int) (v->currentPosition.second); j++){
+          if(j>0 && j <= this->map.size()){
+            this->map[this->map.size()-j][i].first = v->type[0];
+            this->map[this->map.size()-j][i].second = v->ascii_color;
+          }
+        }
+      }
+    }
+  }
+}
 void RenderEngine::UpdateCamera(double delT){
   GLint windowWidth, windowHeight;
   glfwGetWindowSize(window, &windowWidth, &windowHeight);
@@ -326,6 +410,13 @@ void RenderEngine::renderVehicle(Vehicle* vehicle) {
     glScalef(vehicle->length,1.0,vehicle->width);
     glTranslatef((float)(vehicle->currentPosition.first-(this->targetRoad->length/2) - (vehicle->length)/2)/(vehicle->length),0,(float)(-vehicle->currentPosition.second + (this->targetRoad->width/2) + vehicle->width/2)/(vehicle->width));
     glColorPointer(3, GL_FLOAT, 0, colors);
+    if(vehicle->currentSpeed > 0){
+      double theta = atan((vehicle->changeDirection*vehicle->verticalSpeed)/vehicle->currentSpeed) * 180 / M_PI; // in radians
+      glRotatef(theta,0,1,0);
+    }
+    else{
+      glRotatef(0,0,1,0);
+    }
     glDrawArrays(GL_POLYGON, 0, size/3);
 
     glPopMatrix();

@@ -19,6 +19,9 @@ private:
   void UpdateCamera(double delT);
   void generateColorPointer(int size,std:: vector<int> color_rgb, float* mat);
   void initializeModels();
+  std::vector<std::vector<std::pair< char ,std::string> > > map;
+  void renderMap();
+  void generateMap();
   public:
     // The road that this will render
     Road* targetRoad;
@@ -29,6 +32,7 @@ private:
     std::vector<std::pair<std::string,std::pair<std::vector<float>,int> > > models;
     // Set the background color
     std::vector<float> bgcolor;
+    // std::ofstream fout;
 
     // The variable which store the OpenGL window
     GLFWwindow* window;
@@ -49,6 +53,7 @@ private:
     // Clear the screen and render the road, vehicles afresh
     void render(double delT);
     void renderRoad();
+    void initializeMap();
     void addModel(std::string type,float* vertices, int size);
     void renderVehicle(Vehicle* vehicle);
     void endSim();

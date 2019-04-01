@@ -16,6 +16,7 @@ Road::Road() {
     this->width = 0.0;
     // Signal is red by default
     this->signal = "RED";
+    this->ascii_signalcolor = "\033[1;31m";
     this->signal_rgb.push_back(0);
     this->signal_rgb.push_back(0);
     this->signal_rgb.push_back(0);
@@ -97,6 +98,7 @@ void Road::setSignal(std::string signal){
         this->signal_rgb[0] = 11;
         this->signal_rgb[1] = 229;
         this->signal_rgb[2] = 8;
+        this->ascii_signalcolor = "\033[1;32m";
         return;
     }
 
@@ -105,6 +107,7 @@ void Road::setSignal(std::string signal){
         this->signal_rgb[0] = 237;
         this->signal_rgb[1] = 32;
         this->signal_rgb[2] = 32;
+        this->ascii_signalcolor = "\033[1;31m";
         return;
     } else {
         this->error_callback("Signal can only be GREEN/RED");

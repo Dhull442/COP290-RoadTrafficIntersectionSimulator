@@ -23,6 +23,7 @@ Vehicle::Vehicle(){
   this->velLimit = this->maxspeed;
   this->useLimit = false;
   this->emergency = false;
+  this->ascii_color="\033[1;30m";
 }
 
 Vehicle::Vehicle(std::string type, double length, double width): Vehicle(){
@@ -70,6 +71,7 @@ void Vehicle::setColor(std::string color){
     this->color_rgb[0] = 11;
     this->color_rgb[1] = 229;
     this->color_rgb[2] = 8;
+    this->ascii_color = "\033[1;32m";
     return;
   }
   if(!color.compare("RED")){
@@ -77,6 +79,7 @@ void Vehicle::setColor(std::string color){
     this->color_rgb[0] = 237;
     this->color_rgb[1] = 32;
     this->color_rgb[2] = 32;
+    this->ascii_color = "\033[1;31m";
     return;
   }
   if(!color.compare("BLUE")){
@@ -84,6 +87,7 @@ void Vehicle::setColor(std::string color){
     this->color_rgb[0] = 7;
     this->color_rgb[1] = 105;
     this->color_rgb[2] = 231;
+    this->ascii_color = "\033[1;34m";
     return;
   }
   if(!color.compare("ORANGE")){
@@ -91,6 +95,7 @@ void Vehicle::setColor(std::string color){
     this->color_rgb[0] = 242;
     this->color_rgb[1] = 129;
     this->color_rgb[2] = 16;
+    this->ascii_color = "\033[1;31m";
     return;
   }
   if(!color.compare("PINK")){
@@ -98,6 +103,7 @@ void Vehicle::setColor(std::string color){
     this->color_rgb[0] = 254;
     this->color_rgb[1] = 110;
     this->color_rgb[2] = 206;
+    this->ascii_color = "\033[1;35m";
     return;
   }
   if(!color.compare("YELLOW")){
@@ -105,6 +111,7 @@ void Vehicle::setColor(std::string color){
     this->color_rgb[0] = 252;
     this->color_rgb[1] = 235;
     this->color_rgb[2] = 83;
+    this->ascii_color = "\033[1;33m";
     return;
   }
   if(!color.compare("PURPLE")){
@@ -112,6 +119,7 @@ void Vehicle::setColor(std::string color){
     this->color_rgb[0] = 112;
     this->color_rgb[1] = 4;
     this->color_rgb[2] = 253;
+    this->ascii_color = "\033[1;36m";
     return;
   }
   if(!color.compare("WHITE")){
@@ -119,6 +127,7 @@ void Vehicle::setColor(std::string color){
     this->color_rgb[0] = 255;
     this->color_rgb[1] = 255;
     this->color_rgb[2] = 255;
+    this->ascii_color = "\033[1;37m";
     return;
   }
   {
@@ -174,7 +183,7 @@ void Vehicle::updatePos(double delT, double globalTime) {
       this->emergency = false;
     }
 
-    double Disc = sqrt(Disc1);  
+    double Disc = sqrt(Disc1);
     // Get the accleration value from the equation
     this->a = (-B + Disc)/(2*A);
 

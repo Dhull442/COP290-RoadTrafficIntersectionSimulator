@@ -53,7 +53,7 @@ void simulationActions(
     }
 
     // Addition of vehicles routine
-    bool found = false; 
+    bool found = false;
     for (int v = 0; v < vehicles.size(); v++) {
       if (!vehicles[v] -> type.compare(preprocess(function))) { // prepnrocessing to ignore any fuss due to Capitals
         std::cout << "ADDING " << vehicles[v]->type << std::endl;
@@ -160,6 +160,7 @@ int main(int argc, char ** argv) {
             // Create and add new road;
             double length = std::atof(line.substr(line.find("=") + 1).c_str());
             model.back() -> length = length;
+            model.back() -> engine.initializeMap();
             std::cout << "Length : " << length << std::endl;
           }
 
@@ -167,6 +168,7 @@ int main(int argc, char ** argv) {
             // Create and add new road;
             double width = std::atof(line.substr(line.find("=") + 1).c_str());
             model.back() -> width = width;
+            model.back() -> engine.initializeMap();
             std::cout << "Width : " << width << std::endl;
           }
 
