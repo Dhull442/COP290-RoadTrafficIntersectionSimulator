@@ -100,7 +100,7 @@ void RenderEngine::render(double delT) {
         std::cout << currentTime - oldTime << " >= "<< 1/fps << std::endl;
         if(currentTime - oldTime >= 1/fps){
         	// Update the simulation based on previously decided parameters, set new parameters
-        	this->targetRoad->updateSim(currentTime - oldTime);
+        	this->targetRoad->updateSim(currentTime - oldTime, RenderEngine::getTime());
           update = true;
     	  }
         this->UpdateCamera(currentTime - beginTime );
