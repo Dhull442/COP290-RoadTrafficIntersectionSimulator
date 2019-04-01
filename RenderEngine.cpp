@@ -6,6 +6,17 @@
 #include <stdio.h>
 #include "RenderEngine.h"
 
+
+#define ANSI_COLOR_RED     "\033[1;31m"
+#define ANSI_COLOR_GREEN   "\033[1;32m"
+#define ANSI_COLOR_YELLOW  "\033[1;33m"
+#define ANSI_COLOR_BLUE    "\033[1;34m"
+#define ANSI_COLOR_MAGENTA "\033[1;35m"
+#define ANSI_COLOR_CYAN    "\033[1;36m"
+#define ANSI_COLOR_WHITE   "\033[1;37m"
+#define ANSI_COLOR_BLACK   "\033[1;1m"
+#define ANSI_COLOR_RESET   "\033[0m"
+
 RenderEngine::RenderEngine(Road* targetRoad) {
     std::cout << "Instantiated RenderEngine for road " << targetRoad->id << std::endl;
     this->targetRoad = targetRoad;
@@ -114,15 +125,80 @@ void RenderEngine::render(double delT) {
         glfwSwapBuffers(RenderEngine::window);
         glfwPollEvents();
 	if (update) {
+    {this->generateMap();
+    this->renderMap();}
 		update = false;
         	oldTime = currentTime;
-	}	
-        currentTime = glfwGetTime();
-        #ifdef RENDER_ENGINE_H
-        RenderEngine::getTime();
-        #else
-        #endif
+	}
+        currentTime = RenderEngine::getTime();
     }
+}
+
+void RenderEngine::initializeMap(){
+  // this->fout.open("output.txt");
+  std::vector< std::pair<char,std::string> > tmp((int)this->targetRoad->length,std::make_pair(' ',ANSI_COLOR_BLACK));
+  std::vector< std::vector <std::pair<char,std::string> > > tmp2((int)this->targetRoad->width, tmp);
+  this->map = tmp2;
+}
+
+void RenderEngine::renderMap(){
+  std::ofstream fout("output.txt", std::ios_base::app);
+  if(this->map.size()<1){
+    std::cout << "[ ERROR ] - Map was not initialized properly!"<<std::endl;
+    std::exit(1);
+  }
+  for(int i=0;i<this->map[0].size();i++){ // print top boundary
+    fout << ANSI_COLOR_YELLOW <<"=" << ANSI_COLOR_RESET;
+    if(i == (int)this->targetRoad->signalPosition ){
+      fout<< this->targetRoad->ascii_signalcolor << "|" << ANSI_COLOR_RESET;
+    }
+    else
+      fout << " ";
+  }
+  fout << "\n";;
+
+  for(int i=0;i<this->map.size();i++){
+    for(int j = 0 ; j < this->map[i].size();j++){
+      fout << this->map[i][j].second << this->map[i][j].first << ANSI_COLOR_RESET;
+      if(j == (int)this->targetRoad->signalPosition ){
+        fout<< this->targetRoad->ascii_signalcolor << "|" << ANSI_COLOR_RESET;
+      }
+      else
+        fout << " ";
+    }
+    fout << "\n";
+  }
+
+  for(int i=0;i<this->map[0].size();i++){ // print bottom boundary
+    fout << ANSI_COLOR_YELLOW <<"=" << ANSI_COLOR_RESET;
+    if(i == (int)this->targetRoad->signalPosition ){
+      fout<< this->targetRoad->ascii_signalcolor << "|" << ANSI_COLOR_RESET;
+    }
+    else
+      fout << " ";
+  }
+  fout <<"\n\n\n";;
+}
+
+void RenderEngine::generateMap(){
+  // Refresh Everything
+  for(int i=0;i<this->map.size();i++){
+    for(int j=0;j<this->map[0].size();j++){
+      this->map[i][j].first = ' ';
+    }
+  }
+  for(auto v: this->targetRoad->vehicles){
+    for(int i=(int)(v->currentPosition.first-v->length); i<(int)v->currentPosition.first; i++){
+      if(i>=0 && i< this->map[0].size()){
+        for(int j = (int)(v->currentPosition.second - v->width); j < (int) (v->currentPosition.second); j++){
+          if(j>0 && j <= this->map.size()){
+            this->map[this->map.size()-j][i].first = v->type[0];
+            this->map[this->map.size()-j][i].second = v->ascii_color;
+          }
+        }
+      }
+    }
+  }
 }
 
 void RenderEngine::renderRoad() {
@@ -131,7 +207,7 @@ void RenderEngine::renderRoad() {
     float ycoord = this->targetRoad->width/((float)this->scaley);
     float xcoord = this->targetRoad->length/(float)this->scalex - 1.0;
     glRectd(-1.0f, ycoord, xcoord, -ycoord);
-    // std::cout <<"Roadwa "<< ycoord<<" " << xcoord << std::endl;
+
     // Render the signal as a strip
     float xsignal = this->targetRoad->signalPosition/(float)this->scalex - 1.0;
     glColor3f((float)this->targetRoad->signal_rgb[0]/255.0f, (float)this->targetRoad->signal_rgb[1]/255.0f, (float)this->targetRoad->signal_rgb[2]/255.0f);

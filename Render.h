@@ -5,7 +5,6 @@
 #include "Vehicle.h"
 #include "Road.h"
 #include <GLFW/glfw3.h>
-#include <GL/glut.h>
 #include <stdlib.h>
 #include <stdio.h>
 

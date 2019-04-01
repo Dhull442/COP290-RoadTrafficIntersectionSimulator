@@ -13,6 +13,10 @@ class Road;
 
 // This class takes a Road object and renders it
 class RenderEngine {
+private:
+  std::vector<std::vector<std::pair< char ,std::string> > > map;
+  void renderMap();
+  void generateMap();
   public:
     // The road that this will render
     Road* targetRoad;
@@ -40,6 +44,7 @@ class RenderEngine {
 
     // Initialize the variables
     void setup();
+    void initializeMap();
     // Clear the screen and render the road, vehicles afresh
     void render(double delT);
     void renderRoad();

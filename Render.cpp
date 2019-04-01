@@ -2,6 +2,7 @@
 #include "Vehicle.h"
 #include "Road.h"
 #include <GLFW/glfw3.h>
+#include <GL/glut.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <cstdio>
@@ -20,7 +21,7 @@
 RenderEngine::RenderEngine(Road* targetRoad) {
     this->targetRoad = targetRoad;
     // Set framerate to 25
-    this->fps = 100;
+    this->fps = 25;
     // Set the default background color
     this->bgcolor.push_back(0.701f);
     this->bgcolor.push_back(0.341f);
@@ -33,7 +34,6 @@ RenderEngine::RenderEngine(Road* targetRoad) {
     this->CamAngleX=0;
     this->CamAngleY=0;
     this->CamZoom = -20;
-
 
     this->setCameraSpeed(1.0f,1.0f,1.0f); // Change defaults according to need
     this->initializeModels();
@@ -316,7 +316,6 @@ void RenderEngine::renderRoad() {
     this->generateColorPointer(24,this->targetRoad->signal_rgb,signalcolors);
     glColorPointer(3, GL_FLOAT, 0, signalcolors);
     glDrawArrays(GL_POLYGON, 0, 24);
-
 }
 
 void RenderEngine::endSim() {

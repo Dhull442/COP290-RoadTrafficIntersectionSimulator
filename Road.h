@@ -3,7 +3,11 @@
 
 #include <bits/stdc++.h>
 #include "Vehicle.h"
+#ifdef D3
 #include "Render.h"
+#else
+#include "RenderEngine.h"
+#endif
 
 class Vehicle;
 
