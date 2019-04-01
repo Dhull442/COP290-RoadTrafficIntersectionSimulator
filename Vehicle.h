@@ -14,6 +14,7 @@ class Vehicle {
         std::string type;
         std::string color;
         double velLimit;
+        bool emergency;
         bool useLimit;
         double length, width, safedistance;
         double closestDistance;
