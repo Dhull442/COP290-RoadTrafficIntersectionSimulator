@@ -137,13 +137,12 @@ void Vehicle::setColor(std::string color){
 
 // Update the parameters of the Vehicles based on the time increment -- TO BE EDITED
 void Vehicle::updatePos(double delT, double globalTime) {
-    std::cout << "Updating " << this->color << " " << this->type << std::endl;
     this->processed = true;
     this->delT = delT;
     // Firstly, update the velocities and positionx
     // Check if the velocity limit is, in fact, exceeded
     if (this->useLimit) {
-        std::cout << "LIMIT BREACHED " << this->velLimit << std::endl;
+        // std::cout << "LIMIT BREACHED " << this->velLimit << std::endl;
         // If we are using the limit, get the part time until it accelerates
         double partTime = (this->velLimit - this->currentSpeed)/(this->a);
         this->currentPosition.first += (this->currentSpeed)*partTime + 0.5*(this->a)*(partTime)*(partTime) + (this->velLimit)*(delT - partTime);
@@ -168,7 +167,7 @@ void Vehicle::updatePos(double delT, double globalTime) {
     double C = this->currentSpeed*this->currentSpeed/(2*this->acceleration) + this->currentSpeed*delT - this->closestDistance;
     // Sqrt Discriminant of above QE
     double Disc1 = B*B - 4*A*C;
-    std::cout << "Defined A, B, C, D" << std::endl;
+    // std::cout << "Defined A, B, C, D" << std::endl;
 
     // Define the limit on the velocity
     this->velLimit = this->closestDistance/(2*delT);
@@ -227,12 +226,10 @@ void Vehicle::updatePos(double delT, double globalTime) {
         if (this->changeDirection == -1) {
           // The shift was toward the bottom
           // Update the lanes
-          std::cout << "Bottom shift" << std::endl;
           this->parentRoad->removeFromLane(this, this->currentLane.first);
           this->currentLane.first++;
         } else {
           // Shift was toward the top
-          std::cout << "top shift " << std::endl;
           this->parentRoad->removeFromLane(this, this->currentLane.second);
           this->currentLane.second--;
 
@@ -247,23 +244,20 @@ void Vehicle::updatePos(double delT, double globalTime) {
       }
     }
 
-    std::cout << "Update complete" << std::endl;
     this->parentRoad->printLanes();
 }
 
 void Vehicle::changeLane(double delT, double globalTime) {
-  std::cout << "CHANGING LANES" << std::endl;
+  // std::cout << "CHANGING LANES" << std::endl;
   if (globalTime - this->lastLaneChange >= this->timeGap && !this->changingLane && this->currentPosition.first >= 0) {
       // Check if a lane change is isPossible -- downwards
       this->front = NULL;
       this->back = NULL;
       bool hasSpace = this->parentRoad->getAdjVehicles(this, 1, delT, globalTime);
-      std::cout << "Adjacent vehicles are ";
       if (this->front != NULL) {std::cout << front->color << " " << front->type << " ";} else {std::cout << "NULL ";}
       if (this->back != NULL) {std::cout << back->color << " " << back->type << " ";} else {std::cout << "NULL ";}
       std::cout << std::endl;
       if (hasSpace && Vehicle::isPossible(delT)) {
-        std::cout << "Lane change is possible - Lane change downwards" << std::endl;
         this->changingLane = true;
         this->verticalPosition = 0;
         this->verticalSpeed = 0;
@@ -278,12 +272,10 @@ void Vehicle::changeLane(double delT, double globalTime) {
       // Check if it is possible to change in the other direction
 
       hasSpace = this->parentRoad->getAdjVehicles(this, -1, delT, globalTime);
-      std::cout << "Adjacent vehicles are ";
       if (this->front != NULL) {std::cout << front->color << " " << front->type << " ";} else {std::cout << "NULL ";}
       if (this->back != NULL) {std::cout << back->color << " " << back->type << " ";} else {std::cout << "NULL ";}
       std::cout << std::endl;
       if (hasSpace && Vehicle::isPossible(delT)) {
-        std::cout << "Lane change is possible - Lane change upwards" << std::endl;
         this->changingLane = true;
         this->verticalPosition = 0;
         this->verticalSpeed = 0;

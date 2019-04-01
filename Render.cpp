@@ -18,7 +18,6 @@
 #define ANSI_COLOR_RESET   "\033[0m"
 
 RenderEngine::RenderEngine(Road* targetRoad) {
-    std::cout << "Instantiated RenderEngine for road " << targetRoad->id << std::endl;
     this->targetRoad = targetRoad;
     // Set framerate to 25
     this->fps = 100;
@@ -43,7 +42,6 @@ RenderEngine::RenderEngine(Road* targetRoad) {
 // Default constructor
 RenderEngine::RenderEngine() {
     // Do nothing
-    // std::cout << "RenderEngine() default constructor called" << std::endl;
 }
 
 void RenderEngine::error_callback(int error, const char* description) {
@@ -95,7 +93,6 @@ void RenderEngine::setup() {
     glCullFace(GL_BACK);
     this->window = window;
     this->isInitialized = true;
-    std::cout << this->map.size() << std::endl;
 }
 
 void RenderEngine::initializeMap(){
@@ -114,11 +111,8 @@ void RenderEngine::render(double delT) {
     double beginTime = RenderEngine::getTime();
     double oldTime = RenderEngine::getTime();
     double currentTime = RenderEngine::getTime();
-    std::cout << "Starting Render routine"<< std::endl;
     bool update = false;
     while((currentTime - beginTime < delT) && !glfwWindowShouldClose(RenderEngine::window)) {
-        // std::cout << "Rendering now..." << std::endl;
-        // std::cout << currentTime - oldTime << " >= "<< 1/fps << std::endl;
         if(currentTime - oldTime >= 1/fps){
         	// Update the simulation based on previously decided parameters, set new parameters
         	this->targetRoad->updateSim(currentTime - oldTime, RenderEngine::getTime());
@@ -205,7 +199,6 @@ void RenderEngine::generateMap(){
       this->map[i][j].first = ' ';
     }
   }
-  std::cout << "Generating Map"<<std::endl;
   for(auto v: this->targetRoad->vehicles){
     for(int i=(int)(v->currentPosition.first-v->length); i<(int)v->currentPosition.first; i++){
       if(i>=0 && i< this->map[0].size()){
@@ -219,6 +212,7 @@ void RenderEngine::generateMap(){
     }
   }
 }
+
 void RenderEngine::UpdateCamera(double delT){
   GLint windowWidth, windowHeight;
   glfwGetWindowSize(window, &windowWidth, &windowHeight);
@@ -386,7 +380,7 @@ void RenderEngine::renderVehicle(Vehicle* vehicle) {
       std::cout << "[ ERROR ] - No Models for Rendering!"<<std::endl;
       std::exit(1);
     }
-    if (vehicle->isOnRoad) {
+    if (!(vehicle->currentPosition.first < 0 || vehicle->currentPosition.first- vehicle->length > this->targetRoad->length)) {
       std::vector<float> tmp;
       int size = -1;
       for(auto model : this->models){
@@ -401,7 +395,6 @@ void RenderEngine::renderVehicle(Vehicle* vehicle) {
         size = this->models.back().second.second;
       }
     float vertices[size];
-    // std::cout <<"RENDERERERERER: "<< vehicle->currentPosition.first << std::endl;
     std::copy(tmp.begin(),tmp.end(),vertices);
     glPushMatrix();
     glVertexPointer(3, GL_FLOAT, 0, vertices);
@@ -410,13 +403,13 @@ void RenderEngine::renderVehicle(Vehicle* vehicle) {
     glScalef(vehicle->length,1.0,vehicle->width);
     glTranslatef((float)(vehicle->currentPosition.first-(this->targetRoad->length/2) - (vehicle->length)/2)/(vehicle->length),0,(float)(-vehicle->currentPosition.second + (this->targetRoad->width/2) + vehicle->width/2)/(vehicle->width));
     glColorPointer(3, GL_FLOAT, 0, colors);
-    if(vehicle->currentSpeed > 0){
-      double theta = atan((vehicle->changeDirection*vehicle->verticalSpeed)/vehicle->currentSpeed) * 180 / M_PI; // in radians
-      glRotatef(theta,0,1,0);
-    }
-    else{
-      glRotatef(0,0,1,0);
-    }
+    // if(vehicle->currentSpeed > 0 && vehicle->verticalSpeed > 0){
+    //   double theta = atan((vehicle->changeDirection*vehicle->verticalSpeed)/vehicle->currentSpeed) * 180 / M_PI; // in radians
+    //   glRotatef(theta,0,1,0);
+    // }
+    // else{
+    //   glRotatef(0,0,1,0);
+    // }
     glDrawArrays(GL_POLYGON, 0, size/3);
 
     glPopMatrix();
