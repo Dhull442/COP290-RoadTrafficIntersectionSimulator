@@ -34,6 +34,7 @@ RenderEngine::RenderEngine(Road* targetRoad) {
     this->CamAngleX=0;
     this->CamAngleY=0;
     this->CamZoom = -20;
+    this->theta = 0;
 
     this->setCameraSpeed(1.0f,1.0f,1.0f); // Change defaults according to need
     this->initializeModels();
@@ -272,9 +273,10 @@ void RenderEngine::UpdateCamera(double delT){
 
 void RenderEngine::generateColorPointer(int size,std:: vector<int> color_rgb, float* mat){
   for(int i=0;i<size;i++){
-    mat[3*i] = (float)color_rgb[0]/255.0f;
-    mat[3*i+1] = (float)color_rgb[1]/255.0f;
-    mat[3*i+2] = (float)color_rgb[2]/255.0f;
+
+    mat[3*i] = ((float)color_rgb[0]/255.0f)/2.0f;
+    mat[3*i+1] = ((float)color_rgb[1]/255.0f)/2.0f;
+    mat[3*i+2] = ((float)color_rgb[2]/255.0f)/2.0f;
   }
 }
 
@@ -326,15 +328,15 @@ void RenderEngine::endSim() {
 void RenderEngine::initializeModels(){
     float vertices[] =
     {  -1/2.5, -1, -0.5,   -1/2.5,  1,-0.5,    -1/2.5,   1, 0.5,   -1/2.5, -1, 0.5, // back
-       -1/2.5,  1,  0.5,     1/2.5,  1,  0.5,   1/2.5,0.8,0.5,      -1/2.5,0.8,0.5,
-       -1/2.5,0.8,0.5,     1.5/2.5,0.8,0.5,    1.5/2.5,  -1, 0.5,   -1/2.5, -1, 0.5,
-       -1/2.5,  1,  -0.5,     1/2.5,  1,  -0.5,   1/2.5,0.8,-0.5,      -1/2.5,0.8,-0.5,
-       -1/2.5,0.8,- 0.5,     1.5/2.5,0.8,-0.5,    1.5/2.5,  -1, -0.5,   -1/2.5, -1, -0.5,
-       1/2.5,0.8,0.5,      1 /2.5, 0.8, -0.5,     1/2.5, 1, -0.5,       1/2.5,1,0.5,
-       1/2.5,0.8,0.5,     1.5/2.5, 0.8, 0.5,     1.5/2.5, 0.8, -0.5,   1/2.5, 0.8, -0.5,
+       -1/2.5,  1,  0.5,     1/2.5,  1,  0.5,   1/2.5,0,0.5,      -1/2.5,0,0.5,
+       -1/2.5,0,0.5,     1.5/2.5,0,0.5,    1.5/2.5,  -1, 0.5,   -1/2.5, -1, 0.5,
+       -1/2.5,  1,  -0.5,     1/2.5,  1,  -0.5,   1/2.5,0,-0.5,      -1/2.5,0,-0.5,
+       -1/2.5,0,- 0.5,     1.5/2.5,0,-0.5,    1.5/2.5,  -1, -0.5,   -1/2.5, -1, -0.5,
+       1/2.5,0,0.5,      1 /2.5, 0, -0.5,     1/2.5, 1, -0.5,       1/2.5,1,0.5,
+       1/2.5,0,0.5,     1.5/2.5, 0, 0.5,     1.5/2.5, 0, -0.5,   1/2.5, 0, -0.5,
         1/2.5, 1,  0.5,   1/2.5,  1,  -0.5,    -1/2.5,  1,  -0.5,     -1/2.5, 1,  0.5,  // top
         1.5/2.5, -1, 0.5, 1.5/2.5,-1, -0.5,   -1/2.5, -1, -0.5,    -1/2.5, -1, 0.5,
-      1.5/2.5, 0.8, 0.5,    1.5/2.5, 0.8, -0.5,   1.5/2.5, -1, -0.5,    1.5/2.5, -1, 0.5
+      1.5/2.5, 0, 0.5,    1.5/2.5, 0, -0.5,   1.5/2.5, -1, -0.5,    1.5/2.5, -1, 0.5
     };
     std::vector<float> v (vertices,vertices+sizeof(vertices)/sizeof(float));
     this->models.push_back(std::make_pair("truck",std::make_pair(v,v.size())));
@@ -399,16 +401,16 @@ void RenderEngine::renderVehicle(Vehicle* vehicle) {
     glVertexPointer(3, GL_FLOAT, 0, vertices);
     float colors[size];
     this->generateColorPointer(size/3,vehicle->color_rgb,colors);
-    glScalef(vehicle->length,1.0,vehicle->width);
-    glTranslatef((float)(vehicle->currentPosition.first-(this->targetRoad->length/2) - (vehicle->length)/2)/(vehicle->length),0,(float)(-vehicle->currentPosition.second + (this->targetRoad->width/2) + vehicle->width/2)/(vehicle->width));
     glColorPointer(3, GL_FLOAT, 0, colors);
-    // if(vehicle->currentSpeed > 0 && vehicle->verticalSpeed > 0){
-    //   double theta = atan((vehicle->changeDirection*vehicle->verticalSpeed)/vehicle->currentSpeed) * 180 / M_PI; // in radians
-    //   glRotatef(theta,0,1,0);
-    // }
-    // else{
-    //   glRotatef(0,0,1,0);
-    // }
+
+    glTranslatef((float)(vehicle->currentPosition.first-(this->targetRoad->length/2) - (vehicle->length)/2),0,(float)(-vehicle->currentPosition.second + (this->targetRoad->width/2) + vehicle->width/2));
+
+    if(vehicle->currentSpeed > 0 ){
+      if (vehicle->changingLane) vehicle->theta =10*(atan((vehicle->changeDirection*vehicle->verticalSpeed)/vehicle->currentSpeed)); // in radians
+      else vehicle->theta = 0;
+    }
+    glRotatef(vehicle->theta,0,1,0);
+    glScalef(vehicle->length,1.0,vehicle->width);
     glDrawArrays(GL_POLYGON, 0, size/3);
 
     glPopMatrix();

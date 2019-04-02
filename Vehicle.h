@@ -8,11 +8,12 @@ class Road;
 
 class Vehicle {
     private:
-
+        double actualverticalspeed;
 
     public:
         std::string type;
         std::string color;
+        double oldSafedistance;
         double velLimit;
         bool emergency;
         bool useLimit;
@@ -25,6 +26,7 @@ class Vehicle {
         double maxspeed;
         double acceleration, a;
         double currentSpeed;
+        double theta;
         std::pair<double,double> currentPosition; // The coordinate of the front-top of the vehicle
         std::pair<double,double> unrestrictedposition;
         std::vector< int > color_rgb;

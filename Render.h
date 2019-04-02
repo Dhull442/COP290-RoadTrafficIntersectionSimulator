@@ -26,6 +26,7 @@ private:
     Road* targetRoad;
     double fps;
     bool isInitialized;
+    double theta;
     // Used to create a full screen simulation
     int monitorWidth, monitorHeight;
     std::vector<std::pair<std::string,std::pair<std::vector<float>,int> > > models;

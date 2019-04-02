@@ -32,6 +32,8 @@ class Road {
         double default_length = 2;
         double default_width = 2;
         double default_safety_distance = 1;
+        double default_timegap;
+        double default_speedratio;
         int default_skill = 1;
         double length;
         double width;
@@ -51,7 +53,7 @@ class Road {
         Road();
         // Update the simulation in a step of delT
         void updateSim(double delT, double globalTime);
-        void setDefaults(double maxspeed, double acceleration,double length, double width,int skill, double sdistance);
+        void setDefaults(double maxspeed, double acceleration,double length, double width,int skill, double sdistance, double ratio, double timegap, double s);
         // Add a Vehicle to the road
         void addVehicle(Vehicle* vehicle,std::string color);
         // First vehicle obstacle in a lane

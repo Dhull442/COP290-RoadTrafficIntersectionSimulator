@@ -227,7 +227,7 @@ void RenderEngine::endSim() {
 }
 
 void RenderEngine::renderVehicle(Vehicle* vehicle) {
-    if (vehicle->isOnRoad) {
+    if (!(vehicle->currentPosition.first - vehicle->length > this->targetRoad->length || vehicle->currentPosition.first < 0)) {
         // Render only if the vehicle is on the Road
         float x = -1.0 + (float)vehicle->currentPosition.first/(float)this->scalex;
         float y = 2*( - (float)this->targetRoad->width/2 + (float)vehicle->currentPosition.second)/(this->scaley);

@@ -91,7 +91,7 @@ int main(int argc, char ** argv) {
     vv vehicles;
     std::string line;
     int num_rules = 0, safety_skill;
-    double safety_maxspeed, safety_acceleration, safety_length, safety_width, safety_lanes, safety_distance;
+    double safety_maxspeed, safety_acceleration, safety_length, safety_width, safety_lanes, safety_distance, safety_speedratio, safety_timegap, safety_sideclearence;
     while (std::getline(configFile, line)) {
       if (!line.length()) continue; // IGN empty
       if (line[0] == '#') continue; // IGN with #
@@ -139,18 +139,39 @@ int main(int argc, char ** argv) {
             // Create and add new road;
             safety_distance = std::atof(line.substr(line.find("=") + 1).c_str());
             num_rules++;
-            std::cout << "Safety_Acceleration : " << safety_acceleration << std::endl;
+            std::cout << "Safety_Distance : " << safety_distance << std::endl;
+          }
+
+          if (line.find("Safety_SpeedRatio") != std::string::npos) {
+            // Create and add new road;
+            safety_speedratio = std::atof(line.substr(line.find("=") + 1).c_str());
+            num_rules++;
+            std::cout << "Safety_SpeedRatio : " << safety_speedratio << std::endl;
+          }
+
+          if (line.find("Safety_TimeGap") != std::string::npos) {
+            // Create and add new road;
+            safety_timegap = std::atof(line.substr(line.find("=") + 1).c_str());
+            num_rules++;
+            std::cout << "Safety_Timegap : " << safety_timegap << std::endl;
+          }
+
+          if (line.find("Safety_SideClearance") != std::string::npos) {
+            // Create and add new road;
+            safety_sideclearence = std::atof(line.substr(line.find("=") + 1).c_str());
+            num_rules++;
+            std::cout << "Safety_SideClearance : " << safety_sideclearence << std::endl;
           }
 
           if (line.find("Road_Id") != std::string::npos) {
             // Create and add new road;
-            if (num_rules != 7) {
+            if (num_rules != 10) {
               std::cout << "[ ERROR ] Please Specify all the rules." << std::endl;
               std::exit(1);
             }
             int id = std::atoi(line.substr(line.find("=") + 1).c_str());
             Road * newroad = new Road(id);
-            newroad -> setDefaults(safety_maxspeed, safety_acceleration, safety_length, safety_width, safety_skill, safety_distance);
+            newroad -> setDefaults(safety_maxspeed, safety_acceleration, safety_length, safety_width, safety_skill, safety_distance, safety_speedratio, safety_timegap,safety_sideclearence);
             model.push_back(newroad);
             model.back() -> initLanes(safety_lanes);
             std::cout << "Road ID : " << newroad -> id << std::endl;
@@ -186,6 +207,12 @@ int main(int argc, char ** argv) {
             std::cout << "Signal : " << signal << std::endl;
           }
 
+          if (line.find("Road_SideClearance") != std::string::npos) {
+            double maxsp = std::atof(line.substr(line.find("=") + 1).c_str());
+            model.back() -> sideClearance = maxsp;
+            std::cout << "sideClearance : " << maxsp << std::endl;
+          }
+
           // Default Params
           if (line.find("Default_MaxSpeed") != std::string::npos) {
             double maxsp = std::atof(line.substr(line.find("=") + 1).c_str());
@@ -211,6 +238,20 @@ int main(int argc, char ** argv) {
             }
             model.back() -> default_skill = skill;
             std::cout << "Skill : " << skill << std::endl;
+          }
+
+          if (line.find("Default_TimeGap") != std::string::npos) {
+            // Create and add new road;
+            double acc = std::atof(line.substr(line.find("=") + 1).c_str());
+            model.back() -> default_timegap = acc;
+            std::cout << "Time Gap : " << acc << std::endl;
+          }
+
+          if (line.find("Default_SpeedRatio") != std::string::npos) {
+            // Create and add new road;
+            double acc = std::atof(line.substr(line.find("=") + 1).c_str());
+            model.back() -> default_speedratio = acc;
+            std::cout << "Speed Ratio : " << acc << std::endl;
           }
 
           if (line.find("Vehicle_Type") != std::string::npos) {
@@ -252,6 +293,18 @@ int main(int argc, char ** argv) {
             // Create and add new road;
             double sdistance = std::atof(line.substr(line.find("=") + 1).c_str());
             vehicles.back() -> safedistance = sdistance;
+            std::cout << "Vehicle Safety Distance : " << sdistance << std::endl;
+          }
+          if (line.find("Vehicle_SpeedRatio") != std::string::npos) {
+            // Create and add new road;
+            double sdistance = std::atof(line.substr(line.find("=") + 1).c_str());
+            vehicles.back() -> speedRatio = sdistance;
+            std::cout << "Vehicle Speed Ratio : " << sdistance << std::endl;
+          }
+          if (line.find("Vehicle_TimeGap") != std::string::npos) {
+            // Create and add new road;
+            double sdistance = std::atof(line.substr(line.find("=") + 1).c_str());
+            vehicles.back() -> timeGap = sdistance;
             std::cout << "Vehicle Safety Distance : " << sdistance << std::endl;
           }
           // CHANGE MODE

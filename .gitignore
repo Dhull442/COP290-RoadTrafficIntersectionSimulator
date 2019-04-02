@@ -7,4 +7,5 @@ check
 *.o
 .*.cpp.swp
 *.txt
-main
+*.zip
+*/

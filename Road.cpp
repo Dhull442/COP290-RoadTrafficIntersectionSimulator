@@ -37,7 +37,7 @@ Road::Road(int id):Road(){
     this->id = id;
 }
 
-void Road::setDefaults(double maxspeed, double acceleration,double length, double width,int skill,double sdistance){
+void Road::setDefaults(double maxspeed, double acceleration,double length, double width,int skill,double sdistance,double sratio, double time, double clearance){
     // Input correctly < No checks here >
     this->default_maxspeed = maxspeed;
     this->default_acceleration = acceleration;
@@ -45,8 +45,10 @@ void Road::setDefaults(double maxspeed, double acceleration,double length, doubl
     this->default_width = width;
     this->default_skill = skill;
     this->default_safety_distance = sdistance;
-    // ADD TO CONFIG FILE LATER
-    this->sideClearance = 0.4;
+    this->default_speedratio = sratio;
+    this->default_timegap = time;
+    this->sideClearance = clearance;
+
 }
 
 // For adding vehicle
@@ -65,9 +67,7 @@ void Road::addVehicle(Vehicle* vehicle,std::string color) {
     newVehicle->reConstruct();
     newVehicle->currentPosition = this->initPosition(newVehicle);
     newVehicle->changingLane = false;
-    newVehicle->speedRatio = 3;
     newVehicle->lastLaneChange = -100;
-    newVehicle->timeGap = 2;
     newVehicle->verticalSpeed = 0;
     newVehicle->changeDirection = 1;
     newVehicle->verticalSpeed = 0;
@@ -362,7 +362,9 @@ double Road::firstObstacle(Vehicle* vehicle, double delT, double globalTime) {
             std::cout << "OBSTACLE == " << position << std::endl;
         } else {
             // Check the signal position, if signal is RED
-            if (position > this->signalPosition && this->signal.compare("RED") == 0) {
+            std::cout << vehicle->currentPosition.first << " "<< this->signalPosition << std::endl;
+            if (position > this->signalPosition && this->signal.compare("RED") == 0 && vehicle->currentPosition.first < this->signalPosition) {
+                std::cout << "SIGNAL"<< std::endl;
                 position = this->signalPosition;
             }
         }
