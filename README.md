@@ -49,7 +49,12 @@ To run you must specify a configuration `.ini` file as a command-line argument. 
  
  2. This shows how drivers navigate when there is congestion. Most drivers lane change aggressively to get out of the jam as soon as possible.
  
- 
+ <table>
+  <tr>
+    <td><img src="https://github.com/Dhull442/COP290-RoadTrafficIntersectionSimulator/raw/AnagBackend/gifs/Congestion_2D.gif"></td>
+    <td><img src="https://github.com/Dhull442/COP290-RoadTrafficIntersectionSimulator/raw/AnagBackend/gifs/Congestion_3D.gif"></td>
+  </tr>
+ </table>
  
 
 
